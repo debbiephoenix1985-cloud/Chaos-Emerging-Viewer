@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<!-- Firestorm emoji picker layout adapted to the Classic UI XUI schema -->
+<floater name="dp_emoji_picker" title="Choose Emoji" can_close="true"
+ can_drag_on_left="false" can_minimize="false" can_resize="false"
+ width="363" height="394" min_width="363" min_height="394" follows="left|top">
+    <button name="emoji_category_0" label="🕘" font="Emoji" left="7" bottom="-25" height="23" width="32"
+        tool_tip="Frequently used emojis" />
+    <button name="emoji_category_1" label="🔍" font="Emoji" left="40" bottom="-25" height="23" width="32"
+        tool_tip="All emojis" />
+    <button name="emoji_category_2" label="😀" font="Emoji" left="73" bottom="-25" height="23" width="32"
+        tool_tip="Smileys, people and body" />
+    <button name="emoji_category_3" label="🥬" font="Emoji" left="106" bottom="-25" height="23" width="32"
+        tool_tip="Animals and nature" />
+    <button name="emoji_category_4" label="🍔" font="Emoji" left="139" bottom="-25" height="23" width="32"
+        tool_tip="Food and drink" />
+    <button name="emoji_category_5" label="🛩" font="Emoji" left="172" bottom="-25" height="23" width="32"
+        tool_tip="Travel and places" />
+    <button name="emoji_category_6" label="🏈" font="Emoji" left="205" bottom="-25" height="23" width="32"
+        tool_tip="Activities" />
+    <button name="emoji_category_7" label="💡" font="Emoji" left="238" bottom="-25" height="23" width="32"
+        tool_tip="Objects" />
+    <button name="emoji_category_8" label="⚠" font="Emoji" left="271" bottom="-25" height="23" width="32"
+        tool_tip="Symbols" />
+    <button name="emoji_category_9" label="🌂" font="Emoji" left="304" bottom="-25" height="23" width="32"
+        tool_tip="Other emojis" />
+    <line_editor name="emoji_search" label="Search emoji or :shortcode:"
+        left="7" bottom="-55" width="348" height="22" follows="left|right|top" max_length="80" />
+    <text name="emoji_preview" font="SansSerifSmall" left="8" bottom="8"
+        width="330" height="20" follows="left|bottom">Choose an emoji to insert</text>
+</floater>

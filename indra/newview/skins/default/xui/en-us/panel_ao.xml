@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<panel name="animation_overrider_outer_panel" follows="all" visible="true" left="0" bottom="0" width="525" height="508">
+
+<!-- Main Panel -->
+
+	<panel name="animation_overrider_panel" follows="all" visible="true" left="14" bottom="15" width="500" height="470">
+
+		<combo_box name="ao_set_selection_combo" tool_tip="Select animation set to edit." allow_text_entry="true" max_chars="256" follows="top|left|right" left="0" bottom="435" width="394" height="24" />
+
+		<button name="ao_activate" tool_tip="Activate this animation set now." follows="top|right" left="398" bottom="435" width="24" height="24" label="" label_selected="" image_overlay="Activate_Checkmark" image_overlay_alignment="center" />
+
+		
+
+		<check_box name="ao_default" label="Default" tool_tip="Make this animation set the default set that plays when you log in." follows="top|left" left="0" bottom="402" width="114" height="20" />
+
+		<button name="ao_add" tool_tip="Create a new animation set." image_overlay="AddItem_Press" follows="top|right" left="430" bottom="435" width="26" height="24" label="" label_selected="" image_overlay_alignment="center" />
+
+		<button name="ao_remove" tool_tip="Remove this animation set." image_overlay="TrashItem_Press" follows="top|right" left="462" bottom="435" width="26" height="24" label="" label_selected="" image_overlay_alignment="center" />
+
+		<check_box name="ao_sit_override" label="Override Sits" tool_tip="Check this if you want sit animation overrides." follows="top|left" left="131" bottom="402" width="127" height="20" />
+
+		<check_box name="ao_smart" label="Be smart" tool_tip="Smart mode tries to determine if the sit override would clash with the object's own animation and disables the overrider temporarily." follows="top|left" left="269" bottom="402" width="155" height="20" />
+
+		<check_box name="ao_disable_stands_in_mouselook" label="Disable Stands in Mouselook" tool_tip="If you need to preserve your custom stand animation in mouselook, check this box." follows="top|left" left="0" bottom="372" width="280" height="20" />
+
+		<combo_box name="ao_state_selection_combo" tool_tip="Select animation state to edit." follows="top|left|right" left="0" bottom="337" width="488" height="26" />
+
+		<scroll_list name="ao_state_animation_list" multi_select="true" follows="all" left="0" bottom="147" width="450" height="180">
+			<scroll_list.columns name="icon" dynamic_width="false" width="20" />
+			<scroll_list.columns name="animation_name" dynamic_width="true" />
+		</scroll_list>
+
+		<panel name="ao_animation_move_trash_panel" follows="bottom|right" left="455" bottom="147" width="33" height="180">
+
+			<button name="ao_move_up" tool_tip="Move the selected animation up in the list." image_overlay="Arrow_Up" follows="left|bottom" left="0" bottom="144" width="30" height="29" label="" label_selected="" image_overlay_alignment="center" />
+
+			<button name="ao_move_down" tool_tip="Move the selected animation down in the list." image_overlay="Arrow_Down" follows="left|bottom" left="0" bottom="105" width="30" height="29" label="" label_selected="" image_overlay_alignment="center" />
+
+			<button name="ao_trash" tool_tip="Remove the selected animation from the list." image_overlay="TrashItem_Press" follows="left|bottom" left="0" bottom="6" width="30" height="29" label="" label_selected="" image_overlay_alignment="center" />
+		</panel>
+
+		<check_box name="ao_cycle" label="Cycle" tool_tip="Play a different animation from the list every time the animation state is called." follows="bottom|left" left="0" bottom="118" width="100" height="19" />
+
+		<check_box name="ao_randomize" label="Randomize order" tool_tip="Randomize order of animations in cycle mode." follows="bottom|left" left="145" bottom="118" width="160" height="19" />
+
+		<text name="ao_cycle_time_seconds_label" follows="bottom|left" left="0" bottom="85" width="168" height="22" halign="left">Cycle time (seconds):</text>
+
+		<spinner name="ao_cycle_time" tool_tip="Time before switching to the next animation in the list. Set this to 0 to disable automatic animation cycling." decimal_digits="0" initial_value="0" min_val="0" max_val="999" increment="1" follows="bottom|left" left="175" bottom="85" width="90" height="22" />
+
+		<button name="ao_reload" label="Reload" tool_tip="Reload animation overrider configuration." follows="bottom|left" left="0" bottom="43" width="112" height="28" />
+
+		<layout_stack name="next_previous_buttons_stack" orientation="horizontal" follows="bottom|left|right" left="125" bottom="43" width="299" height="28">
+
+		<layout_panel name="next_previous_buttons_stack_left" user_resize="false" follows="left|bottom" left="0" bottom="0" width="145" height="28">
+
+		<button name="ao_previous" image_overlay="BackArrow_Off" tool_tip="Switch to previous animation of the current state." follows="left|bottom" left="0" bottom="0" width="143" height="28" label="" label_selected="" image_overlay_alignment="center" />
+
+		</layout_panel>
+		<layout_panel name="next_previous_buttons_stack_right" user_resize="false" follows="left|bottom" left="153" bottom="0" width="145" height="28">
+
+		<button name="ao_next" image_overlay="ForwardArrow_Off" tool_tip="Switch to next animation of the current state." follows="left|bottom" left="0" bottom="0" width="143" height="28" label="" label_selected="" image_overlay_alignment="center" />
+
+		</layout_panel>
+		</layout_stack>
+
+		<button name="ao_less" tool_tip="Show small Animation Overrider interface." image_overlay="DisclosureArrow_Opened_Off" follows="bottom|right" left="460" bottom="43" width="30" height="28" label="" label_selected="" image_overlay_alignment="center" />
+
+	</panel>
+
+<!-- Reload Cover Panel -->
+
+	<panel name="ao_reload_cover" follows="all" visible="false" bg_alpha_color="Black_50" bg_opaque_color="Black_50" background_visible="true" background_opaque="true" mouse_opaque="true" left="0" bottom="0" width="525" height="508">
+
+		<panel name="ao_reload_text_panel" left="30" top="110" right="-30" bottom="-110" bg_alpha_color="Black_50" bg_opaque_color="Black_50" background_visible="true" background_opaque="true" follows="left|right|top">
+
+			<view_border name="ao_reload_view_border" left="0" top="0" right="-1" bottom="-1" follows="all" />
+			<text name="reload_label" left_delta="0" top_delta="16" halign="center" valign="center" follows="all">
+				Reloading Config
+			</text>
+			<text name="wait_label" v_pad="-4" bottom="-16" halign="center" valign="center" follows="all">
+				Please Wait
+			</text>
+
+			<layout_stack name="ao_reload_indicator_layout_stack" left="0" top="31" right="-1" height="32" orientation="horizontal" follows="top|left|right">
+			<layout_panel name="ao_reload_indicator_left_layout_panel" width="160" height="32" auto_resize="true" user_resize="false">
+			</layout_panel>
+			<layout_panel name="ao_reload_indicator_layout_panel" width="32" height="32" auto_resize="false" user_resize="false">
+			
+			</layout_panel>
+			<layout_panel name="ao_reload_indicator_right_layout_panel" width="160" height="32" auto_resize="true" user_resize="false">
+			</layout_panel>
+			</layout_stack>
+
+		</panel>
+	</panel>
+
+<!-- Small Panel -->
+
+	<panel name="animation_overrider_panel_small" visible="false" follows="bottom|left|right" left="14" bottom="13" width="500" height="65">
+
+	<combo_box name="ao_set_selection_combo_small" tool_tip="Select animation set to edit." follows="top|left|right" left="0" bottom="36" width="400" height="24" />
+
+	<button name="ao_more" tool_tip="Show full interface for configuration." image_overlay="Edit_Wrench" follows="top|right" left="411" bottom="36" width="32" height="24" label="" label_selected="" image_overlay_alignment="center" />
+
+	<button name="ao_previous_small" image_overlay="BackArrow_Off" tool_tip="Switch to previous animation of the current state." follows="bottom|left" left="0" bottom="5" width="124" height="24" label="" label_selected="" image_overlay_alignment="center" />
+
+	<button name="ao_next_small" image_overlay="ForwardArrow_Off" tool_tip="Switch to next animation of the current state." follows="bottom|left" left="135" bottom="5" width="124" height="24" label="" label_selected="" image_overlay_alignment="center" />
+
+	<check_box name="ao_sit_override_small" label="Sits" tool_tip="Check this if you want sit animation overrides." follows="bottom|left" left="270" bottom="5" width="167" height="20" />
+
+	</panel>
+</panel>

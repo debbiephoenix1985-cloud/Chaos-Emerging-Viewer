@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<panel name="chaos" label="Chaos" border="true" top="20" width="517" height="454" follows="left|top|right|bottom">
+ <tab_container name="Chaos features" tab_position="top" left="0" bottom="-450" width="500" height="444">
+  <panel name="chaos_new_prims" label="New prims" border="true" left="0" bottom="-430" width="495" height="425">
+   <check_box name="prim_enable" control_name="ChaosPrimEnable" label="Use my default settings when creating new prims" left="14" bottom="-27" width="452" height="18"/>
+   <text name="prim_dimensions" left="14" bottom="-57" width="440" height="18">New prim dimensions (metres):</text>
+   <spinner name="prim_x" control_name="ChaosPrimSizeX" label="X" label_width="18" left="14" bottom="-80" width="118" height="18" min_val="0.01" max_val="64" increment="0.05" decimal_digits="3"/>
+   <spinner name="prim_y" control_name="ChaosPrimSizeY" label="Y" label_width="18" left="155" bottom="-80" width="118" height="18" min_val="0.01" max_val="64" increment="0.05" decimal_digits="3"/>
+   <spinner name="prim_z" control_name="ChaosPrimSizeZ" label="Z" label_width="18" left="297" bottom="-80" width="118" height="18" min_val="0.01" max_val="64" increment="0.05" decimal_digits="3"/>
+   <text name="prim_material_label" left="14" bottom="-109" width="130" height="18">Default material:</text>
+   <combo_box name="prim_material" control_name="ChaosPrimMaterial" left="139" bottom="-108" width="176" height="19" allow_text_entry="false">
+    <combo_item name="wood" value="3">Wood</combo_item>
+    <combo_item name="stone" value="0">Stone</combo_item>
+    <combo_item name="metal" value="1">Metal</combo_item>
+    <combo_item name="glass" value="2">Glass</combo_item>
+    <combo_item name="plastic" value="5">Plastic</combo_item>
+    <combo_item name="rubber" value="6">Rubber</combo_item>
+    <combo_item name="flesh" value="4">Flesh</combo_item>
+   </combo_box>
+   <check_box name="prim_physical" control_name="ChaosPrimPhysical" label="Physical" left="14" bottom="-141" width="118" height="18"/>
+   <check_box name="prim_phantom" control_name="ChaosPrimPhantom" label="Phantom" left="155" bottom="-141" width="118" height="18"/>
+   <check_box name="prim_temporary" control_name="ChaosPrimTemporary" label="Temporary" left="297" bottom="-141" width="130" height="18"/>
+   <text name="prim_appearance_label" left="14" bottom="-170" width="400" height="18">Appearance applied after the new prim is created:</text>
+   <color_swatch name="prim_color" control_name="ChaosPrimColor" label="Prim colour" can_apply_immediately="true" color="1 1 1 1" left="14" bottom="-251" width="89" height="70"/>
+   <check_box name="prim_fullbright" control_name="ChaosPrimFullbright" label="Fullbright" left="125" bottom="-191" width="150" height="18"/>
+   <spinner name="prim_glow" control_name="ChaosPrimGlow" label="Glow" label_width="44" left="125" bottom="-218" width="193" height="18" min_val="0" max_val="1" increment="0.01" decimal_digits="2"/>
+   <text name="prim_texture_label" left="14" bottom="-278" width="440" height="18">Texture asset UUID (optional; blank keeps the default):</text>
+   <line_editor name="prim_texture" control_name="ChaosPrimTextureUUID" left="14" bottom="-303" width="455" height="20" max_length="36"/>
+   <text name="prim_note_a" left="14" bottom="-353" width="455" height="16">Only newly created prims receive these defaults.</text>
+   <text name="prim_note_b" left="14" bottom="-375" width="455" height="16">Existing objects are not changed.</text>
+  </panel>
+  <panel name="chaos_beams" label="Selection beams" border="true" left="0" bottom="-430" width="495" height="425">
+   <text name="beam_header" left="14" bottom="-29" width="462" height="30">Customise the selection-beam particles shown on your screen.</text>
+   <text name="beam_style_label" left="14" bottom="-69" width="120" height="18">Beam shape:</text>
+   <combo_box name="beam_style" control_name="ChaosBeamStyle" left="145" bottom="-67" width="207" height="20" allow_text_entry="false">
+    <combo_item name="beam_classic" value="0">Classic (unchanged)</combo_item>
+    <combo_item name="beam_spiral" value="1">Spiral</combo_item>
+    <combo_item name="beam_wave" value="2">Wave</combo_item>
+    <combo_item name="beam_helix" value="3">Double helix</combo_item>
+   </combo_box>
+   <text name="beam_colors_label" left="14" bottom="-102" width="370" height="18">Custom particle colours:</text>
+   <color_swatch name="beam_start" control_name="ChaosBeamStartColor" label="Start colour" can_apply_immediately="true" left="14" bottom="-195" width="93" height="82" color="0.8 0.4 1 1"/>
+   <color_swatch name="beam_end" control_name="ChaosBeamEndColor" label="End colour" can_apply_immediately="true" left="133" bottom="-195" width="93" height="82" color="0.3 1 1 1"/>
+   <check_box name="beam_rainbow" control_name="ChaosBeamRainbow" label="Rainbow colour cycling" left="257" bottom="-137" width="205" height="18"/>
+   <spinner name="beam_size" control_name="ChaosBeamSize" label="Particle width" label_width="125" left="14" bottom="-238" width="286" height="20" min_val="0.02" max_val="0.5" increment="0.01" decimal_digits="2"/>
+   <spinner name="beam_radius" control_name="ChaosBeamRadius" label="Shape radius" label_width="125" left="14" bottom="-270" width="286" height="20" min_val="0" max_val="1" increment="0.01" decimal_digits="2"/>
+   <text name="beam_note_a" left="14" bottom="-327" width="455" height="16">Beam changes are local to your viewer.</text>
+   <text name="beam_note_b" left="14" bottom="-349" width="455" height="16">Classic uses the original Cool VL appearance.</text>
+   <text name="beam_note_c" left="14" bottom="-371" width="455" height="16">Other styles use your colours, width and radius.</text>
+  </panel>
+  <panel name="chaos_im" label="IM auto-response" border="true" left="0" bottom="-430" width="495" height="425">
+   <check_box name="im_enable" control_name="ChaosIMEnable" label="Enable advanced IM auto-response" left="14" bottom="-28" width="454" height="18"/>
+   <text name="im_audience_label" left="14" bottom="-62" width="114" height="18">Send replies to:</text>
+   <combo_box name="im_audience" control_name="ChaosIMAudience" left="135" bottom="-61" width="245" height="19" allow_text_entry="false">
+    <combo_item name="im_all" value="0">Everyone (individual IMs)</combo_item>
+    <combo_item name="im_friends" value="1">Friends only</combo_item>
+    <combo_item name="im_nonfriends" value="2">Non-friends only</combo_item>
+    <combo_item name="im_muted" value="3">Muted avatars only</combo_item>
+   </combo_box>
+   <text name="im_message_label" left="14" bottom="-93" width="465" height="18">Automatic message:</text>
+   <line_editor name="im_message" control_name="ChaosIMMessage" left="14" bottom="-121" width="456" height="22" max_length="800"/>
+   <check_box name="im_repeat" control_name="ChaosIMRepeat" label="Repeat the text response for every new message (may be intrusive)" left="14" bottom="-155" width="458" height="20"/>
+   <check_box name="im_give" control_name="ChaosIMGiveItem" label="Offer an inventory item once per sender" left="14" bottom="-192" width="420" height="20"/>
+   <text name="im_itemlabel" left="14" bottom="-220" width="461" height="18">Inventory item UUID (optional, must be transferable):</text>
+   <line_editor name="im_itemid" control_name="ChaosIMItemUUID" left="14" bottom="-247" width="456" height="22" max_length="36"/>
+   <text name="im_note_a" left="14" bottom="-300" width="455" height="16">Replies only to direct avatar IMs.</text>
+   <text name="im_note_b" left="14" bottom="-322" width="455" height="16">No group chat, objects, bots or system messages.</text>
+   <text name="im_note_c" left="14" bottom="-344" width="455" height="16">Existing Busy and Away replies take priority.</text>
+   <text name="im_note_d" left="14" bottom="-366" width="455" height="16">Items are offered only when separately enabled.</text>
+  </panel>
+  <panel name="chaos_name_colors" label="Name-tag colours" border="true" left="0" bottom="-430" width="495" height="425">
+   <check_box name="name_colors_enable" control_name="ChaosNameColorsEnabled" label="Use custom name-tag colours" left="14" bottom="-30" width="455" height="20"/>
+   <text name="name_colors_heading" left="14" bottom="-62" width="465" height="18">Select colours for different avatar categories:</text>
+   <color_swatch name="name_default" control_name="ChaosNameColorDefault" label="Other avatars" left="14" bottom="-172" width="100" height="84" can_apply_immediately="true" color="0.95 0.86 0.76 1"/>
+   <color_swatch name="name_self" control_name="ChaosNameColorSelf" label="Your avatar" left="173" bottom="-172" width="100" height="84" can_apply_immediately="true" color="0.72 0.95 0.98 1"/>
+   <color_swatch name="name_friend" control_name="ChaosNameColorFriend" label="Friends" left="332" bottom="-172" width="100" height="84" can_apply_immediately="true" color="0.45 0.92 0.53 1"/>
+   <color_swatch name="name_muted" control_name="ChaosNameColorMuted" label="Muted avatars" left="14" bottom="-284" width="100" height="84" can_apply_immediately="true" color="0.67 0.67 0.67 1"/>
+   <color_swatch name="name_estate" control_name="ChaosNameColorEstate" label="Estate owners" left="173" bottom="-284" width="100" height="84" can_apply_immediately="true" color="1 0.74 0.35 1"/>
+   <color_swatch name="name_admin" control_name="ChaosNameColorAdmin" label="Known admins" left="332" bottom="-284" width="100" height="84" can_apply_immediately="true" color="1 0.54 0.56 1"/>
+   <text name="name_note_a" left="14" bottom="-327" width="454" height="16">Colours apply locally to the names above avatars.</text>
+   <text name="name_note_b" left="14" bottom="-350" width="454" height="16">Known admins require grid-provided staff-name data.</text>
+   <text name="name_note_c" left="14" bottom="-373" width="454" height="16">Turn off to retain existing viewer and Lua colours.</text>
+  </panel>
+  <panel name="chaos_em_physics" label="Emerald Physics" border="true" left="0" bottom="-430" width="495" height="425">
+   <check_box name="emerald_enable" control_name="ChaosEmeraldPhysicsEnabled" label="Enable classic Emerald breast physics (local only)" left="14" bottom="-28" width="462" height="18"/>
+   <check_box name="emerald_self" control_name="ChaosEmeraldPhysicsSelf" label="Apply to my avatar" left="14" bottom="-57" width="210" height="18"/>
+   <check_box name="emerald_others" control_name="ChaosEmeraldPhysicsOthers" label="Apply to nearby avatars" left="243" bottom="-57" width="234" height="18"/>
+   <text name="emerald_header" left="14" bottom="-89" width="465" height="18">Original Emerald / Phoenix-style controls (0 - 100):</text>
+   <spinner name="emerald_mass" control_name="ChaosEmeraldPhysicsMass" label="Breast mass" label_width="170" left="14" bottom="-119" width="303" height="19" min_val="0" max_val="100" increment="1" decimal_digits="0"/>
+   <spinner name="emerald_rebound" control_name="ChaosEmeraldPhysicsRebound" label="Breast rebound" label_width="170" left="14" bottom="-151" width="303" height="19" min_val="0" max_val="100" increment="1" decimal_digits="0"/>
+   <spinner name="emerald_friction" control_name="ChaosEmeraldPhysicsFriction" label="Breast friction" label_width="170" left="14" bottom="-183" width="303" height="19" min_val="0" max_val="100" increment="1" decimal_digits="0"/>
+   <spinner name="emerald_min_vel" control_name="ChaosEmeraldPhysicsMinVelocity" label="Breast minimum velocity" label_width="170" left="14" bottom="-215" width="303" height="19" min_val="0" max_val="100" increment="1" decimal_digits="0"/>
+   <spinner name="emerald_max_vel" control_name="ChaosEmeraldPhysicsMaxVelocity" label="Breast maximum velocity" label_width="170" left="14" bottom="-247" width="303" height="19" min_val="0" max_val="100" increment="1" decimal_digits="0"/>
+   <spinner name="emerald_z" control_name="ChaosEmeraldPhysicsZInfluence" label="Vertical (Z) influence" label_width="170" left="14" bottom="-279" width="303" height="19" min_val="0" max_val="100" increment="1" decimal_digits="0"/>
+   <text name="emerald_note1" left="14" bottom="-329" width="460" height="16">Works from avatar movement, without a physics clothing layer.</text>
+   <text name="emerald_note2" left="14" bottom="-351" width="460" height="16">Visible only in Chaos Emerging; no changes sent to the grid.</text>
+   <text name="emerald_note3" left="14" bottom="-373" width="460" height="16">Disabled by default. Standard avatar physics is unchanged.</text>
+  </panel>
+ </tab_container>
+</panel>

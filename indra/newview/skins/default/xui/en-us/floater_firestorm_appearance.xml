@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!-- Firestorm 7.1.13 Appearance window composition port: visual organization from floater_my_appearance.xml, sidepanel_appearance.xml, panel_outfits_inventory.xml and panel_outfit_edit.xml; adapted to Cool VL v1 UI controls and native outfit actions. -->
+<floater name="firestorm appearance" title="Appearance" rect_control="FloaterCustomizeAppearanceRect" can_close="true" can_minimize="true" can_resize="false" can_drag_on_left="false" width="580" height="655" min_width="580" min_height="655">
+<icon name="outfit_header_icon" image_name="Default_Outfit_Photo" left="10" bottom="-73" width="35" height="35" follows="left|top" />
+<text name="look_state" font="SansSerifSmall" left="48" bottom="-33" width="445" height="16">Current Outfit</text>
+<text name="current_look" font="SansSerifLargeBold" left="48" bottom="-57" width="465" height="21">Current Outfit</text>
+<button name="edit_current" label="Edit" font="SansSerif" left="516" bottom="-59" width="56" height="27" follows="right|top" />
+<line_editor name="outfit_filter" label="Filter Outfits" font="SansSerifSmall" left="10" bottom="-98" width="559" height="20" follows="left|right|top" />
+<tab_container name="appearance_tabs" tab_position="top" tab_min_width="94" left="7" bottom="-574" width="567" height="470" follows="left|top|right|bottom">
+<panel name="gallery_panel" label="Outfit Gallery" border="false" mouse_opaque="true" left="0" bottom="0" width="565" height="449" follows="all">
+<view_border name="photo_frame_0" bevel_style="line" border_thickness="1" left="12" bottom="-121" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_0" image_name="Default_Outfit_Photo" left="16" bottom="-116" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_0" label="Outfit" font="SansSerifSmall" halign="center" left="12" bottom="-144" width="160" height="19" follows="top|left"/>
+<view_border name="photo_frame_1" bevel_style="line" border_thickness="1" left="198" bottom="-121" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_1" image_name="Default_Outfit_Photo" left="202" bottom="-116" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_1" label="Outfit" font="SansSerifSmall" halign="center" left="198" bottom="-144" width="160" height="19" follows="top|left"/>
+<view_border name="photo_frame_2" bevel_style="line" border_thickness="1" left="384" bottom="-121" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_2" image_name="Default_Outfit_Photo" left="388" bottom="-116" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_2" label="Outfit" font="SansSerifSmall" halign="center" left="384" bottom="-144" width="160" height="19" follows="top|left"/>
+<view_border name="photo_frame_3" bevel_style="line" border_thickness="1" left="12" bottom="-261" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_3" image_name="Default_Outfit_Photo" left="16" bottom="-256" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_3" label="Outfit" font="SansSerifSmall" halign="center" left="12" bottom="-284" width="160" height="19" follows="top|left"/>
+<view_border name="photo_frame_4" bevel_style="line" border_thickness="1" left="198" bottom="-261" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_4" image_name="Default_Outfit_Photo" left="202" bottom="-256" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_4" label="Outfit" font="SansSerifSmall" halign="center" left="198" bottom="-284" width="160" height="19" follows="top|left"/>
+<view_border name="photo_frame_5" bevel_style="line" border_thickness="1" left="384" bottom="-261" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_5" image_name="Default_Outfit_Photo" left="388" bottom="-256" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_5" label="Outfit" font="SansSerifSmall" halign="center" left="384" bottom="-284" width="160" height="19" follows="top|left"/>
+<view_border name="photo_frame_6" bevel_style="line" border_thickness="1" left="12" bottom="-401" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_6" image_name="Default_Outfit_Photo" left="16" bottom="-396" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_6" label="Outfit" font="SansSerifSmall" halign="center" left="12" bottom="-424" width="160" height="19" follows="top|left"/>
+<view_border name="photo_frame_7" bevel_style="line" border_thickness="1" left="198" bottom="-401" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_7" image_name="Default_Outfit_Photo" left="202" bottom="-396" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_7" label="Outfit" font="SansSerifSmall" halign="center" left="198" bottom="-424" width="160" height="19" follows="top|left"/>
+<view_border name="photo_frame_8" bevel_style="line" border_thickness="1" left="384" bottom="-401" width="149" height="102" follows="top|left"/>
+<icon name="outfit_photo_8" image_name="Default_Outfit_Photo" left="388" bottom="-396" width="141" height="93" follows="top|left"/>
+<button name="outfit_tile_8" label="Outfit" font="SansSerifSmall" halign="center" left="384" bottom="-424" width="160" height="19" follows="top|left"/>
+</panel>
+<panel name="outfits_panel" label="Outfits" border="false" left="0" bottom="0" width="565" height="449" follows="all"><scroll_list name="outfits_list" draw_heading="false" draw_stripes="true" multi_select="false" left="5" bottom="5" width="550" height="435" follows="all"><column name="name" label="Outfits" dynamicwidth="true"/></scroll_list></panel>
+<panel name="wearing_panel" label="Wearing" border="false" left="0" bottom="0" width="565" height="449" follows="all"><scroll_list name="wearing_list" draw_heading="false" draw_stripes="false" multi_select="false" left="5" bottom="5" width="550" height="435" follows="all"><column name="name" label="Wearables and attachments" dynamicwidth="true"/></scroll_list></panel>
+</tab_container>
+<panel name="edit_parts_panel" visible="false" border="false" left="7" bottom="-574" width="567" height="470" follows="all">
+<button name="back_to_outfits" label="Back" left="8" bottom="-33" width="70" height="25" follows="top|left" />
+<text name="edit_parts_title" font="SansSerifLargeBold" left="91" bottom="-34" width="440" height="26">Edit Outfit Parts</text>
+<tab_container name="edit_parts_tabs" tab_position="top" tab_min_width="105" left="5" bottom="0" width="558" height="426" follows="all">
+<panel name="clothing_panel" label="Clothing" border="false" left="0" bottom="0" width="555" height="401"><scroll_list name="clothing_list" draw_heading="false" multi_select="false" draw_stripes="false" left="3" bottom="7" width="548" height="385" follows="all"><column name="name" label="Clothing" dynamicwidth="true"/></scroll_list></panel>
+<panel name="attachments_panel" label="Attachments" border="false" left="0" bottom="0" width="555" height="401"><scroll_list name="attachments_list" draw_heading="false" multi_select="false" draw_stripes="false" left="3" bottom="7" width="548" height="385" follows="all"><column name="name" label="Attachments" dynamicwidth="true"/></scroll_list></panel>
+<panel name="bodyparts_panel" label="Body Parts" border="false" left="0" bottom="0" width="555" height="401"><scroll_list name="bodyparts_list" draw_heading="false" multi_select="false" draw_stripes="false" left="3" bottom="7" width="548" height="385" follows="all"><column name="name" label="Body Parts" dynamicwidth="true"/></scroll_list></panel>
+</tab_container>
+<button name="add_more" label="Add More..." font="SansSerif" left="12" bottom="-456" width="120" height="21" follows="bottom|left" />
+<button name="native_edit" label="Edit Shape / Wearables..." font="SansSerif" left="142" bottom="-456" width="184" height="21" follows="bottom|left" />
+</panel>
+<text name="outfit_count" font="SansSerifSmall" left="15" bottom="-593" height="17" width="175" follows="bottom|left">0 Outfits</text>
+<text name="complexity" font="SansSerifSmall" left="390" bottom="-593" height="17" width="178" follows="bottom|right" halign="right">Complexity: 0</text>
+<button name="page_previous" label="&#x25C0;" left="208" bottom="-596" width="42" height="21" follows="bottom|left" />
+<text name="page_label" font="SansSerifSmall" left="250" bottom="-590" width="75" height="16" halign="center">1 / 1</text>
+<button name="page_next" label="&#x25B6;" left="325" bottom="-596" width="42" height="21" follows="bottom|left" />
+<button name="save_as" label="Save as..." font="SansSerif" left="9" bottom="-636" width="120" height="25" follows="bottom|left" />
+<button name="wear_outfit" label="Wear" font="SansSerif" left="134" bottom="-636" width="93" height="25" follows="bottom|left" />
+<button name="add_outfit" label="Add" font="SansSerif" left="232" bottom="-636" width="78" height="25" follows="bottom|left" />
+<button name="outfit_image" label="Outfit Image..." font="SansSerif" left="316" bottom="-636" width="123" height="25" follows="bottom|left" />
+<button name="edit_parts" label="Edit Outfit Parts" font="SansSerif" left="443" bottom="-636" width="127" height="25" follows="bottom|right" />
+</floater>

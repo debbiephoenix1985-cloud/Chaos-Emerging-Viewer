@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!-- Firestorm-era Contacts / Friends / Groups structure, connected to the
+     existing viewer friend and group implementations. No fake panels. -->
+<multi_floater name="contacts" title="Contacts" can_close="false" can_minimize="false" can_resize="true" can_drag_on_left="false" width="452" min_width="340" height="358" min_height="250" follows="top|left|right|bottom">
+	<tab_container name="Preview Tabs" tab_position="top" tab_width="92" follows="left|right|top|bottom" left="0" bottom="0" width="452" height="355" />
+</multi_floater>

@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<floater name="groups" title="Groups" rect_control="FloaterGroupsRect" can_close="true" can_drag_on_left="false" can_minimize="true" can_resize="true" can_tear_off="false" width="452" min_width="360" height="333" min_height="270" follows="top|right">
+	<text name="groupdesc" font="SansSerifSmall" length="1" enabled="true" mouse_opaque="false" halign="left" tab_stop="false" drop_shadow_visible="true" left="8" width="315" height="16" follows="left|right|top" top="-23" right="-94" visible="false">
+		Your currently active group is displayed in bold.
+	</text>
+	<scroll_list name="group list" enabled="true" mouse_opaque="true" multi_select="false" tab_stop="true" column_padding="0" background_visible="true" draw_heading="true" draw_stripes="true" draw_border="true" follows="all" left="6" bottom="26" width="346" height="283">
+		<column name="name" label="Group name" dynamicwidth="true" tool_tip="Double-click to start an IM session with a group" />
+		<column name="profile" image="ff_visible_online_button.tga" width="20" tool_tip="Group is visible in profile." />
+		<column name="chat" image="fg_chat_button.tga" width="20" tool_tip="Receive group chat." />
+		<column name="notices" image="fg_notices_button.tga" width="20" tool_tip="Receive group notices." />
+	</scroll_list>
+	<text name="groupcount" font="SansSerifSmall" length="1" enabled="true" mouse_opaque="false" halign="left" tab_stop="false" drop_shadow_visible="true" follows="bottom|left" left="6" bottom="4" width="347" height="16">
+		You belong to [COUNT] groups (of [MAX] maximum).
+	</text>
+	<text name="filter_text" font="SansSerifSmall" left="9" bottom="5" width="40" height="16" follows="bottom|left" visible="false">
+		Filter:
+	</text>
+	<search_editor name="filter_search" font="SansSerifSmall" label="Type the search string here" tool_tip="Type a search string here to filter by group names in the list." height="16" width="277" left="51" bottom="4" right="-94" follows="bottom|left|right" visible="false" />
+	<button name="Activate" label="Activate" font="SansSerif" mouse_opaque="true" enabled="false" follows="right|top" left="364" bottom="203" width="81" height="24" />
+	<button name="Info" label="Profile" font="SansSerif" mouse_opaque="true" follows="right|top" left="364" bottom="259" width="81" height="24" />
+	<button name="Titles..." label="Group Titles" font="SansSerif" mouse_opaque="true" follows="right|top" left="364" bottom="231" width="81" height="24" />
+	<button name="IM" label="IM/Call" font="SansSerif" mouse_opaque="true" follows="right|top" left="364" bottom="287" width="81" height="24" />
+	<button name="Leave" label="Leave" font="SansSerif" mouse_opaque="true" follows="right|top" left="364" bottom="175" width="81" height="24" />
+	<button name="Create" label="Create..." font="SansSerif" mouse_opaque="true" follows="right|top" left="364" bottom="147" width="81" height="24" />
+	<button name="Search..." label="Search..." font="SansSerif" mouse_opaque="true" follows="right|top" left="364" bottom="119" width="81" height="24" />
+	<button name="OK" label="OK" font="SansSerif" mouse_opaque="true" width="81" height="23" follows="top|right" top="-255" right="-7" visible="false" />
+	<string name="none">
+		none
+	</string>
+<button name="Invite..." label="Invite..." font="SansSerif" tool_tip="Invite residents to the selected group" follows="right|top" left="364" bottom="91" width="81" height="24" /></floater>

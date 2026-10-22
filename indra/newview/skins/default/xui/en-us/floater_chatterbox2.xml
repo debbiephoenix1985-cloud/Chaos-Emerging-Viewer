@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!-- Layout adapted from the real Firestorm 4.6.9 Conversations window.
+     Uses existing Chaos Emerging Viewer multi-floater and IM controls. -->
+<multi_floater name="communicate" title="Conversations - Contacts" rect_control="ChatterboxRect" can_close="true" can_drag_on_left="false" can_minimize="true" can_resize="true" width="580" height="380" follows="top|left" min_width="575" min_height="375">
+	<tab_container name="Preview Tabs" tab_position="left" tab_width="118" follows="left|right|top|bottom" left="1" bottom="2" width="578" height="355" />
+</multi_floater>

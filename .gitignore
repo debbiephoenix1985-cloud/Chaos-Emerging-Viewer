@@ -1,0 +1,49 @@
+# Local build outputs and caches
+/build*/
+/viewer-win64-release/
+/Build*/
+/CMakeFiles/
+/CMakeCache.txt
+/.vs/
+/.vscode/
+/bin/
+/lib/
+/include/
+/resources/
+/installed.xml
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.suo
+*.user
+*.obj
+*.pch
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.lib
+*.exp
+*.msi
+*.msix
+*.zip
+*.tar
+*.7z
+*.tar.bz2
+*.log
+*.cache
+# Secrets, keys and credentials
+*.pfx
+*.p12
+*.pem
+*.key
+*.kdbx
+.env
+.env.*
+# Local development snapshots
+**/patch_backups/
+**/*_before_*/
+**/Build*_checkpoint/
+# Not a publishing channel for third-party voice SDK files
+**/SLVoice.exe
+**/vivoxsdk*
