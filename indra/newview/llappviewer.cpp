@@ -901,7 +901,7 @@ LLApp::InitState LLAppViewer::init()
 
 	// Need to do this initialization before we do anything else, since
 	// anything that touches files should really go through the lldir API
-	gDirUtil.initAppDirs("ChaosEmergingViewer");
+	gDirUtil.initAppDirs("Chaos Emerging");
 	// Set skin search path to default, will be overridden later: this allows
 	// simple skinned file lookups to work
 	gDirUtil.setSkinFolder("default");
