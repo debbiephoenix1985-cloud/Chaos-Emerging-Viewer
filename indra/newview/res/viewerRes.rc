@@ -145,8 +145,8 @@ TOOLNO                      CURSOR              "llno.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,32,4,231
- PRODUCTVERSION 1,32,4,231
+ FILEVERSION 1,32,4,232
+ PRODUCTVERSION 1,32,4,232
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -163,12 +163,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Chaos Emerging Viewer"
             VALUE "FileDescription", "Chaos Emerging Viewer"
-            VALUE "FileVersion", "1.32.4.231"
+            VALUE "FileVersion", "1.32.4.232"
             VALUE "InternalName", "ChaosEmergingViewer"
             VALUE "LegalCopyright", "Copyright ? 2001-2026 Linden Research, Inc., Henri Beauchamp and other Open Source developers"
             VALUE "OriginalFilename", "ChaosEmergingViewer.exe"
             VALUE "ProductName", "Chaos Emerging Viewer"
-            VALUE "ProductVersion", "1.32.4.231"
+            VALUE "ProductVersion", "1.32.4.232"
         END
     END
     BLOCK "VarFileInfo"

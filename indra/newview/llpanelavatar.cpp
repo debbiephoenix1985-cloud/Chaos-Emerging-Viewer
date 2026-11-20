@@ -1132,6 +1132,30 @@ bool LLPanelAvatarPicks::postBuild()
 	return true;
 }
 
+// Match Firestorm 7.2.5 OpenSim behaviour: the simulator can advertise
+// MaxProfilePicks in its SimulatorFeatures. OpenSim does not ordinarily
+// provide Second Life account-level benefits, so using the latter alone
+// incorrectly limits profile Picks to the SL default of ten.
+static S32 getGridProfilePicksLimit()
+{
+	if (gIsInSecondLife)
+	{
+		return LLEconomy::getInstance()->getPicksLimit();
+	}
+
+	// Firestorm fallback for OpenSim grids without MaxProfilePicks.
+	constexpr S32 OPENSIM_PROFILE_PICKS_FALLBACK = 20;
+	if (gAgent.getRegion())
+	{
+		const LLSD& features = gAgent.getRegion()->getSimulatorFeatures();
+		if (features.has("MaxProfilePicks"))
+		{
+			return llmax(0, features["MaxProfilePicks"].asInteger());
+		}
+	}
+	return OPENSIM_PROFILE_PICKS_FALLBACK;
+}
+
 void LLPanelAvatarPicks::refresh()
 {
 	bool is_self = getPanelAvatar()->getAvatarID() == gAgentID;
@@ -1139,7 +1163,7 @@ void LLPanelAvatarPicks::refresh()
 	S32 tab_count = mPicksTab ? mPicksTab->getTabCount() : 0;
 	if (mButtonNew)
 	{
-		S32 max_picks = LLEconomy::getInstance()->getPicksLimit();
+		S32 max_picks = getGridProfilePicksLimit();
 		mButtonNew->setEnabled(is_self && tab_count < max_picks);
 		mButtonNew->setVisible(is_self && editable);
 	}
@@ -1249,7 +1273,11 @@ void LLPanelAvatarPicks::processAvatarPicksReply(LLAvatarPicks* datap)
 void LLPanelAvatarPicks::onClickNew(void* datap)
 {
 	LLPanelAvatarPicks* self = (LLPanelAvatarPicks*)datap;
-	if (!self) return;
+	if (!self || !self->mPicksTab ||
+		self->mPicksTab->getTabCount() >= getGridProfilePicksLimit())
+	{
+		return;
+	}
 
 //MK
 	if (gRLenabled && gRLInterface.mContainsShowloc)

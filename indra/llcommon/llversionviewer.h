@@ -33,8 +33,8 @@
 constexpr S32 LL_VERSION_MAJOR = 1;
 constexpr S32 LL_VERSION_MINOR = 32;
 constexpr S32 LL_VERSION_BRANCH = 4;
-constexpr S32 LL_VERSION_RELEASE = 231;
+constexpr S32 LL_VERSION_RELEASE = 232;
 
 // Include the build identifier in the advertised viewer channel, login and
 // About information so separate Chaos Emerging builds are identifiable.
-const char* const LL_CHANNEL = "Chaos Emerging Viewer 231";
+const char* const LL_CHANNEL = "Chaos Emerging Viewer 232";
