@@ -1046,7 +1046,7 @@ void LLToolDragAndDrop::dropTextureOneFace(LLViewerObject* hit_objp,
 		return;
 	}
 #endif
-	const LLUUID& asset_id = itemp->getAssetUUID();
+	const LLUUID asset_id = itemp->getAssetUUID();
 	if (!handleDropAssetProtections(hit_objp, itemp, source, src_id))
 	{
 		return;
@@ -1063,7 +1063,7 @@ void LLToolDragAndDrop::dropTextureOneFace(LLViewerObject* hit_objp,
 	gViewerStats.incStat(LLViewerStats::ST_EDIT_TEXTURE_COUNT);
 
 	LLPanelFace* panelp =
-		LLFloaterTools::isVisible() ? gFloaterToolsp->getPanelFace() : NULL;
+		(LLFloaterTools::isVisible() && gFloaterToolsp) ? gFloaterToolsp->getPanelFace() : NULL;
 
 	LLTextureEntry* tep = hit_objp ? hit_objp->getTE(hit_face) : NULL;
 
@@ -2697,7 +2697,7 @@ EAcceptance LLToolDragAndDrop::dad3dApplyToObject(LLViewerObject* objp,
 				if (nodep && LLFloaterTools::isVisible() &&
 					// If the diffuse channel is being selected only
 					gSelectMgr.getTextureChannel() == 0 &&
-					(S32)nodep->mSavedGLTFMaterialIds.size() > face)
+					nodep->mSavedTextures.size() > face)
 				{
 					LLViewerTexture* texp = objp->getTEImage(face);
 					nodep->mSavedTextures[face] = texp ? texp->getID()
