@@ -2227,6 +2227,17 @@ bool LLScrollListCtrl::selectItemAt(S32 x, S32 y, MASK mask)
 	return selection_changed;
 }
 
+// Firestorm AO editor needs a row-specific right-click callback. This native
+// scroll-list hook is inert for all controls that do not register one.
+bool LLScrollListCtrl::handleRightMouseDown(S32 x, S32 y, MASK mask)
+{
+    if (mRightMouseDownCallback)
+    {
+        mRightMouseDownCallback(this, x, y, mask);
+        return true;
+    }
+    return LLUICtrl::handleRightMouseDown(x, y, mask);
+}
 bool LLScrollListCtrl::handleMouseDown(S32 x, S32 y, MASK mask)
 {
 	if (childrenHandleMouseDown(x, y, mask) == NULL)

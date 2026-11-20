@@ -919,6 +919,8 @@ void LLInvFVBridge::getClipboardEntries(bool show_asset_id,
 			items.emplace_back("Copy Separator");
 		}
 		items.emplace_back("Copy");
+        // Firestorm 7.2.5 FIRE-36793: inventory item/folder Copy Name.
+        items.emplace_back("Copy Name");
 		if (!isItemCopyable())
 		{
 			disabled_items.emplace_back("Copy");
@@ -1401,7 +1403,17 @@ void LLItemBridge::performAction(LLFolderView* folderp,
 	{
 		HBFloaterThumbnail::showInstance(mUUID);
 	}
-	else if (action == "copy_uuid")
+	else if (action == "copy_name")
+    {
+        // Firestorm 7.2.5 FIRE-36793: copy an item name, not its asset.
+        LLViewerInventoryItem* item = modelp->getItem(mUUID);
+        if (item)
+        {
+            gWindowp->copyTextToClipboard(
+                utf8str_to_wstring(item->getName()));
+        }
+    }
+    else if (action == "copy_uuid")
 	{
 		// Single item only
 		HBInventoryClipboard::storeAsset(modelp->getItem(mUUID));
@@ -2277,7 +2289,18 @@ void LLFolderBridge::performAction(LLFolderView* folderp,
 	{
 		pasteLinkFromClipboard();
 	}
-	else if (action == "properties")
+	else if (action == "copy_name")
+    {
+        // Original Firestorm 7.2.5 folder item-name copy path.
+        LLFolderViewFolder* folder =
+            dynamic_cast<LLFolderViewFolder*>(mInventoryPanel->getRootFolder()->getItemByID(mUUID));
+        if (folder)
+        {
+            gWindowp->copyTextToClipboard(
+                utf8str_to_wstring(folder->getName()));
+        }
+    }
+    else if (action == "properties")
 	{
 		showProperties();
 	}
@@ -4848,20 +4871,9 @@ void LLWearableBridge::onEditOnAvatar(void* user_data)
 // *TODO: implement v3's way and allow wear & edit
 void LLWearableBridge::editOnAvatar()
 {
-	const LLUUID& linked_id = gInventory.getLinkedItemID(mUUID);
-	LLViewerWearable* wearable =
-		gAgentWearables.getWearableFromItemID(linked_id);
-	if (wearable)
-	{
-		// Set the tab to the right wearable.
-		LLFloaterCustomize::setCurrentWearableType(wearable->getType());
-
-		if (gAgent.getCameraMode() != CAMERA_MODE_CUSTOMIZE_AVATAR)
-		{
-			// Start Avatar Customization
-			gAgent.changeCameraToCustomizeAvatar();
-		}
-	}
+	// Firestorm inventory Edit resolves the original item and passes the
+	// worn wearable to the appearance editor, instead of opening Shape.
+	LLFloaterCustomize::editWearable(mUUID);
 }
 
 //static

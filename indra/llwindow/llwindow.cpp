@@ -49,9 +49,10 @@ bool gDebugClicks = false;
 bool gDebugWindowProc = false;
 bool gHiDPISupport = false;
 
+// Local file: URLs are not allowed through the generic external launcher.
+// IM history uses the built-in conversation preview instead.
 const std::string gURLProtocolWhitelist[] =
 {
-	"file:",
 	"http:",
 	"https:",
 	"ftp:",

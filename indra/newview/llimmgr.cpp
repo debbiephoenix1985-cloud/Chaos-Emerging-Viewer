@@ -344,7 +344,8 @@ LLUUID LLIMMgr::computeSessionID(EInstantMessage dialog,
 //static
 void LLIMMgr::chatterBoxInvitationCoro(const std::string& url,
 									   LLUUID session_id,
-									   LLIMMgr::EInvitationType type)
+									   LLIMMgr::EInvitationType type,
+									   const LLSD& voice_channel_info)
 {
 	LLSD data;
 	data["method"] = "accept invitation";
@@ -400,9 +401,12 @@ void LLIMMgr::chatterBoxInvitationCoro(const std::string& url,
 
 	if (type == LLIMMgr::INVITATION_TYPE_VOICE)
 	{
-		floaterp->requestAutoConnect();
-		LLFloaterIMSession::onClickStartCall(floaterp);
-		// Always open IM window when connecting to voice
+		// Do not also queue a second outgoing call from the IM draw loop.
+		// Firestorm starts the incoming call exactly once at acceptance.
+		// Firestorm passes the original invitation's credentials through
+		// the HTTP acceptance coroutine to its incoming-call handler.
+		gIMMgrp->startCall(session_id, LLVoiceChannel::INCOMING_CALL,
+							   voice_channel_info);
 		LLFloaterChatterBox::showInstance(true);
 	}
 	else if (type == LLIMMgr::INVITATION_TYPE_IMMEDIATE)
@@ -452,9 +456,12 @@ bool LLIMMgr::inviteUserResponse(const LLSD& notification,
 					LLFloaterIMSession::findInstance(session_id);
 				if (floaterp)
 				{
-					floaterp->requestAutoConnect();
-					LLFloaterIMSession::onClickStartCall(floaterp);
-					// Always open IM window when connecting to voice
+					// Firestorm starts the incoming call once, without queuing
+					// an outgoing auto-connect from the floater draw loop.
+					// Firestorm 7.1.13 explicitly starts the incoming P2P call
+					// with the server-provided WebRTC voice credentials.
+					gIMMgrp->startCall(session_id, LLVoiceChannel::INCOMING_CALL,
+									   payload["voice_channel_info"]);
 					LLFloaterChatterBox::showInstance(session_id);
 				}
 
@@ -480,7 +487,8 @@ bool LLIMMgr::inviteUserResponse(const LLSD& notification,
 										payload["voice_channel_info"]);
 					gCoros.launch("chatterBoxInvitationCoro",
 								  std::bind(&LLIMMgr::chatterBoxInvitationCoro,
-											url, session_id, inv_type));
+											url, session_id, inv_type,
+											payload["voice_channel_info"]));
 				}
 			}
 			break;
@@ -1101,6 +1109,9 @@ LLUUID LLIMMgr::addSession(const std::string& name, EInstantMessage dialog,
 	}
 	else
 	{
+		// Match Firestorm: an incoming call updates an existing IM's voice
+		// credentials instead of leaving the old channel unchanged.
+		floaterp->setVoiceChannelInfo(voice_call_info);
 		floaterp->open();
 	}
 
@@ -1143,12 +1154,59 @@ LLUUID LLIMMgr::addSession(const std::string& name, EInstantMessage dialog,
 	}
 	else
 	{
+		// Match Firestorm: an incoming call updates an existing IM's voice
+		// credentials instead of leaving the old channel unchanged.
+		floaterp->setVoiceChannelInfo(voice_call_info);
 		floaterp->open();
 	}
 
 	floaterp->setInputFocus(true);
 
 	return floaterp->getSessionID();
+}
+
+// Firestorm's central call entry point: both caller and recipient use the
+// same activation path, preserving direction and fresh voice credentials.
+bool LLIMMgr::startCall(const LLUUID& session_id,
+						 LLVoiceChannel::EDirection direction,
+						 const LLSD& voice_channel_info)
+{
+	LLFloaterIMSession* floaterp = LLFloaterIMSession::findInstance(session_id);
+	if (!floaterp)
+	{
+		return false;
+	}
+	if (voice_channel_info.isMap() && voice_channel_info.size() > 0)
+	{
+		// Mirrors Firestorm's LLIMSession::initVoiceChannel() when a
+		// previously-open text IM receives a new voice invitation.
+		floaterp->setVoiceChannelInfo(voice_channel_info);
+	}
+	LLVoiceChannel* channelp = floaterp->getVoiceChannel();
+	if (!channelp)
+	{
+		return false;
+	}
+	if (!(voice_channel_info.isMap() && voice_channel_info.size() > 0) &&
+		channelp->getState() < LLVoiceChannel::STATE_READY)
+	{
+		channelp->resetChannelInfo();
+	}
+	channelp->setCallDirection(direction);
+	channelp->activate();
+	return true;
+}
+
+bool LLIMMgr::endCall(const LLUUID& session_id)
+{
+	LLFloaterIMSession* floaterp = LLFloaterIMSession::findInstance(session_id);
+	LLVoiceChannel* channelp = floaterp ? floaterp->getVoiceChannel() : NULL;
+	if (!channelp)
+	{
+		return false;
+	}
+	channelp->deactivate();
+	return true;
 }
 
 void LLIMMgr::removeSession(const LLUUID& session_id,
@@ -3603,7 +3661,8 @@ public:
 				gCoros.launch("chatterBoxInvitationCoro",
 							  std::bind(&LLIMMgr::chatterBoxInvitationCoro,
 										url, session_id,
-										LLIMMgr::INVITATION_TYPE_INSTANT_MESSAGE));
+										LLIMMgr::INVITATION_TYPE_INSTANT_MESSAGE,
+										LLSD()));
 			}
 		}
 		else if (input["body"].has("voice"))
@@ -3625,7 +3684,8 @@ public:
 									 input["body"]["from_name"].asString(),
 									 p2p ? IM_SESSION_P2P_INVITE
 										 : IM_SESSION_INVITE,
-									 LLIMMgr::INVITATION_TYPE_VOICE);
+									 LLIMMgr::INVITATION_TYPE_VOICE,
+									 input["body"]["voice"]);
 		}
 		else if (input["body"].has("immediate"))
 		{

@@ -122,6 +122,7 @@ public:
 	void setSpeakers(const LLSD& speaker_list);
 
 	LL_INLINE LLVoiceChannel* getVoiceChannel()			{ return mVoiceChannel; }
+	void setVoiceChannelInfo(const LLSD& voice_channel_info);
 	LL_INLINE EInstantMessage getDialogType() const		{ return mDialog; }
 	LL_INLINE bool isGroupSession() const				{ return mIsGroupSession; }
 	LL_INLINE const std::string& getSessionName() const	{ return mSessionLabel; }

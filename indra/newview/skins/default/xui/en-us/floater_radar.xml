@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <floater name="radar" title="Radar" rect_control="FloaterRadarRect"
  can_resize="true" can_minimize="true" can_close="true" can_drag_on_left="false"
- width="470" min_width="340" height="455" min_height="285" follows="top|right">
+ width="605" min_width="480" height="455" min_height="285" follows="top|right">
 	<string name="cardinals">NSWE</string>
 	<string name="total_avatars">Total number of avatars: %d (%d + yours in sim)</string>
 	<string name="no_avatar">No avatar in range.</string>
@@ -19,9 +19,13 @@
 		    tool_tip="Hold down SHIFT or CTRL while clicking to select multiple avatars.">
 		<column name="marked" label="Mark" width="12" tool_tip="Marked avatars"/>
 		<column name="avatar_name" label="Name" dynamicwidth="true" tool_tip="Hold down SHIFT or CTRL while clicking to select multiple avatars."/>
+		<column name="voice_status" label="" width="20" tool_tip="On voice (microphone highlights while speaking)."/>
+		<column name="typing_status" label="" width="20" tool_tip="Currently typing in local chat."/>
 		<column name="distance" label="Dist." width="48" tool_tip="Distance from your avatar (red=within chat range, yellow=within shout range, green=within draw distance)."/>
 		<column name="position" label="Pos." width="60" tool_tip="Position (X, Y) within this sim, or general direction (cardinal point) for outside sims."/>
 		<column name="altitude" label="Alt." width="48" tool_tip="Altitude"/>
+		<column name="region_seen" label="In reg." width="86" tool_tip="Time observed in this region since the viewer started tracking this avatar. Earlier arrival time is unknown."/>
+		<column name="account_age" label="Age (d)" width="65" tool_tip="Avatar account age in days, calculated from the creation date in the profile. ? means unavailable."/>
 	</scroll_list>
 		<button name="radar_actions_toggle" label="Actions..."
 		tool_tip="Show the existing radar Avatar, Alerts, Moderation and Options controls."

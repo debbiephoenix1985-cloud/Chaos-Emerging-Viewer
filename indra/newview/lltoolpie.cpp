@@ -448,7 +448,9 @@ bool LLToolPie::handleRightClickPick()
 		return true;
 	}
 
-	// Did not click in any UI object, so must have clicked in-world
+	// Did not click any UI object, so this was an in-world right click.
+    // The manual Context/Pie setting overrides either skin's default.
+    const bool use_context = useChaosContextMenu();
 	LLViewerObject* objectp = mPick.getObject();
 	if (objectp && objectp->isAttachment() && !objectp->isHUDAttachment() &&
 		!objectp->permYouOwner())
@@ -481,7 +483,8 @@ bool LLToolPie::handleRightClickPick()
 		LLParcelSelectionHandle selection =
 			gViewerParcelMgr.selectParcelAt(mPick.mPosGlobal);
 		gMenuHolderp->setParcelSelection(selection);
-		gPieLandp->show(x, y, mPieMouseButtonDown);
+		if (use_context) showChaosContextMenu("land", x, y);
+        else gPieLandp->show(x, y, mPieMouseButtonDown);
 
 		// VEFFECT: ShowPie
 		LLHUDEffectSpiral::sphereAtPosition(mPick.mPosGlobal);
@@ -502,7 +505,8 @@ bool LLToolPie::handleRightClickPick()
 			}
 		}
 
-		gPieSelfp->show(x, y, mPieMouseButtonDown);
+		if (use_context) showChaosContextMenu("self", x, y);
+        else gPieSelfp->show(x, y, mPieMouseButtonDown);
 	}
 	else if (objectp)
 	{
@@ -635,7 +639,15 @@ bool LLToolPie::handleRightClickPick()
 				}
 			}
 
-			gPieAvatarp->show(x, y, mPieMouseButtonDown);
+            if (use_context)
+            {
+                LLViewerObject* raw = mPick.getObject();
+                const bool other_attachment = raw && raw->isAttachment() &&
+                                               !raw->permYouOwner();
+                showChaosContextMenu(other_attachment ? "attachment_other" :
+                                    "avatar", x, y);
+            }
+            else gPieAvatarp->show(x, y, mPieMouseButtonDown);
 		}
 		else if (objectp->isAttachment())
 		{
@@ -654,7 +666,8 @@ bool LLToolPie::handleRightClickPick()
 				}
 			}
 
-			gPieAttachmentp->show(x, y, mPieMouseButtonDown);
+            if (use_context) showChaosContextMenu("attachment", x, y);
+            else gPieAttachmentp->show(x, y, mPieMouseButtonDown);
 		}
 		else
 		{
@@ -740,7 +753,8 @@ bool LLToolPie::handleRightClickPick()
 				}
 			}
 #endif
-			gPieObjectp->show(x, y, mPieMouseButtonDown);
+            if (use_context) showChaosContextMenu("object", x, y);
+            else gPieObjectp->show(x, y, mPieMouseButtonDown);
 
 			// VEFFECT: ShowPie object. Do not show when you click on someone
 			// else: it could freak them out.
@@ -1125,22 +1139,31 @@ bool LLToolPie::handleMediaClick(const LLPickInfo& pick)
 		return false;
 	}
 
-	// Does this face have media ?
+	// Test the face's media entry, not whether its player is already
+	// loaded.  Inactive/non-autoplay media has no plugin yet, so requiring
+	// hasMedia() made a first left click silently ignore the face.
 	const LLTextureEntry* tep = objectp->getTE(pick.mObjectFace);
-	viewer_media_t mediap = LLViewerMedia::getMediaImplFromTextureEntry(tep);
-	if (mediap.isNull() || !mediap->hasMedia())
+	if (!tep || !tep->hasMedia() || !tep->getMediaData())
 	{
 		focusp->clearFocus();
 		return false;
 	}
+	viewer_media_t mediap = LLViewerMedia::getMediaImplFromTextureEntry(tep);
 
-	if (!focusp->isFocusedOnFace(pick.getObject(), pick.mObjectFace))
+	if (!focusp->isFocusedOnFace(pick.getObject(), pick.mObjectFace) ||
+		mediap.isNull() || !mediap->hasMedia())
 	{
 		LL_DEBUGS("Media") << (mediap.isNull() ? "Media impl is NULL"
 											   : "New focus detected")
 						   << ", focusing on media face." << LL_ENDL;
 		focusp->setFocusFace(true, pick.getObject(), pick.mObjectFace,
 							 mediap, pick.mNormal);
+		// Resume a paused video with the same first click. Unloaded media
+		// instead starts through setFocusFace()'s normal URL navigation.
+		if (mediap.notNull() && mediap->isMediaPaused())
+		{
+			mediap->play();
+		}
 	}
 	else if (gKeyboardp)
 	{
@@ -1177,14 +1200,15 @@ bool LLToolPie::handleMediaDblClick(const LLPickInfo& pick)
 	}
 
 	const LLTextureEntry* tep = objectp->getTE(pick.mObjectFace);
-	viewer_media_t mediap = LLViewerMedia::getMediaImplFromTextureEntry(tep);
-	if (mediap.isNull() || !mediap->hasMedia())
+	if (!tep || !tep->hasMedia() || !tep->getMediaData())
 	{
 		focusp->clearFocus();
 		return false;
 	}
+	viewer_media_t mediap = LLViewerMedia::getMediaImplFromTextureEntry(tep);
 
-	if (!focusp->isFocusedOnFace(pick.getObject(), pick.mObjectFace))
+	if (!focusp->isFocusedOnFace(pick.getObject(), pick.mObjectFace) ||
+		mediap.isNull() || !mediap->hasMedia())
 	{
 		focusp->setFocusFace(true, pick.getObject(), pick.mObjectFace,
 							 mediap, pick.mNormal);

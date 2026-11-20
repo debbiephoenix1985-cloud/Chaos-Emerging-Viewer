@@ -1,4 +1,13 @@
 <textures version="101">
+  <!-- Original Firestorm Favorites bar button artwork and 9-slice scaling. -->
+  <texture name="ChaosFavoriteButtonOff" file_name="widgets/PushButton_Off.png" preload="true" scale_left="4" scale_top="19" scale_right="28" scale_bottom="4" />
+  <texture name="ChaosFavoriteButtonOver" file_name="navbar/Favorite_Link_Over.png" preload="false" />
+  <texture name="Radar_VoicePTT_Lvl1" file_name="icons/radar_voice/VoicePTT_Lvl1.png" preload="false" />
+  <texture name="Radar_VoicePTT_Lvl2" file_name="icons/radar_voice/VoicePTT_Lvl2.png" preload="false" />
+  <texture name="Radar_VoicePTT_Lvl3" file_name="icons/radar_voice/VoicePTT_Lvl3.png" preload="false" />
+  <texture name="Radar_VoicePTT_Off" file_name="icons/radar_voice/VoicePTT_Off.png" preload="false" />
+  <texture name="Radar_VoicePTT_On" file_name="icons/radar_voice/VoicePTT_On.png" preload="false" />
+  <texture name="radarbox_t" file_name="icons/radar_t.png" preload="false" />
   <texture name="Emoji_Picker_Icon" file_name="icons/emoji_picker_icon.png" preload="true" />
   <texture name="icn_scrollbar_thumb.tga" preload="true" scale_top="7" scale_left="4" scale_bottom="8" scale_right="4" />
   <texture name="icn_scrollbar_bg.tga" preload="true" scale_top="7" scale_left="4" scale_bottom="8" scale_right="4" />
@@ -408,4 +417,16 @@
   <texture name="Inv_Animation" file_name="icons/Inv_Animation.png" preload="false" />
   <!-- Official Firestorm 7.1.13 Outfit Gallery default picture asset. -->
   <texture name="Default_Outfit_Photo" file_name="icons/Default_Outfit_Photo.png" preload="true" />
+  <texture name="FSAO_Animation_Playing" file_name="icn_play.tga" preload="false" />
+  <texture name="FSAO_Animation_Stopped" file_name="icons/Inv_Animation.png" preload="false" />
+  <texture name="Inv_FolderClosed" file_name="icons/Inv_FolderClosed.png" preload="false" />
+  <texture name="Inv_FolderOpen" file_name="icons/Inv_FolderOpen.png" preload="false" />
+  <texture name="ChaosAO_Icon" file_name="widgets/ChaosAO_Icon.png" preload="true" />
+  <texture name="ChaosAO_ArrowUp" file_name="widgets/ChaosAO_ArrowUp.tga" preload="true" />
+  <texture name="ChaosAO_Left_Off" file_name="widgets/ChaosAO_SplitButtonLeft_Off.png" preload="true" scale_left="12" scale_top="16" scale_right="30" scale_bottom="7" />
+  <texture name="ChaosAO_Left_Selected" file_name="widgets/ChaosAO_SplitButtonLeft_Selected.png" preload="true" scale_left="12" scale_top="16" scale_right="30" scale_bottom="7" />
+  <texture name="ChaosAO_Left_Disabled" file_name="widgets/ChaosAO_SplitButtonLeft_Disabled.png" preload="true" scale_left="12" scale_top="16" scale_right="30" scale_bottom="7" />
+  <texture name="ChaosAO_Right_Off" file_name="widgets/ChaosAO_SplitButtonRight_Off.png" preload="true" scale_left="2" scale_top="16" scale_right="20" scale_bottom="7" />
+  <texture name="ChaosAO_Right_Selected" file_name="widgets/ChaosAO_SplitButtonRight_Selected.png" preload="true" scale_left="2" scale_top="16" scale_right="20" scale_bottom="7" />
+  <texture name="ChaosAO_Right_Disabled" file_name="widgets/ChaosAO_SplitButtonRight_Disabled.png" preload="true" scale_left="2" scale_top="16" scale_right="20" scale_bottom="7" />
 </textures>

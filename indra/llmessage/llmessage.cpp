@@ -596,7 +596,7 @@ bool LLMessageSystem::checkMessages(S64 frame_count)
 			{
 				// We need to ACK here to suppress further resends of packets
 				// we have already seen.
-				if (recv_reliable)
+				if (recv_reliable && !recv_packet_id_checked)
 				{
 					cdp->collectRAck(mCurrentRecvPacketID);
 				}
@@ -679,8 +679,11 @@ bool LLMessageSystem::checkMessages(S64 frame_count)
 				cdp->mRecentlyReceivedReliablePackets[mCurrentRecvPacketID] =
 					getMessageTimeUsecs();
 
-				// Put it onto the list of packets to be acked
-				cdp->collectRAck(mCurrentRecvPacketID);
+				// Socket-arrival buffering already acknowledged queued packets.
+				if (!recv_packet_id_checked)
+				{
+					cdp->collectRAck(mCurrentRecvPacketID);
+				}
 				++mReliablePacketsIn;
 			}
 		}
@@ -1004,6 +1007,17 @@ U32 LLMessageSystem::bufferInboundPacket()
 			}
 		}
 
+		// An inbound reliable packet must never be acked unless its queue
+		// can retain it. An overflow is ordinary packet loss, permitting resend.
+		LLPacketRing& inbound = isHighPriorityMessage(pkt) ?
+			mHighPriorityInbound : mLowPriorityInbound;
+		if (!inbound.hasRoom())
+		{
+			llwarns_once << "Inbound message queue full; packet left unacked"
+						 << llendl;
+			return packet_size;
+		}
+
 		if (cdp)
 		{
 			// ACK inbound reliable packet ASAP
@@ -1023,14 +1037,8 @@ U32 LLMessageSystem::bufferInboundPacket()
 			}
 		}
 
-		if (isHighPriorityMessage(pkt))
-		{
-			mHighPriorityInbound.pushPacket(pkt);
-		}
-		else
-		{
-			mLowPriorityInbound.pushPacket(pkt);
-		}
+		// No other queue producer runs between hasRoom() and this push.
+		inbound.pushPacket(pkt);
 	}
 
 	return packet_size;
@@ -1354,7 +1362,8 @@ S32 LLMessageSystem::sendMessage(const LLHost& host)
 	// Tack packet acks onto the end of this message
 
 	// Space left for packet ids:
-	S32 space_left = (MTUBYTES - buffer_length) / sizeof(TPACKETID);
+	// A final byte stores the ack count; reserve it before packing IDs.
+	S32 space_left = (MTUBYTES - buffer_length - 1) / sizeof(TPACKETID);
 
 	S32 ack_count = (S32)cdp->mAcks.size();
 	bool is_ack_appended = false;
@@ -1402,6 +1411,10 @@ S32 LLMessageSystem::sendMessage(const LLHost& host)
 
 		// Clean up the source
 		cdp->mAcks.erase(cdp->mAcks.begin(), last);
+		if (cdp->mAcks.empty())
+		{
+			cdp->mAckCreationTime = 0.f;
+		}
 
 		// Tack the count in the final byte
 		U8 count = (U8)append_ack_count;
@@ -1634,15 +1647,14 @@ void LLMessageSystem::disableCircuit(const LLHost& host)
 					<< code << " removed from lookup table" << llendl;
 			msg->mIPPortToCircuitCode.erase(ip_port);
 		}
-		mCircuitInfo.removeCircuitData(host);
 	}
 	else
 	{
-		// Since we can open circuits which do not have circuit codes, it is
-		// possible for this to happen...
-		llinfos << "Could not find circuit code for " << host
-			    << ", ignoring..." << llendl;
+		// OpenSim neighbour circuits need not have a mapped circuit code.
+		LL_DEBUGS("Circuit") << "No circuit code for " << host
+							  << "; removing host circuit directly" << LL_ENDL;
 	}
+	mCircuitInfo.removeCircuitData(host);
 }
 
 void LLMessageSystem::setCircuitAllowTimeout(const LLHost& host, bool allow)

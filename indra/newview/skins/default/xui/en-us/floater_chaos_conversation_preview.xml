@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<!-- Firestorm built-in conversation preview layout adapted for Chaos widgets. -->
+<floater name="chaos_conversation_preview" title="Conversation History"
+ can_close="true" can_resize="true" can_minimize="true"
+ can_drag_on_left="false" width="610" height="460"
+ min_width="400" min_height="280" follows="left|top">
+    <text_editor name="chat_history" type="string" length="1"
+      font="SansSerif" enabled="false" word_wrap="true"
+      max_length="2147483647" track_bottom="false"
+      bg_readonly_color="ChatHistoryBgColor"
+      bg_writeable_color="ChatHistoryBgColor"
+      text_color="ChatHistoryTextColor"
+      text_readonly_color="ChatHistoryTextColor"
+      follows="all" left="8" bottom="-415" width="594" height="374" />
+    <text name="page_label" left="394" bottom="-439"
+      width="46" height="18" follows="bottom|right">Page</text>
+    <spinner name="history_page_spin" label="" left="441" bottom="-439"
+      width="71" height="20" follows="bottom|right"
+      min_val="1" max_val="1" increment="1" decimal_digits="0" />
+    <text name="page_total" left="521" bottom="-439"
+      width="76" height="18" follows="bottom|right">/ 1</text>
+</floater>

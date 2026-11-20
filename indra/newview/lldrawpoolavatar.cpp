@@ -409,8 +409,9 @@ void LLDrawPoolAvatar::beginImpostor()
 {
 	if (!LLPipeline::sReflectionRender)
 	{
-		LLVOAvatar::sRenderDistance = llclamp(LLVOAvatar::sRenderDistance,
-											  16.f, 256.f);
+		// Keep the avatar render radius coupled to the user's current
+		// draw distance, without the old 256m hard cap.
+		LLVOAvatar::sRenderDistance = LLPipeline::RenderFarClip;
 		LLVOAvatar::sNumVisibleAvatars = 0;
 	}
 
@@ -470,8 +471,9 @@ void LLDrawPoolAvatar::beginDeferredImpostor()
 {
 	if (!LLPipeline::sReflectionRender)
 	{
-		LLVOAvatar::sRenderDistance = llclamp(LLVOAvatar::sRenderDistance,
-											  16.f, 256.f);
+		// Keep the avatar render radius coupled to the user's current
+		// draw distance, without the old 256m hard cap.
+		LLVOAvatar::sRenderDistance = LLPipeline::RenderFarClip;
 		LLVOAvatar::sNumVisibleAvatars = 0;
 	}
 

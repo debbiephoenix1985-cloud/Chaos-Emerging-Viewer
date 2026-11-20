@@ -4447,10 +4447,11 @@ void LLPipeline::stateSort(LLDrawable* drawablep, LLCamera& camera)
 
 	if (drawablep->isAvatar())
 	{
-		// Do not draw avatars beyond render distance or if we do not have a
-		// spatial group.
+		// Avatar visibility must follow the live viewer draw distance,
+		// not the old independent 256m avatar limit. Keeping the two
+		// synchronized makes increased draw distance include avatars too.
 		LLSpatialGroup* groupp = drawablep->getSpatialGroup();
-		if (!groupp || groupp->mDistance > LLVOAvatar::sRenderDistance)
+		if (!groupp || groupp->mDistance > RenderFarClip)
 		{
 			return;
 		}

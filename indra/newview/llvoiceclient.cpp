@@ -46,6 +46,10 @@
 #include "llvoicevivox.h"
 #include "llvoicewebrtc.h"
 
+const F32 LLVoiceClient::POWER_LEVEL_0 = OVERDRIVEN_POWER_LEVEL / 3.f;
+const F32 LLVoiceClient::POWER_LEVEL_1 = OVERDRIVEN_POWER_LEVEL * 2.f / 3.f;
+const F32 LLVoiceClient::POWER_LEVEL_2 = OVERDRIVEN_POWER_LEVEL;
+
 // Global
 LLVoiceClient gVoiceClient;
 
@@ -198,18 +202,21 @@ LLVoiceModule* LLVoiceClient::getModuleFromChannelInfo(const LLSD& info)
 	{
 		return getModuleFromType(info["voice_server_type"].asString());
 	}
-	// When no server type is given, use WebRTC in SL, Vivox in OpenSim.
-	return gIsInSecondLife ? (LLVoiceModule*)&gVoiceWebRTC
-						   : (LLVoiceModule*)&gVoiceVivox;
+	// An invitation without voice_server_type uses the active region's
+	// advertised provider, retained in VoiceServerType by
+	// getModuleFromSimFeatures(). This is essential for OpenSim WebRTC P2P.
+	return gSavedSettings.getString("VoiceServerType") == "webrtc" ?
+		   (LLVoiceModule*)&gVoiceWebRTC : (LLVoiceModule*)&gVoiceVivox;
 }
 
 U32 LLVoiceClient::getVoiceServerType(const LLSD& channel_info)
 {
 	if (!channel_info.has("voice_server_type"))
 	{
-		// Note: Vivox was removed from SL, so an empty server type now means
-		// "webrtc" in SL, "vivox" in OpenSim. HB
-		return gIsInSecondLife ? WEBRTC_SERVER : VIVOX_SERVER;
+		// The agent region advertises its voice provider via
+		// getModuleFromSimFeatures(), including OpenSim WebRTC regions.
+		return gSavedSettings.getString("VoiceServerType") == "webrtc" ?
+			WEBRTC_SERVER : VIVOX_SERVER;
 	}
 	std::string type = channel_info["voice_server_type"].asString();
 	if (type == "vivox")
@@ -287,6 +294,11 @@ void LLVoiceClient::setSpatialVoiceModule(LLVoiceModule* modulep)
 	{
 		mSpatialVoiceModulep->processChannels(true);
 	}
+	// Firestorm refreshes the selected spatial voice provider after switching.
+	if (mSpatialVoiceModulep == &gVoiceWebRTC)
+	{
+		gVoiceWebRTC.updateSettings();
+	}
 	LL_DEBUGS("Voice") << "Spatial voice module changed for: "
 					   << mSpatialVoiceModulep->getName() << LL_ENDL;
 }
@@ -294,6 +306,12 @@ void LLVoiceClient::setSpatialVoiceModule(LLVoiceModule* modulep)
 void LLVoiceClient::setNonSpatialVoiceModule(LLVoiceModule* modulep)
 {
 	mNonSpatialVoiceModulep = modulep;
+	// Firestorm refreshes the selected provider before starting a new
+	// non-spatial call. In Chaos only WebRTC exposes updateSettings().
+	if (mNonSpatialVoiceModulep == &gVoiceWebRTC)
+	{
+		gVoiceWebRTC.updateSettings();
+	}
 	// If do not have a non-spatial module, revert to spatial when possible.
 	if (!mNonSpatialVoiceModulep && mSpatialVoiceModulep)
 	{
@@ -695,7 +713,8 @@ void LLVoiceClient::callUser(const LLUUID& id, U32 server_type)
 
 void LLVoiceClient::hangup(U32 server_type)
 {
-	// Note: there is no hangup() equivalent for WebRTC
+	// WebRTC ad-hoc calls are ended by LLVoiceChannelGroup::deactivate().
+	// Only legacy Vivox calls use the P2P hangup interface.
 	if (server_type == VIVOX_SERVER)
 	{
 		LL_DEBUGS("Voice") << "Leaving Vivox session" << LL_ENDL;
@@ -753,6 +772,34 @@ bool LLVoiceClient::getIsModeratorMuted(const LLUUID& id)
 		   gVoiceWebRTC.getIsModeratorMuted(id);
 }
 
+EVoicePowerLevel LLVoiceClient::getPowerLevel(const LLUUID& id)
+{
+	F32 power = getCurrentPower(id);
+	if (getOnMuteList(id))
+	{
+		return VPL_MUTED;
+	}
+	else if (power == 0.f && !getIsSpeaking(id))
+	{
+		return VPL_PTT_Off;
+	}
+	else if (power < POWER_LEVEL_0)
+	{
+		return VPL_PTT_On;
+	}
+	else if (power < POWER_LEVEL_1)
+	{
+		return VPL_Level1;
+	}
+	else if (power < POWER_LEVEL_2)
+	{
+		return VPL_Level2;
+	}
+	else
+	{
+		return VPL_Level3;
+	}
+}
 F32 LLVoiceClient::getCurrentPower(const LLUUID& id)
 {
 	F32 power = gVoiceWebRTC.getCurrentPower(id);

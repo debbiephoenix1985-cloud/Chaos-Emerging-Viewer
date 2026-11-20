@@ -1390,35 +1390,38 @@ bool LLTextureFetchWorker::doWork(S32 param)
 		if (mRequestedSize < 0)
 		{
 			bool may_be_missing = LLTerrain::isAsset(mID);
-			if (mGetStatus == gStatusNotFound)
-			{
-				if (mWriteToCacheState == NOT_WRITE)
-				{
-					// Map tiles or server bakes. For map tiles, failed means
-					// empty region, which is normal and expected.
-					mState = DONE;
-					releaseHttpSemaphore();
-					if (mFTType != FTT_MAP_TILE)
-					{
-						llwarns << "Texture missing from server (404): "
-								<< mUrl << llendl;
-					}
-					return true;
-				}
-
-				// Fallback and try UDP
-				if (mCanUseNET && !may_be_missing)
-				{
-					llinfos << "Falling back to UDP sim fetch for texture: "
-							<< mID << llendl;
-					mState = INIT;
-					mCanUseHTTP = false;
-					mUrl.clear();
-					setHighPriority();
-					releaseHttpSemaphore();
-					return false;
-				}
-			}
+            if (mGetStatus == gStatusNotFound)
+            {
+                // Firestorm OpenSim 404 recovery: an ordinary texture may be
+                // available through the simulator UDP asset path even when
+                // its HTTP texture capability responds with 404. Never use
+                // this fallback for terrain UUIDs (also PBR material UUIDs),
+                // map tiles or server bakes.
+                if (mCanUseNET && !may_be_missing &&
+                    mFTType != FTT_LOCAL_FILE &&
+                    mFTType != FTT_MAP_TILE &&
+                    mFTType != FTT_SERVER_BAKE)
+                {
+                    llinfos << "HTTP 404: trying simulator UDP texture fetch: "
+                            << mID << llendl;
+                    mState = INIT;
+                    mCanUseHTTP = false;
+                    mUrl.clear();
+                    setHighPriority();
+                    releaseHttpSemaphore();
+                    return false;
+                }
+                // Otherwise finish cleanly; repeating an unavailable
+                // terrain/material HTTP fetch cannot recover the asset.
+                mState = DONE;
+                releaseHttpSemaphore();
+                if (mFTType != FTT_MAP_TILE)
+                {
+                    llwarns << "Texture missing from server (404): "
+                            << mUrl << llendl;
+                }
+                return true;
+            }
 			else if (mGetStatus == gStatusUnavailable)
 			{
 				llinfos_once << "Texture server busy (503): " << mUrl

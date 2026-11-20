@@ -595,26 +595,30 @@ void LLJoystickCameraRotate::draw()
 {
 	LLGLSUIDefault gls_ui;
 
-	getImageUnselected()->draw(0, 0);
+	// Keep the rendered joystick inside exactly the same rectangle used by
+	// hit testing. Unscaled texture drawing can exceed the hitbox when a
+	// non-power-of-two camera icon is loaded into a padded GL texture.
+	getImageUnselected()->draw(0, 0, getRect().getWidth(),
+								 getRect().getHeight());
 
 	if (mInTop)
 	{
-		drawRotatedImage(getImageSelected()->getImage(), 0);
+		drawRotatedImage(getImageSelected(), 0);
 	}
 
 	if (mInRight)
 	{
-		drawRotatedImage(getImageSelected()->getImage(), 1);
+		drawRotatedImage(getImageSelected(), 1);
 	}
 
 	if (mInBottom)
 	{
-		drawRotatedImage(getImageSelected()->getImage(), 2);
+		drawRotatedImage(getImageSelected(), 2);
 	}
 
 	if (mInLeft)
 	{
-		drawRotatedImage(getImageSelected()->getImage(), 3);
+		drawRotatedImage(getImageSelected(), 3);
 	}
 
 	if (sDebugRects)
@@ -623,22 +627,30 @@ void LLJoystickCameraRotate::draw()
 	}
 }
 
-// Draws image rotated by multiples of 90 degrees
-void LLJoystickCameraRotate::drawRotatedImage(LLGLTexture* image,
+// Draw camera pressed-direction highlights rotated by multiples of 90 degrees.
+void LLJoystickCameraRotate::drawRotatedImage(LLUIImagePtr image,
 											  S32 rotations)
 {
-	S32 width = image->getWidth();
-	S32 height = image->getHeight();
+	if (image.isNull() || image->getImage().isNull()) return;
 
-	static const F32 uv[][2] =
+	// Firestorm / EXT-2023: UI art can occupy only part of a padded GPU
+	// texture (e.g. 48x48 artwork inside a 64x64 GL texture). UVs of 1.0
+	// render the overlay offset from the clickable joystick sectors.
+	// Use the image's actual sub-texture coordinates, but draw all 4
+	// highlights inside the exact joystick rectangle used for clicks.
+	const S32 width = getRect().getWidth();
+	const S32 height = getRect().getHeight();
+	const F32 u = (F32)image->getWidth() / (F32)image->getTextureWidth();
+	const F32 v = (F32)image->getHeight() / (F32)image->getTextureHeight();
+	const F32 uv[][2] =
 	{
-		{ 1.f, 1.f },
-		{ 0.f, 1.f },
+		{ u, v },
+		{ 0.f, v },
 		{ 0.f, 0.f },
-		{ 1.f, 0.f }
+		{ u, 0.f }
 	};
 
-	gGL.getTexUnit(0)->bind(image);
+	gGL.getTexUnit(0)->bind(image->getImage());
 
 	gGL.color4fv(UI_VERTEX_COLOR.mV);
 
@@ -776,17 +788,20 @@ void LLJoystickCameraZoom::setToggleState(bool top, bool bottom)
 
 void LLJoystickCameraZoom::draw()
 {
+	// Match vertical zoom drawing to its actual clickable rectangle too.
+	const S32 width = getRect().getWidth();
+	const S32 height = getRect().getHeight();
 	if (mInTop)
 	{
-		mPlusInImage->draw(0,0);
+		mPlusInImage->draw(0, 0, width, height);
 	}
 	else if (mInBottom)
 	{
-		mMinusInImage->draw(0,0);
+		mMinusInImage->draw(0, 0, width, height);
 	}
 	else
 	{
-		getImageUnselected()->draw(0, 0);
+		getImageUnselected()->draw(0, 0, width, height);
 	}
 
 	if (sDebugRects)

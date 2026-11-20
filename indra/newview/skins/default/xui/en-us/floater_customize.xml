@@ -16,7 +16,7 @@
       <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-180" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="16" mouse_opaque="true" name="no modify instructions" width="530">
@@ -50,19 +50,19 @@
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Skin" left="0" mouse_opaque="true" name="Skin" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-180" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="16" mouse_opaque="true" name="no modify instructions" width="530">
@@ -86,19 +86,19 @@
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Hair" left="0" mouse_opaque="true" name="Hair" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-180" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="16" mouse_opaque="true" name="no modify instructions" width="530">
@@ -120,19 +120,19 @@
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Eyes" left="0" mouse_opaque="true" name="Eyes" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-180" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="16" mouse_opaque="true" name="no modify instructions" width="530">
@@ -150,19 +150,19 @@
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Shirt" left="0" mouse_opaque="true" name="Shirt" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -187,19 +187,19 @@ avatar. Alternately, you create a new one from scratch and wear it.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Pants" left="0" mouse_opaque="true" name="Pants" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -224,19 +224,19 @@ avatar. Alternately, you create new ones from scratch and wear them.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Shoes" left="0" mouse_opaque="true" name="Shoes" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -261,19 +261,19 @@ avatar. Alternately, you create new ones from scratch and wear them.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Socks" left="0" mouse_opaque="true" name="Socks" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -298,19 +298,19 @@ avatar. Alternately, you create new ones from scratch and wear them.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Jacket" left="0" mouse_opaque="true" name="Jacket" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -336,19 +336,19 @@ avatar. Alternately, you create a new one from scratch and wear it.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Gloves" left="0" mouse_opaque="true" name="Gloves" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -373,19 +373,19 @@ avatar. Alternately, you create new ones from scratch and wear them.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Undershirt" left="0" mouse_opaque="true" name="Undershirt" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -410,19 +410,19 @@ avatar. Alternately, you create a new one from scratch and wear it.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Underpants" left="0" mouse_opaque="true" name="Underpants" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -447,19 +447,19 @@ avatar. Alternately, you create new ones from scratch and wear them.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Skirt" left="0" mouse_opaque="true" name="Skirt" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -484,19 +484,19 @@ avatar. Alternately, you create a new one from scratch and wear it.
     <panel name="Tattoo" label="Tattoo" border="true" mouse_opaque="true" follows="left|top|right|bottom" width="578" height="573" left="0" bottom="-574">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -506,12 +506,12 @@ avatar. Alternately, you create a new one from scratch and wear it.
       <text bottom="-180" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="16" mouse_opaque="true" name="no modify instructions" width="530">
 				You do not have permission to modify this wearable.
 			</text>
-      <texture_picker name="Head Tattoo" label="Head tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-166" />
-      <texture_picker name="Upper Tattoo" label="Upper tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-256" />
-      <texture_picker name="Lower Tattoo" label="Lower tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-346" />
-      <color_swatch border_color="0.45098 0.517647 0.607843 1" bottom="-399" can_apply_immediately="true" color="1 1 1 1" follows="left|top" height="80" label="Color/tint" left="14" mouse_opaque="true" name="Color/Tint" tool_tip="Click to open Color Picker" width="70" />
-      <button name="Take Off" label="Take off" follows="left|top" width="82" height="20" left="8" bottom="-424" />
-      <spinner name="layer" label="Layer:" mouse_opaque="true" enabled="true" label_width="40" font="SansSerifSmall" decimal_digits="0" min_val="0" initial_val="0" increment="1" left="8" bottom="-450" width="82" height="16" follows="left|top|right" />
+      <texture_picker name="Head Tattoo" label="Head" tool_tip="Head tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-166" />
+      <texture_picker name="Upper Tattoo" label="Upper" tool_tip="Upper body tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="205" bottom="-166" />
+      <texture_picker name="Lower Tattoo" label="Lower" tool_tip="Lower body tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="300" bottom="-166" />
+      <color_swatch border_color="0.45098 0.517647 0.607843 1" bottom="-280" can_apply_immediately="true" color="1 1 1 1" follows="left|top" height="80" label="Color/tint" left="14" mouse_opaque="true" name="Color/Tint" tool_tip="Click to open Color Picker" width="70" />
+      <button name="Take Off" label="Take off" follows="left|top" width="82" height="20" left="8" bottom="-305" />
+      <spinner name="layer" label="Layer:" mouse_opaque="true" enabled="true" label_width="40" font="SansSerifSmall" decimal_digits="0" min_val="0" initial_val="0" increment="1" left="8" bottom="-345" width="82" height="16" follows="left|top|right" />
       <text bottom="-486" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="right" height="28" right="117" mouse_opaque="true" name="Item Action Label" width="100" visible="false">
                 Tattoo:
             </text>
@@ -523,19 +523,19 @@ avatar. Alternately, you create a new one from scratch and wear it.
     <panel name="Universal" label="Universal" border="true" mouse_opaque="true" follows="left|top|right|bottom" width="578" height="573" left="0" bottom="-574">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -545,17 +545,17 @@ avatar. Alternately, you create a new one from scratch and wear it.
       <text bottom="-180" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="16" mouse_opaque="true" name="no modify instructions" width="530">
 				You do not have permission to modify this wearable.
 			</text>
-      <texture_picker name="Head Universal Tattoo" label="Head Universal Tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-166" />
-      <texture_picker name="Eyes Tattoo" label="Eyes tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="205" bottom="-166" />
-      <texture_picker name="Hair Tattoo" label="Hair tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="300" bottom="-166" />
-      <texture_picker name="Upper Universal Tattoo" label="Upper Universal Tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-256" />
-      <texture_picker name="Left Arm Tattoo" label="Left arm tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="205" bottom="-256" />
-      <texture_picker name="Lower Universal Tattoo" label="Lower Universal Tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="72" height="86" left="110" bottom="-346" />
-      <texture_picker name="Left Leg Tattoo" label="Left leg tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="72" height="86" left="205" bottom="-346" />
-      <texture_picker name="Skirt Tattoo" label="Skirt tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="72" height="86" left="300" bottom="-346" />
-      <texture_picker name="Aux1 Tattoo" label="Aux1 tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-436" />
-      <texture_picker name="Aux2 Tattoo" label="Aux2 tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="205" bottom="-436" />
-      <texture_picker name="Aux3 Tattoo" label="Aux3 tattoo" tool_tip="Click to choose a picture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="300" bottom="-436" />
+      <texture_picker name="Head Universal Tattoo" label="Head" tool_tip="Head universal tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-166" />
+      <texture_picker name="Eyes Tattoo" label="Eyes" tool_tip="Eye universal tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="205" bottom="-166" />
+      <texture_picker name="Hair Tattoo" label="Hair" tool_tip="Hair universal tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="300" bottom="-166" />
+      <texture_picker name="Upper Universal Tattoo" label="Upper" tool_tip="Upper body universal tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-256" />
+      <texture_picker name="Left Arm Tattoo" label="Left arm" tool_tip="Left arm universal tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="205" bottom="-256" />
+      <texture_picker name="Lower Universal Tattoo" label="Lower" tool_tip="Lower body universal tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="72" height="86" left="110" bottom="-346" />
+      <texture_picker name="Left Leg Tattoo" label="Left leg" tool_tip="Left leg universal tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="72" height="86" left="205" bottom="-346" />
+      <texture_picker name="Skirt Tattoo" label="Skirt" tool_tip="Skirt universal tattoo texture" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="72" height="86" left="300" bottom="-346" />
+      <texture_picker name="Aux1 Tattoo" label="Aux 1" tool_tip="Auxiliary texture 1" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="110" bottom="-436" />
+      <texture_picker name="Aux2 Tattoo" label="Aux 2" tool_tip="Auxiliary texture 2" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="205" bottom="-436" />
+      <texture_picker name="Aux3 Tattoo" label="Aux 3" tool_tip="Auxiliary texture 3" can_apply_immediately="true" default_image_name="Default" allow_no_texture="true" follows="left|top" width="76" height="86" left="300" bottom="-436" />
       <color_swatch border_color="0.45098 0.517647 0.607843 1" bottom="-399" can_apply_immediately="true" color="1 1 1 1" follows="left|top" height="80" label="Color/tint" left="14" mouse_opaque="true" name="Color/Tint" tool_tip="Click to open Color Picker" width="70" />
       <button name="Take Off" label="Take off" follows="left|top" width="82" height="20" left="8" bottom="-424" />
       <spinner name="layer" label="Layer:" mouse_opaque="true" enabled="true" label_width="40" font="SansSerifSmall" decimal_digits="0" min_val="0" initial_val="0" increment="1" left="8" bottom="-450" width="82" height="16" follows="left|top|right" />
@@ -570,19 +570,19 @@ avatar. Alternately, you create a new one from scratch and wear it.
     <panel name="Alpha" label="Alpha" border="true" mouse_opaque="true" follows="left|top|right|bottom" width="578" height="573" left="0" bottom="-574">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">
@@ -615,19 +615,19 @@ avatar. Alternately, you create a new one from scratch and wear it.
     <panel border="true" bottom="-574" follows="left|top|right|bottom" height="573" label="Physics" left="0" mouse_opaque="true" name="Physics" width="578">
       <icon name="lock" image_name="icon_lock.tga" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="551" height="16" width="16" follows="top|right" />
       <icon name="icon" color="1 1 1 1" mouse_opaque="true" bottom="-40" left="12" height="16" width="16" follows="left|top" />
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title" width="500">
 				[DESC]
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_no_modify" width="500">
 				[DESC]: cannot modify
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_loading" width="500">
 				[DESC]: loading...
 			</text>
-      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="385">
+      <text bottom="-45" drop_shadow_visible="true" follows="left|top|right" font="SansSerif" halign="left" height="16" left="35" mouse_opaque="true" name="title_not_worn" width="500">
 				[DESC]: not worn
 			</text>
-      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="540">
+      <text bottom="-69" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="14" left="15" mouse_opaque="true" name="path" width="270">
 				Located in [PATH]
 			</text>
       <text bottom="-52" drop_shadow_visible="true" follows="left|top|right" font="SansSerifSmall" halign="left" height="28" left="8" mouse_opaque="true" name="not worn instructions" width="373">

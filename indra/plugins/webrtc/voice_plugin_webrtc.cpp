@@ -95,11 +95,14 @@ public:
 	// LLWebRTCLogCallback override
 	void LogMessage(LogLevel level, const std::string& message) override;
 
+	// The Firestorm native llwebrtc device interface controls capture and
+	// playout through active voice connections. Channel lifecycle is driven
+	// by LLVoiceWebRTC, not by a persistent device-enable method.
 	LL_INLINE void setVoiceEnabled(bool enabled)
 	{
-		if (mDeviceInterface)
+		if (!enabled)
 		{
-			mDeviceInterface->setVoiceEnabled(enabled);
+			setGlobalMute(true, 0.f);
 		}
 	}
 
@@ -170,7 +173,7 @@ public:
 	{
 		if (mDeviceInterface)
 		{
-		    mDeviceInterface->setMicGain(gain);
+			mDeviceInterface->setPeerConnectionGain(gain);
 		}
 	}
 
@@ -178,15 +181,17 @@ public:
 	{
 		if (mDeviceInterface)
 		{
-			mDeviceInterface->setTuningMicGain(gain);
+			mDeviceInterface->setPeerConnectionGain(gain);
 		}
 	}
 
-	LL_INLINE void setGlobalMute(bool mute, F32 delay)
+	LL_INLINE void setGlobalMute(bool muted, F32 delay)
 	{
-		if (mDeviceInterface)
+		// Firestorm's native engine mutes each active voice session rather
+		// than exposing the later global-device mute API.
+		for (const auto& entry : mConnections)
 		{
-			mDeviceInterface->setMute(mute, delay);
+			mute(entry.first, muted);
 		}
 	}
 
@@ -785,8 +790,13 @@ void HBPluginVoiceWebRTC::connect(const LLUUID& connection_id,
 				srv.mUrls.emplace_back(url);
 			}
 		}
-		options.mServers.emplace_back(srv);
-		
+		// The WebRTC ICE parser rejects an ICE server with no URLs.
+		// Keep host candidates available when no STUN/TURN is supplied.
+		if (!srv.mUrls.empty())
+		{
+			options.mServers.emplace_back(srv);
+		}
+
 		if (connectp->connect(options))
 		{
 			if (sDebug)

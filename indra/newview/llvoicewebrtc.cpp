@@ -213,7 +213,7 @@ LLVoiceConnection::LLVoiceConnection(const LLUUID& region_id,
 	mCurrentStatus(LLVoiceClientStatusObserver::STATUS_VOICE_ENABLED),
 	mMuted(true),
 	mShutDown(false),
-	mPrimary(false),
+	mPrimary(true),
 	mIceCompleted(false),
 	mSpeakerVolume(0.f),
 	mOutstandingRequests(0),
@@ -326,10 +326,18 @@ bool LLVoiceConnection::pluginCreateSession()
 		pluginp->sendVoiceCommand(mID, "add_connection");
 		if (mVoiceConnectionState != VS_START_SESSION)
 		{
-			// This is a re-creation after a plugin failure: reset the
-			// connection steps flags and update the state. HB
+			// A previous WebRTC plugin process went away. The replacement
+			// has no transport to disconnect: sending a disconnect here
+			// left us waiting for a "closed" callback it might never send.
+			// Reprovision a fresh server viewer_session and ICE exchange
+			// instead, as Firestorm's native reconnect path does.
 			mHasDataInterface = mIceCompleted = false;
-			setVoiceConnectionState(VS_SESSION_EXIT);
+			mViewerSession.setNull();
+			mIceCandidates.clear();
+			mRetryWaitPeriod = 0;
+			mRetryWaitSecs = ll_frand() + 0.5f;
+			setVoiceConnectionState(mShutDown ? VS_SESSION_EXIT :
+										VS_START_SESSION, true);
 		}
 		mPluginSessionCreated = true;
 		return true;
@@ -346,6 +354,16 @@ void LLVoiceConnection::processIceUpdatesCoro()
 {
 	if (gDisconnected || LLApp::isQuitting() ||gVoiceWebRTC.isTerminated() ||
 		mShutDown)
+	{
+		return;
+	}
+
+	// The server allocates the viewer session in response to the SDP offer.
+	// ICE may arrive from WebRTC first; retain those candidates and the ICE
+	// completion marker until the provisioning reply supplies the session ID.
+	// Sending a null viewer_session associates them with no call and breaks
+	// the subsequent voice negotiation.
+	if (mViewerSession.isNull())
 	{
 		return;
 	}
@@ -660,8 +678,15 @@ bool LLVoiceConnection::processPluginData()
 			const LLSD& data = *it;
 			if (data.has("ice_completed"))
 			{
-				mIceCompleted = true;
-				LL_DEBUGS("Voice") << "ICE complete" << LL_ENDL;
+				// The plugin sends this field for BOTH ICE_GATHERING_NEW
+				// (false) and ICE_GATHERING_COMPLETE (true). Firestorm's
+				// OnIceGatheringState() preserves the actual Boolean state.
+				// Treating false as true prematurely signals ICE completion
+				// to the server and can prevent an ad-hoc call joining.
+				mIceCompleted = data["ice_completed"].asBoolean();
+				LL_DEBUGS("Voice") << "ICE gathering complete: "
+								   << (mIceCompleted ? "true" : "false")
+								   << LL_ENDL;
 			}
 			if (data.has("ice_candidates") && data["ice_candidates"].isArray())
 			{
@@ -681,7 +706,7 @@ bool LLVoiceConnection::processPluginData()
 				LL_DEBUGS("Voice") << "Got " << count
 								   << " new ICE candidate(s)." << LL_ENDL;
 			}
-			if (data.has("channel_sdp"))
+			if (data.has("channel_sdp") && !mShutDown)
 			{
 				mChannelSDP = data["channel_sdp"].asString();
 				LL_DEBUGS("Voice") << "Received offer: " << mChannelSDP
@@ -691,7 +716,7 @@ bool LLVoiceConnection::processPluginData()
 					setVoiceConnectionState(VS_REQUEST_CONNECTION, true);
 				}
 			}
-			if (data.has("got_data_interface"))
+			if (data.has("got_data_interface") && !mShutDown)
 			{
 				LL_DEBUGS("Voice") << "Data interface ready." << LL_ENDL;
 				mHasDataInterface = true;
@@ -715,17 +740,36 @@ bool LLVoiceConnection::processPluginData()
 							<< chan_data << llendl;
 				}
 			}
-			if (data.has("established"))
+			if (data.has("established") && !mShutDown)
 			{
+				// Firestorm ignores a delayed audio-established callback
+				// after the corresponding connection has begun shutting down.
 				setVoiceConnectionState(VS_SESSION_ESTABLISHED);
 			}
 			if (data.has("closed"))
 			{
-				setVoiceConnectionState(VS_CLOSED);
+				// Match Firestorm 7.1.13 OnPeerConnectionClosed(): a peer
+				// close is a completed shutdown only when we are waiting for
+				// our explicit disconnect, or when the engine is terminating.
+				// Do not restart an active/pending private call in response to
+				// an unsolicited or stale close notification.
+				if (mVoiceConnectionState == VS_WAIT_FOR_CLOSE ||
+					gVoiceWebRTC.isTerminated())
+				{
+					setVoiceConnectionState(VS_CLOSED);
+				}
+				else
+				{
+					LL_DEBUGS("Voice") << "Ignoring peer close outside disconnect; state "
+									   << state2string(mVoiceConnectionState) << LL_ENDL;
+				}
 			}
 			if (data.has("renegotiate"))
 			{
-				setVoiceConnectionState(VS_SESSION_RETRY);
+				if (!mShutDown)
+				{
+					setVoiceConnectionState(VS_SESSION_RETRY);
+				}
 				mCurrentStatus = LLVoiceClientStatusObserver::ERROR_UNKNOWN;
 			}
 		}
@@ -748,8 +792,10 @@ bool LLVoiceConnection::connectionStateMachine()
 		return false;
 	}
 
-	// Process ICE updates if needed.
-	if (mIceCompleted || mIceCandidates.isDefined())
+	// Process ICE updates only after the provisioning response has
+	// allocated a server viewer_session for this specific connection.
+	if (!mViewerSession.isNull() &&
+		(mIceCompleted || mIceCandidates.isDefined()))
 	{
 		gCoros.launch("processIceUpdates",
 					  std::bind(&LLVoiceConnection::processIceUpdatesCoro,
@@ -780,6 +826,9 @@ bool LLVoiceConnection::connectionStateMachine()
 				pluginCreateSession();
 				break;
 			}
+			// A restarted peer connection must obtain its own fresh server
+			// session before any newly gathered ICE candidates are signalled.
+			mViewerSession.setNull();
 			mIceCompleted = false;
 			setVoiceConnectionState(VS_WAIT_FOR_SESSION_START);
 			LLPluginClassMedia* pluginp = gVoiceWebRTC.getPlugin();
@@ -826,14 +875,9 @@ bool LLVoiceConnection::connectionStateMachine()
 				setVoiceConnectionState(VS_DISCONNECT);
 				break;
 			}
-			// Update the peer connection with the various characteristics of
-			// this connection.
-			if (isSpatial())
-			{
-				// We will determine primary state later and set mute
-				// accordinly
-				mPrimary = false;
-			}
+			// Firestorm retains the primary-region identity assigned when
+			// creating the spatial connection. Do not clear it before the
+			// initial data-channel join or the server sees a non-primary peer.
 			setSpeakerVolume(mSpeakerVolume);
 			gVoiceWebRTC.onConnectionEstablished(mChannelID, mRegionID);
 			setVoiceConnectionState(VS_WAIT_FOR_DATA_CHANNEL);
@@ -1216,8 +1260,11 @@ LLVoiceConnectionSpatial::LLVoiceConnectionSpatial(const LLUUID& region_id,
 :	LLVoiceConnection(region_id, chan_id),
 	mParcelLocalID(parcel_id)
 {
-	// Will be set to primary after the connection is established
-	mPrimary = false;
+	// Match Firestorm's spatial connection ownership from creation.
+	// The first join packet must already identify the agent region as
+	// primary; it cannot wait until the session reaches VS_SESSION_UP.
+	LLViewerRegion* regionp = gAgent.getRegion();
+	mPrimary = regionp && region_id == regionp->getRegionID();
 }
 
 //virtual
@@ -1382,10 +1429,12 @@ void LLVoiceConnectionAdHoc::requestVoiceConnection()
 		return;
 	}
 
-	const std::string& url = regionp->getCapability("VoiceSignalingRequest");
+	// Firestorm 7.1.13 provisions ad-hoc voice through the same
+	// ProvisionVoiceAccountRequest capability used for native WebRTC calls.
+	const std::string& url = regionp->getCapability("ProvisionVoiceAccountRequest");
 	if (url.empty())
 	{
-		LL_DEBUGS("Voice") << "VoiceSignalingRequest capability not yet received for region "
+		LL_DEBUGS("Voice") << "ProvisionVoiceAccountRequest capability not yet received for region "
 						   << regionp->getIdentity() << LL_ENDL;
 		setVoiceConnectionState(VS_SESSION_RETRY);
 		return;
@@ -1614,7 +1663,14 @@ bool LLVoiceWebRTC::launchPlugin()
 		terminate();
 		return false;
 	}
-	mWebRTCPlugin->setLockupTimeout(3.f);	// Timeout after 3 seconds freezes
+	// A second viewer can temporarily saturate the CPU and the Windows
+	// audio device stack during login. Avoid falsely declaring this
+	// viewer's still-running WebRTC plugin dead from a short heartbeat
+	// pause. A genuinely exited plugin is still detected immediately.
+	// Firestorm runs WebRTC natively, without our out-of-process timeout.
+	const F32 timeout = gSavedSettings.getBool("VoiceMultiInstance") ?
+							45.f : 15.f;
+	mWebRTCPlugin->setLockupTimeout(timeout);
 	return true;
 }
 
@@ -1638,21 +1694,16 @@ void LLVoiceWebRTC::idle(void* userdatap)
 		return;
 	}
 
-	// Keep both Vivox and WebRTC implementations installed and initialized,
-	// but run the WebRTC plugin only for an active WebRTC voice channel.
-	// OpenSim regions without VoiceServerType use Vivox; starting WebRTC on
-	// those regions needlessly opens a second audio device and can conflict
-	// with the active Vivox session. When switching away from WebRTC, clear
-	// its sessions and release the plugin. A subsequent WebRTC channel
-	// request sets mProcessChannels again and launches the plugin normally.
-	if (!self->mProcessChannels)
+	// Firestorm keeps its native WebRTC engine alive when transferring
+	// between spatial and non-spatial channels. Likewise, do not destroy
+	// the Chaos WebRTC plugin during the asynchronous P2P invite/credential
+	// handoff: LLVoiceChannelProximal deactivates spatial processing before
+	// LLVoiceChannelGroup receives its new channel credentials.
+	// Process the existing plugin while the non-spatial channel is pending;
+	// processChannels() will shut down old spatial sessions as required.
+	// Do not start WebRTC unnecessarily on Vivox-only regions.
+	if (!self->mProcessChannels && !self->mWebRTCPlugin)
 	{
-		if (self->mWebRTCPlugin)
-		{
-			llinfos << "No active WebRTC voice channel: releasing WebRTC plugin."
-					<< llendl;
-			self->cleanUp();
-		}
 		return;
 	}
 
@@ -1691,10 +1742,10 @@ void LLVoiceWebRTC::idle(void* userdatap)
 		if (self->mPluginNeedsConfig)
 		{
 			self->mPluginNeedsConfig = false;
-			self->mWebRTCPlugin->setVoiceEnabled(self->mVoiceEnabled);
-			// Push the settings, devices and audio/mic levels to the new
-			// plugin.
+			// Configure devices and audio processing before enabling the
+			// plugin's recording/playout path.
 			gVoiceClient.updateSettings();
+			self->mWebRTCPlugin->setVoiceEnabled(self->mVoiceEnabled);
 		}
 		if (self->mPluginHasDied)
 		{
@@ -1735,7 +1786,13 @@ void LLVoiceWebRTC::predShutdownSession(const sessionState::ptr_t& sessionp)
 
 bool LLVoiceWebRTC::isVoiceWorking() const
 {
-	return !mTerminated && mVoiceEnabled && mIsProcessingChannels;
+	// Firestorm 7.1.13 reports WebRTC availability from its running voice
+	// engine, NOT from STATUS_JOINED. During P2P negotiation Firestorm
+	// deliberately withholds STATUS_JOINED until the peer arrives. Using
+	// mIsProcessingChannels here incorrectly rejects incoming invitations
+	// from LLIMMgr while a non-spatial channel is being established.
+	return !mTerminated && mInitDone && mVoiceEnabled &&
+		   (mProcessChannels || mWebRTCPlugin != NULL);
 }
 
 #if 0	// Not used in the Cool VL Viewer
@@ -1877,10 +1934,10 @@ void LLVoiceWebRTC::processChannels()
 			}
 			else
 			{
-				// Voice is disabled, so leave and disable PTT
+				// Voice is disabled, so leave and disable PTT.
+				// Keep channel processing available when voice or parcel
+				// permission returns, as Firestorm does.
 				leaveChannel(true);
-				// Also stop processing channels. HB
-				mProcessChannels = false;
 			}
 		}
 	}
@@ -2150,15 +2207,13 @@ void LLVoiceWebRTC::onConnectionEstablished(const std::string& channel_id,
 		}
 		mSession = mNextSession;
 		mNextSession.reset();
-		// Add ourselves as a participant.
-		if (mSession)
-		{
-			LLViewerRegion* regionp = gAgent.getRegion();
-			if (regionp)
-			{
-				mSession->addParticipant(gAgentID, regionp->getRegionID());
-			}
-		}
+	}
+
+	// Firestorm registers the local participant for the established channel,
+	// whether it replaced a pending channel or re-established an active one.
+	if (mSession)
+	{
+		mSession->addParticipant(gAgentID, region_id);
 	}
 
 	if (mSession && mSession->mChannelID == channel_id)
@@ -2179,13 +2234,14 @@ void LLVoiceWebRTC::onConnectionEstablished(const std::string& channel_id,
 void LLVoiceWebRTC::onConnectionShutDown(const std::string& channel_id,
 										 const LLUUID& region_id)
 {
-	if (mSession && mSession->mChannelID == channel_id)
+	// The agent can be in another region by the time an old spatial
+	// connection closes. Clear participants belonging to the closed region
+	// regardless of the agent's current region, but never treat a null
+	// region ID as a request to remove every participant.
+	if (mSession && mSession->mChannelID == channel_id &&
+		region_id.notNull())
 	{
-		LLViewerRegion* regionp = gAgent.getRegion();
-		if (regionp && regionp->getRegionID() == region_id)
-		{
-			mSession->removeAllParticipants(region_id);
-		}
+		mSession->removeAllParticipants(region_id);
 	}
 }
 
@@ -2415,18 +2471,26 @@ void LLVoiceWebRTC::leaveChannel(bool stop_talking)
 
 bool LLVoiceWebRTC::isCurrentChannel(const LLSD& channel_info)
 {
-	if (!mProcessChannels || !mSession ||
+	if (!mProcessChannels ||
 		channel_info["voice_server_type"].asString() != WEBRTCSTR)
 	{
 		return false;
 	}
-	if (mSession)
+
+	// Match Firestorm 7.1.13: the pending session is the channel being
+	// activated while the previous spatial channel is being replaced.
+	sessionState::ptr_t sessionp = mSession;
+	if (!sessionp)
+	{
+		sessionp = mNextSession;
+	}
+	if (sessionp)
 	{
 		if (!channel_info["session_handle"].asString().empty())
 		{
-			return mSession->mHandle == channel_info["session_handle"].asString();
+			return sessionp->mHandle == channel_info["session_handle"].asString();
 		}
-		return channel_info["channel_uri"].asString() == mSession->mChannelID;
+		return channel_info["channel_uri"].asString() == sessionp->mChannelID;
 	}
 	return false;
 }
@@ -3072,6 +3136,7 @@ LLVoiceWebRTC::pstate_ptr_t LLVoiceWebRTC::sessionState::addParticipant(const LL
 		{
 			gVoiceWebRTC.lookupName(id);
 		}
+		gVoiceWebRTC.notifyParticipantListChanged();
 	}
 	LL_DEBUGS("Voice") << "Participant: " << participantp->mURI << LL_ENDL;
 
@@ -3103,6 +3168,7 @@ void LLVoiceWebRTC::sessionState::removeParticipant(pstate_ptr_t participantp)
 		LL_DEBUGS("Voice") << "Participant \"" << participantp->mURI <<  "\" ("
 						   << part_id << ") removed." << LL_ENDL;
 		mParticipantsByUUID.erase(iter);
+		gVoiceWebRTC.notifyParticipantListChanged();
 #if 0	// Not used in the Cool VL Viewer
 		gVoiceWebRTC.notifyParticipantObservers();
 #endif

@@ -17,23 +17,32 @@
 			Inventory thumbnail
 		</radio_item>
 	</radio_group>
-	<text name="file_size_label" left="10" bottom="-468" width="195" height="25" follows="left|top">
+	<text name="file_size_label" left="230" bottom="-495" width="280" height="20" follows="left|top">
 		File size: [SIZE] KB
 	</text>
 	<button name="new_snapshot_btn" label="Refresh snapshot" left="10" bottom="-52" width="195" height="20" follows="left|top" />
-	<button name="send_btn" label="Send" left="10" width="105" height="20" follows="left|top" bottom="-495" />
-	<button name="upload_btn" label="Save (L$[AMOUNT])" left="10" width="105" height="20" follows="left|top" bottom="-495" />
-	<flyout_button name="save_btn" label="Save" tool_tip="Save image to a file" left="10" width="105" height="20" follows="left|top" bottom="-495">
+	<button name="send_btn" label="Send" left="10" width="105" height="20" follows="left|top" bottom="-509" />
+	<button name="upload_btn" label="Save (L$[AMOUNT])" left="10" width="105" height="20" follows="left|top" bottom="-509" />
+	<flyout_button name="save_btn" label="Save" tool_tip="Save image to a file" left="10" width="105" height="20" follows="left|top" bottom="-509">
 		<flyout_button_item name="save_item" value="save">
 			Save
 		</flyout_button_item>
 		<flyout_button_item name="saveas_item" value="save as">
 			Save As...
 		</flyout_button_item>
+		<flyout_button_item name="saveas_png_item" value="save as png">
+			Save as PNG...
+		</flyout_button_item>
+		<flyout_button_item name="saveas_jpeg_item" value="save as jpeg">
+			Save as JPEG...
+		</flyout_button_item>
+		<flyout_button_item name="saveas_bmp_item" value="save as bmp">
+			Save as BMP...
+		</flyout_button_item>
 	</flyout_button>
-	<button name="discard_btn" label="Cancel" left="120" width="85" height="20" follows="left|top" bottom="-495" />
-	<button name="more_btn" label="More &gt;&gt;" font="SansSerifSmall" halign="center" tool_tip="Show advanced Options" left="10" bottom="-522" width="95" height="20" follows="left|top" />
-	<button name="less_btn" label="&lt;&lt; Less" font="SansSerifSmall" halign="center" tool_tip="Hide advanced Options" width="95" height="20" follows="left|top" left="10" bottom="-522" />
+	<button name="discard_btn" label="Cancel" left="120" width="85" height="20" follows="left|top" bottom="-509" />
+	<button name="more_btn" label="More &gt;&gt;" font="SansSerifSmall" halign="center" tool_tip="Show advanced Options" left="10" bottom="-535" width="95" height="20" follows="left|top" />
+	<button name="less_btn" label="&lt;&lt; Less" font="SansSerifSmall" halign="center" tool_tip="Hide advanced Options" width="95" height="20" follows="left|top" left="10" bottom="-535" />
 	<text name="type_label2" left="10" width="115" height="15" follows="top|left" bottom="-299">
 		Size
 	</text>
@@ -164,6 +173,9 @@
 	<check_box name="freeze_frame_check" label="Freeze frame (fullscreen preview)" left="15" follows="left|top" bottom="-152" width="195" />
 	<check_box name="auto_snapshot_check" control_name="AutoSnapshot" label="Auto-refresh" left="15" follows="left|top" bottom="-173" width="195" />
 	<check_box name="temp_check" label="Temporary image (free)" tooltip="Sets the texture asset to be temporary, meaning it is free but, in return, only valid/available for as long as the server keeps texture bakes around." left="15" follows="left|top" bottom="-442" width="195" />
+	<text name="snapshot_filter_label" left="10" bottom="-459" width="195" height="13" follows="left|top">Image filter</text>
+	<combo_box name="snapshot_filter_combo" label="No Filter" left="10" bottom="-484" width="195" height="20" follows="left|top"
+	 tool_tip="Choose a Firestorm image filter for the snapshot preview and saved image" />
 	<string name="unknown">
 		unknown
 	</string>

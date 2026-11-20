@@ -89,9 +89,8 @@ LLFolderDictionary::LLFolderDictionary()
 	addEntry(LLFolderType::FT_GESTURE, 				new FolderEntry("gesture",	true));
 	addEntry(LLFolderType::FT_MESH, 				new FolderEntry("mesh",		false));
 
-#if 0	// Viewer 2 folder: useless for v1 !
-	addEntry(LLFolderType::FT_FAVORITE, 			new FolderEntry("favorite",	false));
-#endif
+	// Firestorm-compatible Favorites inventory category (type 23).
+	addEntry(LLFolderType::FT_FAVORITE,			new FolderEntry("favorite", false));
 
 	addEntry(LLFolderType::FT_CURRENT_OUTFIT, 		new FolderEntry("current",	true));
 

@@ -32,7 +32,7 @@
 
 #include "llfloater.h"
 
-class LLCheckBoxCtrl;
+class LLUICtrl;
 class LLJoystickCameraRotate;
 class LLJoystickCameraZoom;
 class LLJoystickCameraTrack;
@@ -52,12 +52,21 @@ private:
 
 	void onOpen() override;
 	void onClose(bool app_quitting) override;
+	static void onClickResetCamera(void* userdata);
+	static void onClickFront(void* userdata);
+	static void onClickSide(void* userdata);
+	static void onClickRear(void* userdata);
+	static void onClickTPP(void* userdata);
+	static void onClickObject(void* userdata);
+	static void onClickMouselook(void* userdata);
+	static void onClickPosition(void* userdata);
+	static void onClickSave(void* userdata);
+	static void onSelectPreset(LLUICtrl* ctrl, void* userdata);
+	static void selectPreset(const std::string& preset);
 
 public:
 	LLJoystickCameraRotate* mRotate;
 	LLJoystickCameraZoom*	mZoom;
 	LLJoystickCameraTrack*	mTrack;
 
-private:
-	LLCheckBoxCtrl* 		mFrontViewCheck;
 };

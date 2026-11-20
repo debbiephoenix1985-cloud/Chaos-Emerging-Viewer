@@ -1583,6 +1583,7 @@ void LLInventoryModel::updateCategory(const LLViewerInventoryCategory* cat,
 		}
 
 		old_cat->copyViewerCategory(cat);
+		restore_local_folder_thumbnail(old_cat);
 		addChangedMask(mask, cat_id);
 	}
 	else
@@ -2309,6 +2310,7 @@ void LLInventoryModel::addCategory(LLViewerInventoryCategory* category)
 	{
 		// Insert category uniquely into the map
 		// LLPointer will deref and delete the old one
+		restore_local_folder_thumbnail(category);
 		mCategoryMap[category->getUUID()] = category;
 		//mInventory[category->getUUID()] = category;
 	}

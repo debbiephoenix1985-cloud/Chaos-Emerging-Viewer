@@ -42,6 +42,7 @@
 #include "llscrollbar.h"
 #include "llstring.h"
 #include "lluictrl.h"
+#include <functional>
 #include "lluuid.h"
 
 // Represents a cell in a scrollable table.
@@ -503,6 +504,8 @@ public:
 
 	void highlightNthItem(S32 index);
 
+	void setRightMouseDownCallback(std::function<void(LLUICtrl*, S32, S32, MASK)> cb)
+	{ mRightMouseDownCallback = std::move(cb); }
 	void setDoubleClickCallback(void (*cb)(void*)) override	{ mOnDoubleClickCallback = cb; }
 	void setMaximumSelectCallback(void (*cb)(void*))		{ mOnMaximumSelectCallback = cb; }
 	void setSortChangedCallback(void (*cb)(void*))			{ mOnSortChangedCallback = cb; }
@@ -609,6 +612,7 @@ public:
 
 	// Overridden from LLView
 	void draw() override;
+	bool handleRightMouseDown(S32 x, S32 y, MASK mask) override;
 	bool handleMouseDown(S32 x, S32 y, MASK mask) override;
 	bool handleMouseUp(S32 x, S32 y, MASK mask) override;
 	bool handleDoubleClick(S32 x, S32 y, MASK mask) override;
@@ -743,6 +747,7 @@ private:
 	std::vector<sort_column_t> mSortColumns;
 
 	void				(*mOnDoubleClickCallback)(void* userdata);
+	std::function<void(LLUICtrl*, S32, S32, MASK)> mRightMouseDownCallback;
 	void				(*mOnMaximumSelectCallback)(void* userdata);
 	void				(*mOnSortChangedCallback)(void* userdata);
 

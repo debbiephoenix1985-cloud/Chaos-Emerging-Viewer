@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='utf-8'?>
+<menu name="Chaos Context Self" label="Self" opaque="true">
+    <menu_item_call name="ChaosContext_self_81" label="Sit Down">
+        <on_click function="Chaos.ContextSelfAction" userdata="sit" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_self_82" label="Stand Up">
+        <on_click function="Chaos.ContextSelfAction" userdata="stand" />
+    </menu_item_call>
+    <menu name="ChaosContext_self_83" label="Take Off">
+        <menu name="ChaosContext_self_84" label="Clothes">
+            <menu_item_call name="ChaosContext_self_85" label="Shirt">
+                <on_click function="Edit.TakeOff" userdata="shirt" />
+                <on_enable function="Edit.EnableTakeOff" userdata="shirt" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_86" label="Pants">
+                <on_click function="Edit.TakeOff" userdata="pants" />
+                <on_enable function="Edit.EnableTakeOff" userdata="pants" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_87" label="Skirt">
+                <on_click function="Edit.TakeOff" userdata="skirt" />
+                <on_enable function="Edit.EnableTakeOff" userdata="skirt" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_88" label="Shoes">
+                <on_click function="Edit.TakeOff" userdata="shoes" />
+                <on_enable function="Edit.EnableTakeOff" userdata="shoes" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_89" label="Socks">
+                <on_click function="Edit.TakeOff" userdata="socks" />
+                <on_enable function="Edit.EnableTakeOff" userdata="socks" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_90" label="Jacket">
+                <on_click function="Edit.TakeOff" userdata="jacket" />
+                <on_enable function="Edit.EnableTakeOff" userdata="jacket" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_91" label="Gloves">
+                <on_click function="Edit.TakeOff" userdata="gloves" />
+                <on_enable function="Edit.EnableTakeOff" userdata="gloves" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_92" label="Undershirt">
+                <on_click function="Edit.TakeOff" userdata="undershirt" />
+                <on_enable function="Edit.EnableTakeOff" userdata="undershirt" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_93" label="Underpants">
+                <on_click function="Edit.TakeOff" userdata="underpants" />
+                <on_enable function="Edit.EnableTakeOff" userdata="underpants" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_94" label="Tattoo">
+                <on_click function="Edit.TakeOff" userdata="tattoo" />
+                <on_enable function="Edit.EnableTakeOff" userdata="tattoo" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_95" label="Physics">
+                <on_click function="Edit.TakeOff" userdata="physics" />
+                <on_enable function="Edit.EnableTakeOff" userdata="physics" />
+            </menu_item_call>
+            <menu_item_call name="ChaosContext_self_96" label="Alpha">
+                <on_click function="Edit.TakeOff" userdata="alpha" />
+                <on_enable function="Edit.EnableTakeOff" userdata="alpha" />
+            </menu_item_call>
+            <menu_item_separator />
+            <menu_item_call name="ChaosContext_self_97" label="All Clothes">
+                <on_click function="Edit.TakeOff" userdata="all" />
+            </menu_item_call>
+        </menu>
+        <menu name="ChaosContext_self_98" label="HUD" />
+        <menu name="ChaosContext_self_99" label="Detach" />
+        <menu_item_call name="ChaosContext_self_100" label="Detach All">
+            <on_click function="Self.RemoveAllAttachments" />
+            <on_enable function="Self.EnableRemoveAllAttachments" />
+        </menu_item_call>
+    </menu>
+    <menu name="ChaosContext_self_101" label="Appearance">
+        <menu_item_call name="ChaosContext_self_102" label="Now wearing...">
+            <on_click function="ShowFloater" userdata="appearance" />
+            <on_enable function="Edit.EnableCustomizeAvatar" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_self_103" label="Outfits">
+            <on_click function="ShowFloater" userdata="appearance" />
+            <on_enable function="Edit.EnableCustomizeAvatar" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_self_104" label="Edit Shape">
+            <on_click function="ShowFloater" userdata="appearance" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_self_105" label="Edit Outfit">
+            <on_click function="ShowFloater" userdata="appearance" />
+            <on_enable function="Edit.EnableCustomizeAvatar" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_self_106" label="Hover Height">
+            <on_enable function="Chaos.ContextDisabled" />
+        </menu_item_call>
+        <menu_item_separator />
+        <menu_item_call name="ChaosContext_self_107" label="Reset Skeleton">
+            <on_click function="Chaos.ContextAvatarAction" userdata="skeleton" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_self_108" label="Reset Skeleton And Animations">
+            <on_click function="Chaos.ContextAvatarAction" userdata="skeletonanim" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_self_109" label="Reset Mesh LOD">
+            <on_click function="Chaos.ContextAvatarAction" userdata="mesh" />
+        </menu_item_call>
+    </menu>
+    <menu name="ChaosContext_self_110" label="Community">
+        <menu_item_call name="ChaosContext_self_111" label="Friends">
+            <on_click function="ShowFloater" userdata="friends" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_self_112" label="Groups">
+            <on_click function="ShowFloater" userdata="groups" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_self_113" label="Profile">
+            <on_click function="ShowAgentProfile" userdata="agent" />
+        </menu_item_call>
+    </menu>
+    <menu_item_call name="ChaosContext_self_114" label="Script Info">
+        <on_enable function="Chaos.ContextDisabled" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_self_115" label="Show Textures">
+        <on_click function="Avatar.Debug" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_self_116" label="Texture Refresh">
+        <on_click function="Chaos.ContextAvatarAction" userdata="textures" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_self_117" label="Dump XML">
+        <on_enable function="Chaos.ContextDisabled" />
+    </menu_item_call>
+    <menu_item_separator />
+    <menu_item_call name="ChaosContext_self_118" label="Block Particle Owner">
+        <on_click function="Particle.Mute" />
+    </menu_item_call>
+</menu>

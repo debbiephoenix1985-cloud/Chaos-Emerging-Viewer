@@ -80,6 +80,8 @@ public:
 	std::string getLocationString() const;
 
 	LL_INLINE std::string getGrid() const		{ return mGrid; }
+	LL_INLINE bool isHop() const				{ return mIsHop; }
+	LL_INLINE std::string getHopAuthority() const	{ return mHopAuthority; }
 	LL_INLINE std::string getRegion() const		{ return mRegion; }
 	LL_INLINE LLVector3 getPosition() const		{ return mPosition; }
 	LL_INLINE std::string getAppCmd() const		{ return mAppCmd; }
@@ -147,6 +149,8 @@ private:
 	LLSD				mAppQueryMap;
 	std::string			mAppQuery;
 
+	bool			mIsHop = false;	// Keep the original OpenSim hop:// format
+	std::string		mHopAuthority;	// Gatekeeper host and port, if specified
 	std::string			mGrid;		// Reference to grid manager grid
 	std::string			mRegion;
 	LLVector3			mPosition;

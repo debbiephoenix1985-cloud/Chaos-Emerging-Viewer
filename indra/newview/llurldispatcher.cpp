@@ -198,6 +198,33 @@ bool LLURLDispatcherImpl::dispatchRegion(const LLSLURL& slurl,
 	}
 
 	std::string region_name = slurl.getRegion();
+	LLGridManager* grid_mgr = LLGridManager::getInstance();
+	const std::string dest_host = grid_mgr->getGridHost(slurl.getGrid());
+	const std::string active_host = grid_mgr->getGridHost();
+	const bool same_grid = dest_host == active_host;
+	// Firestorm-style OpenSim gatekeeper handling. Only a genuine hop://
+	// link may address a remote grid; the Second Life grids are not OpenSim
+	// gatekeepers and must remain blocked.
+	const bool hypergrid_hop = !gIsInSecondLife && slurl.isHop() &&
+									dest_host != "secondlife" && dest_host != "aditi";
+	if (!same_grid && !hypergrid_hop)
+	{
+		llwarns << "Refusing non-Hypergrid location URL: "
+				<< slurl.getSLURLString() << " - destination host: "
+				<< dest_host << " - current host: " << active_host << llendl;
+		LLSD args;
+		args["SLURL"] = slurl.getLocationString();
+		args["CURRENT_GRID"] = active_host;
+		args["GRID"] = dest_host.empty() ? slurl.getGrid() : dest_host;
+		gNotifications.add("CantTeleportToGrid", args);
+		return true;
+	}
+	if (hypergrid_hop && !same_grid && !slurl.getHopAuthority().empty())
+	{
+		region_name = slurl.getHopAuthority() + ":" + region_name;
+		llinfos << "Resolving OpenSim Hypergrid gatekeeper region: "
+				<< region_name << llendl;
+	}
 
 	LLFloaterURLDisplay* floaterp = LLFloaterURLDisplay::getInstance(LLSD());
 	floaterp->setName(region_name);
@@ -264,9 +291,20 @@ void LLURLDispatcherImpl::regionHandleCallback(U64 region_handle,
 	LLSLURL slurl(url);
 
 	LLGridManager* gm = LLGridManager::getInstance();
-	// We cannot teleport cross grid at this point
-	if (gm->getGridHost(slurl.getGrid()) != gm->getGridHost())
+	// The OpenSim world map has already resolved an explicit hop://
+	// gatekeeper destination; do not re-apply the Second Life-only
+	// restriction here. All other cross-grid URLs remain blocked.
+	const bool open_sim_hop = !gIsInSecondLife && slurl.isHop() &&
+								gm->getGridHost(slurl.getGrid()) != "secondlife" &&
+								gm->getGridHost(slurl.getGrid()) != "aditi";
+	if (!open_sim_hop &&
+		gm->getGridHost(slurl.getGrid()) != gm->getGridHost())
 	{
+		llwarns << "Rejecting cross-grid teleport SLURL: " << url
+				<< " - parsed destination grid: " << slurl.getGrid()
+				<< " - resolved destination host: "
+				<< gm->getGridHost(slurl.getGrid())
+				<< " - current grid host: " << gm->getGridHost() << llendl;
 		LLSD args;
 		args["SLURL"] = slurl.getLocationString();
 		args["CURRENT_GRID"] = gm->getGridHost();
@@ -414,12 +452,10 @@ bool LLURLDispatcher::dispatchFromTextEditor(const std::string& url)
 		// 'true' to the LLTextEditor caller, so that the latter would not try
 		// and launch a web browser to process an SLURL (even if unknown to the
 		// viewer) like it would be an HTML link !  HB
-		// Note: text editors are considered sources of trusted URLs in order
-		// to make object IM and avatar profile links in chat history work.
-		// While a malicious resident could chat an app SLURL, the receiving
-		// resident will see it and must affirmatively click on it.
-		// *TODO: Make this trust model more refined. JC
-		LLURLDispatcherImpl::dispatch(slurl, "clicked", NULL, true);
+		// Chat and history text can originate from other residents. Keep
+		// the deliberate click, but use each command's untrusted policy
+		// instead of granting every displayed SLURL trusted privileges.
+		LLURLDispatcherImpl::dispatch(slurl, "clicked", NULL, false);
 	}
 	return dispatched;
 }

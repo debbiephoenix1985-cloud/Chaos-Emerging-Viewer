@@ -74,6 +74,7 @@ public:
 	bool isTempAsset() const;
 
 	static void show(void*);
+	static void showLocal();
 	static void hide(void*);
 	static void update();
 
@@ -105,6 +106,7 @@ private:
 	static void onClickKeep(void* datap);
 	static void onCommitSave(LLUICtrl* ctrlp, void* datap);
 	static void onClickNewSnapshot(void* datap);
+	static void onCommitSnapshotFilter(LLUICtrl* ctrlp, void* datap);
 	static void onClickAutoSnap(LLUICtrl* ctrlp, void* datap);
 	static void onClickLess(void* datap);
 	static void onClickMore(void* datap);

@@ -64,6 +64,8 @@ void handle_copy(void*);
 void handle_take();
 void handle_take_copy();
 void handle_object_delete();
+// Reuse the Tools menu's existing selected-object script reset queue.
+void handle_reset_selection();
 void handle_object_return();
 bool visible_take_object();
 bool enable_object_take_copy();
@@ -198,6 +200,10 @@ extern LLPieMenu*				gPieAvatarp;
 extern LLPieMenu*				gPieObjectp;
 extern LLPieMenu*				gPieAttachmentp;
 extern LLPieMenu*				gPieLandp;
+
+// Firestorm-style world context menus: manual preference overrides skin.
+bool useChaosContextMenu();
+void showChaosContextMenu(const char* kind, S32 x, S32 y);
 extern LLPieMenu*				gPieParticlep;
 
 // Sub-menu of gPieAvatarp

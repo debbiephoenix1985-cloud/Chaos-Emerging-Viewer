@@ -1226,7 +1226,34 @@ std::string LLViewerTextEditor::getEmbeddedText()
 
 std::string LLViewerTextEditor::appendTime(bool prepend_newline)
 {
-	std::string text = LLLogChat::timestamp(true) + " ";
+	// IM and group-chat timestamps use the same clock source and format as
+	// Nearby Chat and the top status-bar clock (SLT, UTC, or local).
+	const U32 mode = llmin(gSavedSettings.getU32("StatusBarTimeMode"), 2U);
+	const time_t clock_time = mode == 2 ? computer_time() : time_corrected();
+	struct tm* timep = NULL;
+	if (mode == 0)
+	{
+		timep = utc_to_pacific_time(clock_time, gPacificDaylightTime);
+	}
+	else if (mode == 1)
+	{
+		timep = utc_time_to_tm(clock_time);
+	}
+	else
+	{
+		timep = local_time_to_tm(clock_time);
+	}
+
+	const std::string format =
+		gSavedSettings.getBool("LogTimestampSeconds") ?
+		gSavedSettings.getString("LongTimeFormat") :
+		gSavedSettings.getString("ShortTimeFormat");
+	std::string timestamp;
+	if (timep)
+	{
+		timeStructToFormattedString(timep, format, timestamp);
+	}
+	std::string text = "[" + timestamp + "]  ";
 	appendColoredText(text, false, prepend_newline, LLColor4::grey);
 	return text;
 }

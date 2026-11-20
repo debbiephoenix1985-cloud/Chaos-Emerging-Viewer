@@ -1,4 +1,4 @@
-/**
+﻿/**
 * @file llstatusbar.cpp
 * @brief LLStatusBar class implementation
 *
@@ -33,6 +33,10 @@
 #include "llstatusbar.h"
 
 #include "llbutton.h"
+#include "llaudioengine.h"
+#include "llmediaremotectrl.h"
+#include "llviewermedia.h"
+#include "llvoiceclient.h"
 #include "llcachename.h"
 #include "llmenugl.h"				// For gMenuBarHeight
 #include "llparcel.h"
@@ -138,6 +142,10 @@ LLBalanceHandler gBalanceHandler;
 
 LLStatusBar::LLStatusBar(const LLRect& rect)
 :	LLPanel("status bar", LLRect(), false),	// Not mouse opaque
+	mTopSharedMediaRemote(NULL),
+	mTopParcelMediaRemote(NULL),
+	mTopParcelMusicRemote(NULL),
+	mTopMasterRemote(NULL),
 	mUseOldIcons(true),
 	mParcelTextColor(LLColor4(gColors.getColor("ParcelTextColor"))),
 	mVisibility(true),
@@ -232,6 +240,31 @@ LLStatusBar::LLStatusBar(const LLRect& rect)
 
 	mTextTime = getChild<LLTextBox>("TimeText");
 	mTextTime->setClickedCallback(onClickTime, this);
+	mBtnHome = getChild<LLButton>("teleport_home_btn");
+	mBtnHome->setClickedCallback(onClickHome, this);
+
+	// Build 207: the original remote buttons are also available next to Home.
+	mTopSharedMediaRemote = new LLMediaRemoteCtrl("top_shared_media_remote",
+		LLRect(0, 20, 64, 0), "panel_top_shared_media_remote.xml",
+		LLMediaRemoteCtrl::REMOTE_SHARED_MEDIA);
+	addChild(mTopSharedMediaRemote);
+	mTopParcelMediaRemote = new LLMediaRemoteCtrl("top_parcel_media_remote",
+		LLRect(0, 20, 64, 0), "panel_top_media_remote.xml",
+		LLMediaRemoteCtrl::REMOTE_PARCEL_MEDIA);
+	addChild(mTopParcelMediaRemote);
+	mTopParcelMusicRemote = new LLMediaRemoteCtrl("top_parcel_music_remote",
+		LLRect(0, 20, 64, 0), "panel_top_music_remote.xml",
+		LLMediaRemoteCtrl::REMOTE_PARCEL_MUSIC);
+	addChild(mTopParcelMusicRemote);
+	mTopMasterRemote = new LLMediaRemoteCtrl("top_master_volume",
+		LLRect(0, 20, 32, 0), "panel_top_master_volume.xml",
+		LLMediaRemoteCtrl::REMOTE_MASTER_VOLUME);
+	addChild(mTopMasterRemote);
+	mTopSharedMediaRemote->setVisible(false);
+	mTopParcelMediaRemote->setVisible(false);
+	mTopParcelMusicRemote->setVisible(false);
+	mTopMasterRemote->setVisible(false);
+
 
 	mTextBalance = getChild<LLTextBox>("BalanceText");
 	mTextBalance->setClickedCallback(onClickBalance);
@@ -895,6 +928,50 @@ void LLStatusBar::refresh()
 	mTextTime->setRect(r);
 	new_right -= r.getWidth() + 6;
 
+	// Keep Teleport Home immediately beside the clock, even when the
+	// balance display or search bar changes width or visibility.
+	r = mBtnHome->getRect();
+	r.translate(new_right - r.mRight, 0);
+	mBtnHome->setRect(r);
+	mBtnHome->setVisible(mVisibility);
+	new_right -= r.getWidth() + 6;
+
+	// Place media/music/volume immediately left of Home, only in Top mode.
+	const bool remotes_top = (gSavedSettings.getString("MediaRemoteBarLocation") == "top");
+	static LLCachedControl<bool> music_setting(gSavedSettings, "EnableStreamingMusic");
+	static LLCachedControl<bool> media_setting(gSavedSettings, "EnableStreamingMedia");
+	static LLCachedControl<bool> shared_setting(gSavedSettings, "PrimMediaMasterEnabled");
+	static LLCachedControl<bool> hide_master_setting(gSavedSettings, "HideMasterRemote");
+	const bool top_visible = remotes_top && mVisibility;
+	const bool music_active = top_visible && gAudiop && music_setting &&
+							 parcel && !parcel->getMusicURL().empty();
+	const bool parcel_media_active = top_visible && gAudiop && media_setting &&
+								 parcel && !parcel->getMediaURL().empty();
+	const bool shared_active = top_visible && gAudiop && media_setting &&
+							  shared_setting &&
+							  (LLViewerMedia::isAnyMediaEnabled() ||
+							   LLViewerMedia::isAnyMediaDisabled());
+	const bool master_active = top_visible &&
+							  (!hide_master_setting || music_active ||
+							   parcel_media_active || shared_active ||
+							   LLVoiceClient::voiceEnabled());
+	// Top media panels have their own 18px XUI, with native control callbacks
+	// and child buttons aligned with Home in the status bar's 18px row.
+	// NEVER reuse the taller bottom-overlay XUI for these top controls.
+	auto place_top_remote = [&new_right](LLMediaRemoteCtrl* ctrl,
+										 bool show, S32 width)
+	{
+		ctrl->setVisible(show);
+		ctrl->setEnabled(show);
+		if (!show) return;
+		ctrl->setRect(LLRect(new_right - width, 18, new_right, 0));
+		new_right -= width + 3;
+	};
+	// From left: shared media, parcel media, music, volume, Home.
+	place_top_remote(mTopMasterRemote, master_active, 32);
+	place_top_remote(mTopParcelMusicRemote, music_active, 64);
+	place_top_remote(mTopParcelMediaRemote, parcel_media_active, 64);
+	place_top_remote(mTopSharedMediaRemote, shared_active, 64);
 	static LLCachedControl<bool> show_search_bar(gSavedSettings,
 												 "ShowSearchBar");
 	showing = mVisibility && show_search_bar;
@@ -1033,6 +1110,7 @@ void LLStatusBar::setVisibleForMouselook(bool visible)
 	mTextBalance->setVisible(visible && show_balance);
 	mBtnBuyMoney->setVisible(visible && !show_balance && show_buy);
 	mTextTime->setVisible(visible);
+	mBtnHome->setVisible(visible);
 	mLineEditSearch->setVisible(visible);
 	mBtnSearch->setVisible(visible);
 	mBtnSearchBevel->setVisible(visible);
@@ -1167,6 +1245,13 @@ void LLStatusBar::onClickTime(void* data)
 		gSavedSettings.setU32("StatusBarTimeMode", self->mTimeMode);
 		self->mDirty = true;
 	}
+}
+
+//static
+void LLStatusBar::onClickHome(void*)
+{
+	// Use the same teleport-home action as World > Teleport Home.
+	gAgent.teleportHome();
 }
 
 //static

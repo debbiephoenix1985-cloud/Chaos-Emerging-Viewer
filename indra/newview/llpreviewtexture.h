@@ -65,6 +65,8 @@ public:
 
 	LL_INLINE void setNotCopyable()						{ mIsCopyable = false; }
 
+	void saveAsWithFormat(HBFileSelector::ESaveFilter type);
+	static void onSaveFormatChosen(LLUICtrl* ctrlp, void* userdata);
 	static void saveAsCallback(HBFileSelector::ESaveFilter type,
 							   std::string& filename, void* user_data);
 
@@ -83,6 +85,7 @@ protected:
 	bool setAspectRatio(F32 width, F32 height);
 	static void onAspectRatioCommit(LLUICtrl*, void* userdata);
 	static void onRefreshBtn(void* data);
+	static void onSaveAsBtn(void* data);
 
 	LL_INLINE const char* getTitleName() const override	{ return "Texture"; }
 
@@ -95,6 +98,7 @@ private:
 	LLFrameTimer						mSavedFileTimer;
 
 	std::string							mSaveFileName;
+	HBFileSelector::ESaveFilter mSaveFileType = HBFileSelector::FFSAVE_PNG;
 
 	LLUUID								mImageID;
 

@@ -1610,12 +1610,25 @@ void LLTabContainer::setPanelTitle(S32 index, const std::string& title)
 			LLButton* tab_button = tuple->mButton;
 			if (tab_button)
 			{
-				mTotalTabWidth -= tab_button->getRect().getWidth();
-				tab_button->reshape(llclamp(fontp->getWidth(title) +
-											TAB_PADDING + tuple->mPadding,
-											mMinTabWidth, mMaxTabWidth),
-									tab_button->getRect().getHeight());
-				mTotalTabWidth += tab_button->getRect().getWidth();
+				// Conversations has fixed-width vertical tabs (118px from
+				// floater_chatterbox2.xml). The full resident name is retained
+				// for the tooltip and tab identity, but it must not expand
+				// the rail and overlap the IM content on initial title update.
+				if (mIsVertical && getName() == "Preview Tabs")
+				{
+					tab_button->reshape(mMinTabWidth,
+										tab_button->getRect().getHeight());
+					tab_button->setToolTip(title);
+				}
+				else
+				{
+					mTotalTabWidth -= tab_button->getRect().getWidth();
+					tab_button->reshape(llclamp(fontp->getWidth(title) +
+												TAB_PADDING + tuple->mPadding,
+												mMinTabWidth, mMaxTabWidth),
+										tab_button->getRect().getHeight());
+					mTotalTabWidth += tab_button->getRect().getWidth();
+				}
 				tab_button->setLabelSelected(title);
 				tab_button->setLabelUnselected(title);
 			}

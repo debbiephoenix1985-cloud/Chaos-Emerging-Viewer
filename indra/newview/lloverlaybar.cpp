@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lloverlaybar.cpp
  * @brief LLOverlayBar class implementation
  *
@@ -174,7 +174,6 @@ LLOverlayBar::LLOverlayBar(const LLRect& rect)
 		LLCallbackMap(createParcelMediaRemote, this);
 	factory_map["shared_media_remote"] =
 		LLCallbackMap(createSharedMediaRemote, this);
-	factory_map["voice_remote"] = LLCallbackMap(createVoiceRemote, this);
 
 	LLUICtrlFactory::getInstance()->buildPanel(this, "panel_overlaybar.xml",
 											   &factory_map);
@@ -471,6 +470,13 @@ void LLOverlayBar::draw()
 //virtual
 void LLOverlayBar::refresh()
 {
+	static bool last_remotes_top = (gSavedSettings.getString("MediaRemoteBarLocation") == "top");
+	const bool remotes_top = (gSavedSettings.getString("MediaRemoteBarLocation") == "top");
+	if (last_remotes_top != remotes_top)
+	{
+		last_remotes_top = remotes_top;
+		layoutButtons();
+	}
 	U32 ims_received = gIMMgrp ? gIMMgrp->getIMsReceived() : 0U;
 	if (ims_received != mLastIMsCount)
 	{
@@ -576,7 +582,7 @@ void LLOverlayBar::refresh()
 			r.mLeft = right - mParcelMusicRemoteWidth;
 			right = r.mLeft - mStatusBarPad;
 			mParcelMusicRemote->setRect(r);
-			mParcelMusicRemote->setVisible(true);
+			mParcelMusicRemote->setVisible(!remotes_top);
 			visible = true;
 		}
 		else
@@ -600,7 +606,7 @@ void LLOverlayBar::refresh()
 			r.mLeft = right - mParcelMediaRemoteWidth;
 			right = r.mLeft - mStatusBarPad;
 			mParcelMediaRemote->setRect(r);
-			mParcelMediaRemote->setVisible(true);
+			mParcelMediaRemote->setVisible(!remotes_top);
 			visible = true;
 		}
 		else
@@ -625,7 +631,7 @@ void LLOverlayBar::refresh()
 			r.mLeft = right - mSharedMediaRemoteWidth;
 			right = r.mLeft - mStatusBarPad;
 			mSharedMediaRemote->setRect(r);
-			mSharedMediaRemote->setVisible(true);
+			mSharedMediaRemote->setVisible(!remotes_top);
 			visible = true;
 		}
 		else
@@ -652,8 +658,8 @@ void LLOverlayBar::refresh()
 		}
 	}
 
-	mMasterRemote->setVisible(visible);
-	mMasterRemote->setEnabled(visible);
+	mMasterRemote->setVisible(visible && !remotes_top);
+	mMasterRemote->setEnabled(visible && !remotes_top);
 
 	updateBoundingRect();
 }

@@ -1,4 +1,4 @@
-<llsd>
+﻿<llsd>
 	<map>
 	<key>FSUndeformUUID</key>
 		<map>
@@ -6460,6 +6460,17 @@
 		<key>Value</key>
 		<boolean>1</boolean>
 		</map>
+    <key>HideLibraryFolder</key>
+    <map>
+        <key>Comment</key>
+        <string>TRUE hides the Library root in inventory views without altering inventory contents</string>
+        <key>Persist</key>
+        <integer>1</integer>
+        <key>Type</key>
+        <string>Boolean</string>
+        <key>Value</key>
+        <boolean>0</boolean>
+    </map>
 	<key>HideCurrentOutfitFolder</key>
 		<map>
 		<key>Comment</key>
@@ -6469,7 +6480,7 @@
 		<key>Type</key>
 		<string>Boolean</string>
 		<key>Value</key>
-		<boolean>1</boolean>
+		<boolean>0</boolean>
 		</map>
 	<key>HideEmptySystemFolders</key>
 		<map>
@@ -6503,6 +6514,17 @@
 		<string>Boolean</string>
 		<key>Value</key>
 		<boolean>0</boolean>
+		</map>
+	<key>MediaRemoteBarLocation</key>
+		<map>
+		<key>Comment</key>
+		<string>Media, stream and volume controls appear on either the top or bottom bar</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>String</string>
+		<key>Value</key>
+		<string>top</string>
 		</map>
 	<key>HideMasterRemote</key>
 		<map>
@@ -14801,6 +14823,88 @@
 		<key>Value</key>
 		<boolean>0</boolean>
 		</map>
+	<key>ShowAOButton</key>
+		<map>
+		<key>Comment</key>
+		<string>Show the AO on/off button and editor arrow in the toolbar</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Boolean</string>
+		<key>Value</key>
+		<boolean>1</boolean>
+		</map>
+	<key>ShowRegionInfoButton</key>
+		<map>
+		<key>Comment</key>
+		<string>Show the Region Details button in the bottom toolbar</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Boolean</string>
+		<key>Value</key>
+		<boolean>1</boolean>
+		</map>
+	<key>ShowStatisticsButton</key>
+		<map>
+		<key>Comment</key>
+		<string>Show the Statistics button in the bottom toolbar</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Boolean</string>
+		<key>Value</key>
+		<boolean>1</boolean>
+		</map>
+	<key>ChaosRightClickMenuStyle</key>
+		<map>
+		<key>Comment</key>
+		<string>Right-click world menu: auto follows selected skin, context uses Firestorm-style list, pie uses legacy radial menu.</string>
+		<key>Persist</key><integer>1</integer>
+		<key>Type</key><string>String</string>
+		<key>Value</key><string>auto</string>
+		</map>
+	<key>ShowMutedNearbyChat</key>
+		<map>
+		<key>Comment</key>
+		<string>Show muted text in Nearby Chat and remember the selection after restarting the viewer.</string>
+		<key>Persist</key><integer>1</integer>
+		<key>Type</key><string>Boolean</string>
+		<key>Value</key><boolean>0</boolean>
+		</map>
+	<key>ShowFavoritesBar</key>
+		<map>
+		<key>Comment</key>
+		<string>Show the Firestorm-style Favorites landmark teleport bar</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Boolean</string>
+		<key>Value</key>
+		<boolean>1</boolean>
+		</map>
+	<key>ShowCameraControlsButton</key>
+		<map>
+		<key>Comment</key>
+		<string>Show the Camera Controls bottom toolbar button</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Boolean</string>
+		<key>Value</key>
+		<boolean>1</boolean>
+		</map>
+	<key>ShowFavWearablesButton</key>
+		<map>
+		<key>Comment</key>
+		<string>Show the Favourite Wearables button in the toolbar</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Boolean</string>
+		<key>Value</key>
+		<boolean>1</boolean>
+		</map>
 	<key>ShowInventoryButton</key>
 		<map>
 		<key>Comment</key>
@@ -15307,13 +15411,24 @@
 	<key>SkinCurrent</key>
 		<map>
 		<key>Comment</key>
-		<string>The currently selected skin.</string>
+		<string>The currently selected skin. Modern is the fresh-install default.</string>
 		<key>Persist</key>
 		<integer>1</integer>
 		<key>Type</key>
 		<string>String</string>
 		<key>Value</key>
-		<string>default</string>
+		<string>dark</string>
+		</map>
+	<key>SkinMediaLayoutPresetApplied</key>
+		<map>
+		<key>Comment</key>
+		<string>Once true, changing skins never overrides the saved media controls position.</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Boolean</string>
+		<key>Value</key>
+		<boolean>0</boolean>
 		</map>
 	<key>SkipStaticVectorSizing</key>
 		<map>
@@ -17616,7 +17731,7 @@
 		<key>Type</key>
 		<string>String</string>
 		<key>Value</key>
-		<string>Chaos Emerging Viewer</string>
+		<string>Chaos Emerging Viewer 170</string>
 		</map>
 	<key>VisibilityAutoRefreshBorder</key>
 		<map>
@@ -17793,6 +17908,17 @@
 		<string>String</string>
 		<key>Value</key>
 		<string>Default</string>
+		</map>
+	<key>VoiceMultiInstance</key>
+		<map>
+		<key>Comment</key>
+		<string>Enables using voice in multiple simultaneous viewer instances (Firestorm VoiceMultiInstance).</string>
+		<key>Persist</key>
+		<integer>1</integer>
+		<key>Type</key>
+		<string>Boolean</string>
+		<key>Value</key>
+		<boolean>1</boolean>
 		</map>
 	<key>VoiceOutputAudioDevice</key>
 		<map>
@@ -19594,5 +19720,51 @@
 		<key>Value</key>
 		<real>100</real>
 		</map>
-	</map>
+	<key>ChaosCameraWindowRect</key>
+		<map>
+		<key>Comment</key><string>Movable compact camera controls; fresh default position safely above the chat toolbar</string>
+		<key>Persist</key><integer>1</integer>
+		<key>Type</key><string>Rect</string>
+		<key>Value</key><array><integer>120</integer><integer>480</integer><integer>290</integer><integer>323</integer></array>
+		</map>
+	<key>ChaosCameraCompactRect</key>
+		<map>
+		<key>Comment</key><string>Resizable compact Firestorm-style camera controls; separate from the old oversized layout</string>
+		<key>Persist</key><integer>1</integer>
+		<key>Type</key><string>Rect</string>
+		<key>Value</key><array><integer>0</integer><integer>135</integer><integer>170</integer><integer>0</integer></array>
+		</map>
+	<key>ChaosCameraMyViewSaved</key>
+		<map>
+		<key>Comment</key><string>Whether the user has saved a custom camera view</string>
+		<key>Persist</key><integer>1</integer>
+		<key>Type</key><string>Boolean</string>
+		<key>Value</key><boolean>0</boolean>
+		</map>
+	<key>ChaosCameraMyViewPos</key>
+		<map>
+		<key>Comment</key><string>Saved camera position relative to avatar</string>
+		<key>Persist</key><integer>1</integer>
+		<key>Type</key><string>Vector3</string>
+		<key>Value</key><array><real>0</real><real>0</real><real>0</real></array>
+		</map>
+	<key>ChaosCameraMyViewFocus</key>
+		<map>
+		<key>Comment</key><string>Saved camera focus relative to avatar</string>
+		<key>Persist</key><integer>1</integer>
+		<key>Type</key><string>Vector3</string>
+		<key>Value</key><array><real>0</real><real>0</real><real>0</real></array>
+		</map>
+	  <key>LoginSRVTimeout</key>
+  <map>
+      <key>Comment</key>
+      <string>Duration in seconds of the login SRV request timeout</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>90.0</real>
+  </map>
+</map>
 </llsd>

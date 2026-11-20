@@ -62,42 +62,30 @@ LLPacketRing::~LLPacketRing()
 	}
 }
 
-void LLPacketRing::pushPacket(const LLPacketBuffer& packet)
+bool LLPacketRing::hasRoom() const
 {
+	return mNumBufferedPackets < mRing.size() || mRing.size() < MAX_BUFFER_RING_SIZE;
+}
+
+bool LLPacketRing::pushPacket(const LLPacketBuffer& packet)
+{
+	if (!hasRoom())
+	{
+		llwarns_once << "Inbound packet ring full: leaving the newest packet unqueued"
+					 << llendl;
+		return false;
+	}
 	U32 ring_size = mRing.size();
-	if (mNumBufferedPackets >= ring_size && ring_size < MAX_BUFFER_RING_SIZE)
+	if (mNumBufferedPackets >= ring_size)
 	{
 		ring_size = expandRing();
 	}
-
 	LLPacketBuffer* slotp = mRing[mHeadIndex];
-	S32 old_size = slotp->getSize();
 	*slotp = packet;
-
 	mHeadIndex = (mHeadIndex + 1) % ring_size;
-
-	if (mNumBufferedPackets < ring_size)
-	{
-		++mNumBufferedPackets;
-		mNumBufferedBytes += packet.getSize();
-		return;
-	}
-
-	// Ring is at maximum capacity; oldest packet was overwritten.
-	// This is VERY BAD because we have already ACKed the packet we are
-	// loosing (if it was "reliable").
-	llwarns << "Rung buffer overflow at " << mNumBufferedPackets
-			<< " packets. Oldest packet dropped to make room." << llendl;
-	S32 delta = packet.getSize() - old_size;
-	if ((S32)mNumBufferedBytes + delta < 0)	// This should not happen. HB
-	{
-		llwarns << "Buffered bytes accounting error. Reset to 0." << llendl;
-		mNumBufferedBytes = 0;
-	}
-	else
-	{
-		mNumBufferedBytes += delta;
-	}
+	++mNumBufferedPackets;
+	mNumBufferedBytes += packet.getSize();
+	return true;
 }
 
 bool LLPacketRing::popPacket(LLPacketBuffer& packet)

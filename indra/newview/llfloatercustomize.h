@@ -85,6 +85,8 @@ public:
 	static void	 updateAvatarHeightDisplay();
 
 	static void setCurrentWearableType(LLWearableType::EType type);
+	static bool editWearable(const LLUUID& item_id);
+	static bool applyRequestedWearableEdit();
 
 	LL_INLINE static LLWearableType::EType getCurrentWearableType()
 	{
@@ -130,6 +132,7 @@ private:
 	void*							mNextStepAfterSaveUserdata;
 
 	static LLWearableType::EType	sCurrentWearableType;
+	static LLUUID					sRequestedWearableItemID;
 	static uuid_list_t				sFetchingRequests;
 };
 

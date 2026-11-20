@@ -303,7 +303,19 @@ bool LLGLTFMaterialList::decodeAsset(const LLUUID& id,
 	LLSD asset;
 	if (!LLSDSerialize::deserialize(asset, istream, -1))
 	{
-		llwarns << "Failed to deserialize material LLSD for " << id << llendl;
+		// The region sends one terrain UUID per slot without specifying
+        // whether it is a legacy texture or PBR material. The GLTF
+        // decoder is therefore also tried for valid legacy textures.
+        // Keep genuinely invalid non-terrain GLTF assets as warnings.
+        if (LLTerrain::isAsset(id))
+        {
+            LL_DEBUGS("GLTF") << "Legacy terrain asset is not GLTF LLSD: "
+                              << id << LL_ENDL;
+        }
+        else
+        {
+            llwarns << "Failed to deserialize material LLSD for " << id << llendl;
+        }
 		return false;
 	}
 	if (!asset.has("version"))

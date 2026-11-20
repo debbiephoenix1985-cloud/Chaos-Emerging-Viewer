@@ -1,10 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <floater legacy_header_height="18" can_resize="true" can_dock="false" can_close="true" height="535" min_height="525" min_width="525" name="animation_overrider" help_topic="animation_overrider" save_rect="true" save_visibility="true" single_instance="true" save_dock_state="false" title="Animation Overrider" width="535">
 
 	<string name="ao_no_sets_loaded">
 No Sets Loaded
 	</string>
 
+	<string name="ao_track_main">Main animations</string>
+	<string name="ao_no_track_animations">No track animations loaded</string>
+	<string name="ao_group_tooltip">Animation group; members play together:</string>
+	<string name="ao_member_tooltip">Part of a synchronized animation group</string>
 	<string name="ao_no_animations_loaded">
 No Animations Loaded
 	</string>
@@ -12,6 +16,34 @@ No Animations Loaded
 You can only drag and drop an animation notecard on the full interface window. Click on the wrench icon to open it.
 	</string>
 
+	<string
+		name="ao_dnd_add_to_track">
+Drop to add to this track
+	</string>
+	<string
+		name="ao_dnd_merge">
+Drop to group with this animation
+	</string>
+	<string
+		name="ao_dnd_add_to_group">
+Drop to add to this group
+	</string>
+	<string
+		name="ao_dnd_folder_pour">
+Drop folder to add its animations to this track
+	</string>
+	<string
+		name="ao_dnd_folder_group">
+Drop folder to create an animation group
+	</string>
+	<string name="ao_add_blank_label">New empty set...</string>
+	<string name="ao_add_clone_label">Clone current set...</string>
+	<string name="ao_cm_collapse">Collapse</string>
+	<string name="ao_cm_delete">Delete</string>
+	<string name="ao_cm_expand">Expand</string>
+	<string name="ao_cm_find_original">Find Original</string>
+	<string name="ao_cm_move_out">Move out of group</string>
+	<string name="ao_cm_rename_group">Rename group...</string>
 	<panel name="animation_overrider_outer_panel" filename="panel_ao.xml" left="0" width="525" height="508" follows="all" bottom="0">
 	</panel>
 </floater>

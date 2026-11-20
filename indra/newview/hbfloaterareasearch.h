@@ -53,6 +53,7 @@
 #pragma once
 
 #include "llfloater.h"
+#include "llsaleinfo.h"
 
 class LLButton;
 class LLFlyoutButton;
@@ -92,13 +93,15 @@ private:
 
 	bool postBuild() override;
 	void draw() override;
+	bool handleRightMouseDown(S32 x, S32 y, MASK mask) override;
 
 	enum OBJECT_COLUMN_ORDER
 	{
 		LIST_OBJECT_NAME,
 		LIST_OBJECT_DESC,
 		LIST_OBJECT_OWNER,
-		LIST_OBJECT_GROUP
+		LIST_OBJECT_GROUP,
+		LIST_OBJECT_DISTANCE
 	};
 
 	void addInResultsList(const LLUUID& object_id, bool match_filters);
@@ -113,6 +116,16 @@ private:
 	// Returns true if the object details are up to date, false otherwise and
 	// in that latter case, sends an update request if needed.
 	static bool checkObjectDetails(const LLUUID& object_id);
+
+	// Context menu actions operate on the object under the last right click.
+	LLViewerObject* getContextObject();
+	static void onMenuTouch(void* userdata);
+	static void onMenuTakeCopy(void* userdata);
+	static void onMenuBuy(void* userdata);
+	static void onMenuEdit(void* userdata);
+	static void onMenuReturn(void* userdata);
+	static void onMenuDelete(void* userdata);
+	static void onMenuTeleport(void* userdata);
 
 	static void onSelectResult(LLUICtrl*, void* userdata);
 	static void onDoubleClickResult(void* userdata);
@@ -142,6 +155,13 @@ private:
 		F32			time_stamp;
 		LLUUID		owner_id;
 		LLUUID		group_id;
+		LLUUID		last_owner_id;
+		U32			base_mask = 0;
+		U32			owner_mask = 0;
+		U32			group_mask = 0;
+		U32			everyone_mask = 0;
+		U32			next_owner_mask = 0;
+		LLSaleInfo	sale_info;
 		std::string	name;
 		std::string	desc;
 	};
@@ -159,6 +179,9 @@ private:
 	LLButton*					mReportBtn;
 	LLButton*					mShowBtn;
 	LLButton*					mRefreshBtn;
+	LLHandle<LLView>			mContextMenuHandle;
+	LLUUID						mContextObjectID;
+	F32							mLastDistanceUpdate = 0.f;
 
 	LLUUID						mSearchUUID;
 	std::string					mSearchedName;

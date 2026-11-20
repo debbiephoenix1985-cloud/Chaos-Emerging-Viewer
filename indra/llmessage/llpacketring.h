@@ -46,9 +46,10 @@ public:
 	LLPacketRing();
     ~LLPacketRing();
 
-	// Copies 'packet' onto the tail of the ring, growing the ring or
-	// overwriting the oldest entry when the ring is at capacity.
-	void pushPacket(const LLPacketBuffer& packet);
+	// Return false when the maximum-sized ring is full: do not acknowledge
+	// reliable network traffic that cannot be buffered.
+	bool hasRoom() const;
+	bool pushPacket(const LLPacketBuffer& packet);
 
 	// Copies the head (oldest) packet into 'packet'. Returns true if a packet
 	// was available, false if the ring was empty.

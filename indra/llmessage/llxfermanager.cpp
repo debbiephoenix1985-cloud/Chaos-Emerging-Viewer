@@ -526,7 +526,8 @@ bool LLXferManager::validateFileForTransfer(const std::string& filename)
 
 static bool remove_prefix(std::string& filename, const std::string& prefix)
 {
-	if (std::equal(prefix.begin(), prefix.end(), filename.begin()))
+	if (filename.size() >= prefix.size() &&
+		std::equal(prefix.begin(), prefix.end(), filename.begin()))
 	{
 		filename = filename.substr(prefix.length());
 		return true;
@@ -534,25 +535,19 @@ static bool remove_prefix(std::string& filename, const std::string& prefix)
 	return false;
 }
 
-// NOTE: This function is only used to check file names that our own code
-// places in the cache directory. As such, it can be limited to this very
-// restrictive file name pattern. It does not need to handle other characters.
+// Simulator requests may read these cache files. Use the restrictive
+// legacy .tmp filename pattern also enforced in Firestorm 7.2.4.
 static bool verify_cache_filename(const std::string& filename)
 {
-	size_t len = filename.size();
-	if (len < 1 || len > 50)
+	const size_t len = filename.size();
+	if (len < 5 || len > 50 || filename.compare(len - 4, 4, ".tmp") != 0)
 	{
 		return false;
 	}
-	for (U32 i = 0; i < len; ++i)
+	for (size_t i = 0; i < len - 4; ++i)
 	{
-		char c = filename[i];
-		bool ok = isalnum(c);
-		if (!ok && i > 0)
-		{
-			ok = '_' == c || '-' == c || '.' == c;
-		}
-		if (!ok)
+		const unsigned char c = static_cast<unsigned char>(filename[i]);
+		if (!isalnum(c) && c != '_' && c != '-')
 		{
 			return false;
 		}

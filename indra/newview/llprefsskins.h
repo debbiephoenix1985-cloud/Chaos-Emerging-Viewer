@@ -35,6 +35,10 @@
 
 class LLRadioGroup;
 
+// Applies the Modern/Legacy media-bar position once, on the first deliberate
+// skin change. Thereafter the user's saved position is always respected.
+void applyChaosSkinMediaPresetOnce(const std::string& skin);
+
 class LLPrefSkins final : public LLPanel
 {
 	LOG_CLASS(LLPrefSkins);
@@ -51,7 +55,6 @@ public:
 private:
 	static void onSelectSkin(LLUICtrl* ctrl, void* data);
 	static void onClickClassic(void* data);
-	static void onClickSilver(void* data);
 	static void onClickDark(void* data);
 
 private:

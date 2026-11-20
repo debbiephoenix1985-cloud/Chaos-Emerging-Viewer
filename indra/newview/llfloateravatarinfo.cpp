@@ -44,6 +44,8 @@
 #include "llgridmanager.h"			// For gIsInSecondLife
 #include "llfloaterinventory.h"
 #include "llviewercontrol.h"
+#include "llviewerwindow.h"
+#include "llslurl.h"
 #include "llweb.h"
 
 using namespace std::placeholders;
@@ -175,7 +177,34 @@ void* LLFloaterAvatarInfo::createPanelAvatar(void* data)
 
 bool LLFloaterAvatarInfo::postBuild()
 {
+	childSetAction("copy_avatar_uuid", onCopyAvatarUUID, this);
+	childSetAction("copy_avatar_profile_url", onCopyAvatarProfileURL, this);
 	return true;
+}
+
+void LLFloaterAvatarInfo::onCopyAvatarUUID(void* userdata)
+{
+	auto* self = static_cast<LLFloaterAvatarInfo*>(userdata);
+	if (self && self->mAvatarID.notNull() && gWindowp)
+	{
+		gWindowp->copyTextToClipboard(
+			utf8str_to_wstring(self->mAvatarID.asString()));
+	}
+}
+
+void LLFloaterAvatarInfo::onCopyAvatarProfileURL(void* userdata)
+{
+	auto* self = static_cast<LLFloaterAvatarInfo*>(userdata);
+	if (self && self->mAvatarID.notNull() && gWindowp)
+	{
+		// Match the exact profile URL that Chaos already uses for
+		// clickable avatar names in local chat (llfloaterchat.cpp).
+		// The no-host app URL is resolved against the current grid,
+		// including OpenSim, by LLSLURL and LLURLDispatcher.
+		const std::string url = llformat("secondlife:///app/agent/%s/about",
+								self->mAvatarID.asString().c_str());
+		gWindowp->copyTextToClipboard(utf8str_to_wstring(url));
+	}
 }
 
 LLFloaterAvatarInfo::LLFloaterAvatarInfo(const LLUUID& avatar_id)

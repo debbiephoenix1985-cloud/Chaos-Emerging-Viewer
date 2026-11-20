@@ -705,6 +705,14 @@ std::string LLGridManager::getGridHost(std::string grid)
 				{
 					temp = grid_array[i]["name"].asString();
 					LLStringUtil::toLower(temp);
+					// Dayturn grid label fix: resolve the configured display
+					// label as well as the internal name for hop/SLURL routing.
+					std::string label = grid_array[i]["label"].asString();
+					LLStringUtil::toLower(label);
+					if (!temp.empty() && label == grid)
+					{
+						return temp;
+					}
 					if (temp == grid)
 					{
 						return grid;

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file llfloatertools.cpp
  * @brief The edit tools, including move, position, land, etc.
  *
@@ -46,6 +46,7 @@
 #include "lluictrlfactory.h"
 
 #include "llagent.h"
+#include "llfloateradvancedbuild.h"
 #include "llfloatermediasettings.h"
 #include "llfloaterobjectweights.h"
 #include "llfloateropenobject.h"
@@ -302,6 +303,7 @@ bool LLFloaterTools::postBuild()
 	mCheckStretchUniform = getChild<LLCheckBoxCtrl>("checkbox uniform");
 
 	mCheckStretchTexture = getChild<LLCheckBoxCtrl>("checkbox stretch textures");
+	mCheckSnapToGrid = getChild<LLCheckBoxCtrl>("checkbox snap to grid");
 
 	mCheckUseRootForPivot = getChild<LLCheckBoxCtrl>("checkbox use root for pivot");
 
@@ -460,6 +462,8 @@ bool LLFloaterTools::postBuild()
 	mTab->setFollows(FOLLOWS_TOP | FOLLOWS_LEFT);
 	mTab->setBorderVisible(false);
 	mTab->selectFirstTab();
+
+	getChild<LLButton>("advanced_build_button")->setClickedCallback(onClickAdvancedBuild, this);
 
 	mStatusText["rotate"] = getString("status_rotate");
 	mStatusText["scale"] = getString("status_scale");
@@ -771,6 +775,7 @@ void LLFloaterTools::updatePopup(LLCoordGL center, MASK mask)
 	//mCheckSelectLinked->setVisible(edit_visible);
 	mCheckStretchUniform->setVisible(edit_visible);
 	mCheckStretchTexture->setVisible(edit_visible);
+	mCheckSnapToGrid->setVisible(edit_visible);
 	mCheckUseRootForPivot->setVisible(edit_visible);
 
 	// Create buttons
@@ -1086,6 +1091,15 @@ void LLFloaterTools::onClickGridOptions(void* datap)
 	{
 		self->addDependentFloater(floaterp);
 	}
+}
+
+//static
+void LLFloaterTools::onClickAdvancedBuild(void* datap)
+{
+    LLFloaterAdvancedBuild::showInstance();
+    LLFloaterTools* self = (LLFloaterTools*)datap;
+    LLFloaterAdvancedBuild* advanced = LLFloaterAdvancedBuild::findInstance();
+    if (self && advanced) self->addDependentFloater(advanced);
 }
 
 //static

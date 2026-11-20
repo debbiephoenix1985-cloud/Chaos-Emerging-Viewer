@@ -1990,7 +1990,7 @@ void LLViewerRegion::requestBaseCapabilitiesCoro(U64 region_handle)
 	// This loop is used for retrying a capabilities request.
 	do
 	{
-		const std::string& url = self->getCapability("Seed");
+		std::string url = self->getCapability("Seed");
 		if (url.empty())
 		{
 			llwarns << "No Seed capability for region: "
@@ -2027,9 +2027,17 @@ void LLViewerRegion::requestBaseCapabilitiesCoro(U64 region_handle)
 				<< " at requesting seed for region " << self->getIdentity()
 				<< " from: " << url << llendl;
 
+		LLTimer caps_timer;
+		self = nullptr;
 		result = adapter.postAndSuspend(url, cap_names, sHttpOptions,
 										sHttpHeaders);
 
+		const F32 caps_seconds = caps_timer.getElapsedTimeF32();
+		if (caps_seconds > 15.f)
+		{
+			llwarns << "Slow neighbour seed-capability reply: "
+					<< caps_seconds << "s for handle " << region_handle << llendl;
+		}
 		state = LLStartUp::getStartupState();
 		if (state < STATE_WORLD_INIT)
 		{
@@ -2105,7 +2113,7 @@ void LLViewerRegion::requestBaseCapabilitiesCompleteCoro(U64 region_handle)
 		return;
 	}
 
-	const std::string& url = self->getCapability("Seed");
+	std::string url = self->getCapability("Seed");
 	if (url.empty())
 	{
 		llwarns << "No 'Seed' capability for region: " << self->getIdentity()
@@ -2122,7 +2130,8 @@ void LLViewerRegion::requestBaseCapabilitiesCompleteCoro(U64 region_handle)
 			<< self->getIdentity() << " from: " << url << llendl;
 
 	LLCoreHttpUtil::HttpCoroutineAdapter adapter("BaseCapabilitiesRequest");
-	LLSD result = adapter.postAndSuspend(url, cap_names, sHttpOptions,
+	self = nullptr;
+    LLSD result = adapter.postAndSuspend(url, cap_names, sHttpOptions,
 										 sHttpHeaders);
 
 	// Abort now if we are quitting

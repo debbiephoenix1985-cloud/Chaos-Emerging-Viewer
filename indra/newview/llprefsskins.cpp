@@ -39,6 +39,16 @@
 
 #include "llviewercontrol.h"
 
+void applyChaosSkinMediaPresetOnce(const std::string& skin)
+{
+	if (!gSavedSettings.getBool("SkinMediaLayoutPresetApplied"))
+	{
+		gSavedSettings.setString("MediaRemoteBarLocation",
+									 skin == "dark" ? "top" : "bottom");
+		gSavedSettings.setBool("SkinMediaLayoutPresetApplied", true);
+	}
+}
+
 LLPrefSkins::LLPrefSkins()
 {
 	LLUICtrlFactory::getInstance()->buildPanel(this,
@@ -51,23 +61,14 @@ bool LLPrefSkins::postBuild()
 	mSkinsSelector->setCommitCallback(onSelectSkin);
 	mSkinsSelector->setCallbackUserData(this);
 
-	if (!gDirUtil.hasSkin("custom"))
+	// Only Chaos Default and Dark are shipped/selected.
+	const std::string active_skin = gSavedSettings.getString("SkinCurrent");
+	if (active_skin != "default" && active_skin != "dark")
 	{
-		LLRadioCtrl* radiop = mSkinsSelector->getRadioButton(3);
-		if (radiop)
-		{
-			radiop->setEnabled(false);
-		}
-		if (gSavedSettings.getString("SkinCurrent") == "custom")
-		{
-			llwarns << "Skin 'custom' does not exist, switching to default skin."
-					<< llendl;
-			gSavedSettings.setString("SkinCurrent", "default");
-		}
+		gSavedSettings.setString("SkinCurrent", "dark");
 	}
 
 	childSetAction("classic_preview", onClickClassic, this);
-	childSetAction("silver_preview", onClickSilver, this);
 	childSetAction("dark_preview", onClickDark, this);
 
 	refresh();
@@ -85,6 +86,7 @@ void LLPrefSkins::apply()
 {
 	if (mSkin != gSavedSettings.getString("SkinCurrent"))
 	{
+		applyChaosSkinMediaPresetOnce(gSavedSettings.getString("SkinCurrent"));
 		gNotifications.add("ChangeSkin");
 		refresh();
 	}
@@ -109,14 +111,6 @@ void LLPrefSkins::onClickClassic(void* data)
 	LLPrefSkins* self = (LLPrefSkins*)data;
 	gSavedSettings.setString("SkinCurrent", "default");
 	self->mSkinsSelector->setValue("default");
-}
-
-//static 
-void LLPrefSkins::onClickSilver(void* data)
-{
-	LLPrefSkins* self = (LLPrefSkins*)data;
-	gSavedSettings.setString("SkinCurrent", "silver");
-	self->mSkinsSelector->setValue("silver");
 }
 
 //static 

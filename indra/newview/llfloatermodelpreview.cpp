@@ -674,7 +674,7 @@ void LLFloaterModelPreview::loadModel(S32 lod)
 	LLMeshFileSelectorData* data = new LLMeshFileSelectorData;
 	data->mMP = mModelPreview;
 	data->mLOD = lod;
-	HBFileSelector::loadFile(HBFileSelector::FFLOAD_MODEL, model_load_callback,
+	HBFileSelector::loadUploadFile(HBFileSelector::FFLOAD_MODEL, model_load_callback,
 							 data);
 }
 

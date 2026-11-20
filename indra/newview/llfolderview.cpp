@@ -5434,9 +5434,13 @@ bool LLInventoryFilter::check(LLFolderViewItem* itemp)
 		return false;
 	}
 
-	if (mHideLibrary &&
-		gInventory.isObjectDescendentOf(item_id,
-										gInventory.getLibraryRootFolderID()))
+	// Firestorm 7.2.5 FIRE-34881: hide Library root and descendants in
+	// the existing Chaos folder view; do not remove inventory model data.
+	static LLCachedControl<bool> hide_library(gSavedSettings, "HideLibraryFolder");
+	if ((mHideLibrary || hide_library) &&
+		(item_id == gInventory.getLibraryRootFolderID() ||
+		 gInventory.isObjectDescendentOf(item_id,
+										gInventory.getLibraryRootFolderID())))
 	{
 		return false;
 	}
@@ -5525,7 +5529,7 @@ bool LLInventoryFilter::isNotDefault()
 {
 	return mFilterOps.mFilterTypes != mDefaultFilterOps.mFilterTypes ||
 		   mFilterSubType != -1 || mFilterWorn || mFilterLastOpen ||
-		   mFilterSubString.size() || mHideLibrary ||
+		   mFilterSubString.size() || mHideLibrary || gSavedSettings.getBool("HideLibraryFolder") ||
 		   mFilterOps.mPermissions != mDefaultFilterOps.mPermissions ||
 		   mFilterOps.mMinDate != mDefaultFilterOps.mMinDate ||
 		   mFilterOps.mMaxDate != mDefaultFilterOps.mMaxDate ||
@@ -5535,7 +5539,7 @@ bool LLInventoryFilter::isNotDefault()
 bool LLInventoryFilter::isActive()
 {
 	return mFilterOps.mFilterTypes != 0xffffffff || mFilterWorn ||
-		   mFilterLastOpen || mFilterSubString.size() ||
+		   mFilterLastOpen || mFilterSubString.size() || gSavedSettings.getBool("HideLibraryFolder") ||
 		   mFilterOps.mPermissions != PERM_NONE ||
 		   mFilterOps.mMinDate != time_min() ||
 		   mFilterOps.mMaxDate != time_max() ||

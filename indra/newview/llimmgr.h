@@ -32,6 +32,7 @@
 
 #include "llfloater.h"
 #include "llinstantmessage.h"
+#include "llvoicechannel.h"
 
 class LLFloaterChatterBox;
 class LLFloaterIM;
@@ -98,6 +99,14 @@ public:
 		return addSession(name, IM_NOTHING_SPECIAL, other_participant_id,
 						  voice_call_info);
 	}
+
+	// Firestorm 7.1.13 call lifecycle: establish direction, credentials and
+	// channel activation together for incoming and outgoing voice calls.
+	bool startCall(const LLUUID& session_id,
+				   LLVoiceChannel::EDirection direction =
+					   LLVoiceChannel::OUTGOING_CALL,
+				   const LLSD& voice_channel_info = LLSD());
+	bool endCall(const LLUUID& session_id);
 
 	// This leaves the session (by sending a message to the server, unless
 	// snooze_duration is not zero), removes the panel referenced by session_id
@@ -219,7 +228,8 @@ private:
 
 	static void chatterBoxInvitationCoro(const std::string& url,
 										 LLUUID session_id,
-										 LLIMMgr::EInvitationType type);
+										 LLIMMgr::EInvitationType type,
+										 const LLSD& voice_channel_info);
 
 	static void startDeprecatedConference(const LLUUID& temp_session_id,
 										  const LLUUID& creator_id,

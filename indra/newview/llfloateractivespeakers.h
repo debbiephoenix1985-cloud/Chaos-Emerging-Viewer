@@ -39,6 +39,8 @@
 #include "llrefcount.h"
 #include "llsingleton.h"
 
+#include <set>
+
 class LLButton;
 class LLPanelActiveSpeakers;
 class LLScrollListCtrl;
@@ -75,6 +77,8 @@ public:
 			  ESpeakerType type = SPEAKER_AGENT,
 			  ESpeakerStatus status = LLSpeaker::STATUS_TEXT_ONLY);
 
+	bool isInVoiceChannel();
+
 	LL_INLINE void setStatus(ESpeakerStatus status)
 	{
 		if (mStatus != status)
@@ -106,7 +110,7 @@ public:
 
 	static void onAvatarNameLookup(const LLUUID& id,
 								   const LLAvatarName& avatar_name,
-								   void* userdatap);
+								   LLHandle<LLSpeaker> speaker_handle);
 
 public:
 	// Current activity status in speech group
@@ -170,9 +174,11 @@ class LLSpeakerMgr : public LLOldEvents::LLObservable
 {
 public:
 	LLSpeakerMgr(LLVoiceChannel* channelp);
+	// Firestorm updates the speaker manager when a voice channel is replaced.
+	void setVoiceChannel(LLVoiceChannel* channelp) { mVoiceChannel = channelp; }
 
 	const LLPointer<LLSpeaker> findSpeaker(const LLUUID& agent_id);
-	void update(bool resort_ok);
+	virtual void update(bool resort_ok);
 	void setSpeakerTyping(const LLUUID& speaker_id, bool typing);
 	void speakerChatted(const LLUUID& speaker_id);
 	LLPointer<LLSpeaker> setSpeaker(const LLUUID& id,
@@ -190,7 +196,7 @@ public:
 	void requestMuteChange(const LLUUID& agent_id, bool mute);
 
 protected:
-	void updateSpeakerList();
+	virtual void updateSpeakerList();
 
 	static void requestMuteChangeCB(const LLSD& result, std::string name,
 									bool muted, bool success);
@@ -227,8 +233,22 @@ class LLActiveSpeakerMgr : public LLSpeakerMgr,
 public:
 	LLActiveSpeakerMgr();
 
+	// Region presence must be checked regardless of whether list sorting is
+	// paused while the user interacts with the volume slider.
+	void update(bool resort_ok) override;
+
 protected:
-	virtual void updateSpeakerList();
+	void updateSpeakerList() override;
+
+private:
+	// The voice engine signals participant joins and leaves; defer the
+	// associated speaker-list reconciliation to the next UI refresh.
+	boost::signals2::scoped_connection mRosterConnection;
+	bool mParticipantRosterChanged = false;
+	LLUUID mPresenceRegionID;
+	LLFrameTimer mPresenceTimer;
+	std::set<LLUUID> mPreviouslySeenInRegion;
+	std::set<LLUUID> mDepartedFromRegion;
 };
 
 class LLLocalSpeakerMgr : public LLSpeakerMgr,

@@ -336,14 +336,13 @@ public:
 	bool thumbnailSnapshot(LLImageRaw* rawp, S32 width, S32 height,
 						   bool show_ui, bool do_rebuild, U32 type);
 
-	LL_INLINE bool isSnapshotLocSet() const				{ return !sSnapshotDir.empty(); }
-	LL_INLINE const std::string& getSnapshotBaseName()	{ return sSnapshotBaseName; }
+	bool isSnapshotLocSet() const;
+	std::string getSnapshotBaseName() const;
 	void setSnapshotLoc(std::string filepath);
-	LL_INLINE void resetSnapshotLoc() const				{ sSnapshotDir.clear(); }
 	bool saveImageNumbered(LLImageFormatted* image);
 
 	// Reset the directory where snapshots are saved.
-	// Client will open directory picker on next snapshot save.
+	// Client will open file picker on next snapshot save.
 	void resetSnapshotLoc();
 
 	void playSnapshotAnimAndSound();

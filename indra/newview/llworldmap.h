@@ -248,7 +248,9 @@ private:
 	// extents changed.
 	bool extendAABB(U32 x_min, U32 y_min, U32 x_max, U32 y_max);
 
-	bool isTrackedUnknownLocation(U32 x, U32 y) const;
+	bool isTrackedUnknownLocation(U32 x, U32 y,
+									U32 width = REGION_WIDTH_UNITS,
+									U32 height = REGION_WIDTH_UNITS) const;
 
 	static void mapLayerRequestCallback(LLSD result);
 

@@ -1128,16 +1128,11 @@ void LLCircuitData::collectRAck(TPACKETID packet_num)
 {
 	if (mAcks.empty())
 	{
-		// First extra ack, we need to add ourselves to the list of circuits
-		// that need to send acks
+		// Start a fresh collection window after each empty ack list.
 		gMessageSystemp->mCircuitInfo.mSendAckMap[mHost] = this;
-	}
-
-	mAcks.push_back(packet_num);
-	if (mAckCreationTime == 0.f)
-	{
 		mAckCreationTime = getAgeInSeconds();
 	}
+	mAcks.push_back(packet_num);
 }
 
 // This method is called during the message system processAcks() to send out

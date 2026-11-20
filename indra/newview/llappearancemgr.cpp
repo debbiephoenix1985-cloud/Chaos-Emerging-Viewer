@@ -2473,7 +2473,16 @@ S32 LLAppearanceMgr::getCOFVersion() const
 void LLAppearanceMgr::updateCOF() const
 {
 	const LLUUID cof_id = getCOF(true);
-	gInventory.updateCategory(gInventory.getCategory(cof_id));
+	LLViewerInventoryCategory* cof = gInventory.getCategory(cof_id);
+	// Dayturn COF audit: a newly created/unfetched category need not be
+	// present in the inventory model yet. Never dereference a null COF.
+	if (!cof)
+	{
+		llwarns << "Current Outfit Folder not available yet: " << cof_id
+				<< llendl;
+		return;
+	}
+	gInventory.updateCategory(cof);
 	gInventory.notifyObservers();
 }
 

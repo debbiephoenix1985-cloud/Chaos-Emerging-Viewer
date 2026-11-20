@@ -1621,7 +1621,7 @@ void LLFloater::updateButtons()
 			// *HACK: always render close button for hosted floaters so that
 			// users do not accidentally hit the button when closing multiple
 			// windows in the chatterbox
-			(i == BUTTON_CLOSE && mButtonScale != 1.f))
+			(i == BUTTON_CLOSE && mButtonScale != 1.f && getName() != "contact_sets"))
 		{
 			++button_count;
 

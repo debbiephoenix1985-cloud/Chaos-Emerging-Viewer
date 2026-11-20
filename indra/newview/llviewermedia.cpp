@@ -1040,7 +1040,7 @@ void LLViewerMedia::clearAllCaches()
 {
 #if CHROME_VERSION_MAJOR >= 120
 	std::string cache_dir = gDirUtil.getCacheDir() +
-							LL_DIR_DELIM_STR "cef_cache";
+							LL_DIR_DELIM_STR "chaos_cef_cache";
 	if (!LLFile::isdir(cache_dir))
 	{
 		llinfos << "No CEF cache directory found." << llendl;
@@ -3457,26 +3457,19 @@ void LLViewerMediaImpl::doMediaTexUpdate(LLViewerMediaTexture* media_tex,
 	// Prevents media source tear-down during update
 	mLock.lock();
 
-	static LLCachedControl<bool> recreate(gSavedSettings,
-										  "RecreateMediaGLTexOnUpdate");
-	bool do_recreate = recreate;
-	U32 tex_name = media_tex->getTexName();
-	if (!tex_name)
-	{
-		do_recreate = true;
-	}
+	// Firestorm media-frame path: allocate a new GL texture for each frame
+	// instead of reusing the previous texture name (Windows/NVIDIA safe path).
+	U32 tex_name = 0;
 
 	// Wrap 'data' in an LLImageRaw but do NOT make a copy.
 	LLPointer<LLImageRaw> raw = new LLImageRaw(data, media_tex->getWidth(),
 											   media_tex->getHeight(),
 											   media_tex->getComponents(),
 											   true);
-	// Recreating the GL texture at each media update is wasteful but might be
-	// needed when GL calls are blocking in some poor OpenGL implementations.
-	if (do_recreate)
-	{
-		media_tex->createGLTexture(0, raw, 0, true, true, &tex_name);
-	}
+	// Match Firestorm: recreate every frame before uploading changed pixels.
+	// Avoids stale media frames on OpenGL drivers that do not reliably
+	// display repeated subimage updates of the same video texture.
+	media_tex->createGLTexture(0, raw, 0, true, true, &tex_name);
 
 	// Copy just the subimage covered by the image raw to GL
 	media_tex->setSubImage(data, data_width, data_height, x_pos, y_pos, width,

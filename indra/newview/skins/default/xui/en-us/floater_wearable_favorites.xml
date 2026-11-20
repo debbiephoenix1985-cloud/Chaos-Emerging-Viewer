@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<floater name="wearable favorites" title="Favourite Wearables"
+ can_resize="true" can_minimize="true" can_close="true"
+ width="460" height="330" min_width="325" min_height="200">
+    <text name="instruction" left="12" right="-10" bottom="-41"
+      height="18" follows="left|top|right">
+      Drag clothing, attachments or HUDs from Inventory into this window.
+    </text>
+    <text name="search_label" left="12" bottom="-77"
+      width="52" height="18" follows="left|top">Search:</text>
+    <search_editor name="filter" font="SansSerifSmall"
+      max_length="256" label="Search favourite wearables"
+      left="69" right="-10" bottom="-79" height="20"
+      follows="left|right|top"/>
+    <!-- Firestorm 7.2.5 folder views in the existing Chaos favourites floater. -->
+    <combo_box name="folder_combo" left="10" bottom="-116"
+       width="111" height="22" follows="left|top" />
+    <button name="new_folder_btn" label="New" tool_tip="Create a favourites folder" left="127"
+       bottom="-116" width="50" height="22" follows="left|top" />
+    <button name="rename_folder_btn" label="Rename" left="183"
+       bottom="-116" width="59" height="22" follows="left|top" />
+    <button name="delete_folder_btn" label="Delete" tool_tip="Delete selected favourites folder" left="248"
+       bottom="-116" width="65" height="22" follows="left|top" />
+    <scroll_list name="favorites" left="10" right="-10"
+      top="-126" bottom="41" follows="left|top|right|bottom"
+      multi_select="false" draw_heading="true" draw_stripes="true">
+       <column name="name" label="Favourite wearable" dynamicwidth="true"/>
+       <column name="type" label="Type" width="100"/>
+       <column name="worn" label="Status" width="95"/>
+    </scroll_list>
+    <button name="remove" label="Remove favourite"
+       tool_tip="Deletes only the favourite link, never the original item."
+       bottom="11" left="10" height="22" width="145"
+       follows="left|bottom"/>
+    <button name="refresh" label="Refresh"
+       bottom="11" right="-10" height="22" width="80"
+       follows="right|bottom"/>
+</floater>

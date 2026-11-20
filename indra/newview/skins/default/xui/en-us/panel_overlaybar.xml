@@ -36,8 +36,6 @@
 	<button name="Rebake Region" label="Rebake region" font="SansSerif" halign="center"
 	 tool_tip="Click here to rebake the navmesh of the region."
 	 left_delta="112" bottom="-41" width="102" height="20" follows="left|top" />
-	<panel name="voice_remote" border="false" background_visible="false"
-	 left="300" bottom="-41" width="108" height="20" follows="right|top" />
 	<panel name="shared_media_remote" border="false" background_visible="false"
 	 left="450" bottom="-41" width="64" height="20" follows="right|top" />
 	<panel name="parcel_media_remote" border="false" background_visible="false"

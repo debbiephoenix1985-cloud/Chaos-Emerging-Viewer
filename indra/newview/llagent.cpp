@@ -377,8 +377,13 @@ void LLAgent::init()
 	// Initialize the appearance dictionary before we need it... This saves us
 	// having to use a slow and cumbersome LLSingleton to access the pointer to
 	// this class.
-	gAvatarAppDictp =
-		new LLAvatarAppearanceDefines::LLAvatarAppearanceDictionary();
+	// On a failed-login retry this dictionary already exists. Recreating it
+	// leaks the previous instance on every attempt.
+	if (!gAvatarAppDictp)
+	{
+		gAvatarAppDictp =
+			new LLAvatarAppearanceDefines::LLAvatarAppearanceDictionary();
+	}
 
 	mDrawDistance = gSavedSettings.getF32("RenderFarClip");
 
@@ -410,9 +415,13 @@ void LLAgent::init()
 
 	mEffectColor = gSavedSettings.getColor4("EffectColor");
 
-	LLControlVariable* maturity =
-		gSavedSettings.getControl("PreferredMaturity");
-	if (maturity)
+	// On a login retry, the already-initialized agent must not register
+	// another copy of its maturity-setting callbacks.
+	if (!mInitialized)
+	{
+		LLControlVariable* maturity =
+			gSavedSettings.getControl("PreferredMaturity");
+		if (maturity)
 	{
 		maturity->getValidateSignal()->connect(std::bind(&LLAgent::validateMaturity,
 														 this, _2));
@@ -423,7 +432,8 @@ void LLAgent::init()
 	LLAppCoreHttp& app_core_http = gAppViewerp->getAppCoreHttp();
 	app_core_http.getPolicy(LLAppCoreHttp::AP_AGENT);
 
-	mInitialized = true;
+		mInitialized = true;
+	}
 }
 
 void LLAgent::cleanup()
@@ -6338,8 +6348,24 @@ bool LLAgent::teleportCore(const LLVector3d& pos_global)
 
 	if (mTeleportState != TELEPORT_NONE)
 	{
-		llwarns << "Attempt to teleport when already teleporting." << llendl;
-		return false;
+		// A local teleport may never get a TeleportLocal/TeleportFailed reply.
+		// Its progress display is only started by the reply, so its ordinary
+		// timeout cannot run. Allow a later TP once the request has expired.
+		S32 attachments = isAgentAvatarValid() ?
+			gAgentAvatarp->getNumAttachments() : 0;
+		const F32 expiry = 15.f + 3.f * attachments;
+		if (mTeleportState == TELEPORT_LOCAL &&
+			gTeleportDisplayTimer.getElapsedTimeF32() > expiry)
+		{
+			llwarns << "Unanswered local teleport timed out; accepting a new request."
+					<< llendl;
+			setTeleportState(TELEPORT_NONE);
+		}
+		else
+		{
+			llwarns << "Attempt to teleport when already teleporting." << llendl;
+			return false;
+		}
 	}
 
 	if (!mRegionp)
@@ -6383,6 +6409,8 @@ bool LLAgent::teleportCore(const LLVector3d& pos_global)
 	}
 	if (is_local)
 	{
+		// Start the watchdog at the request, not only after TeleportLocal.
+		gTeleportDisplayTimer.reset();
 		setTeleportState(TELEPORT_LOCAL);
 	}
 	else

@@ -127,7 +127,14 @@ bool LLPanelEditWearable::postBuild()
 	mTitleNoModify = getChild<LLTextBox>("title_no_modify", true, false);
 	mTitleNotWorn = getChild<LLTextBox>("title_not_worn", true, false);
 	mTitleLoading = getChild<LLTextBox>("title_loading", true, false);
+	// User-created wearable names can be longer than the visible header.
+	// Prevent text escaping its panel, and keep the full value on hover.
+	if (mTitle) mTitle->setUseEllipses(true);
+	if (mTitleNoModify) mTitleNoModify->setUseEllipses(true);
+	if (mTitleNotWorn) mTitleNotWorn->setUseEllipses(true);
+	if (mTitleLoading) mTitleLoading->setUseEllipses(true);
 	mPath = getChild<LLTextBox>("path", true, false);
+	if (mPath) mPath->setUseEllipses(true);
 
 	mButtonImport = getChild<LLButton>("import", true, false);
 	if (mButtonImport)
@@ -669,6 +676,12 @@ void LLPanelEditWearable::draw()
 		}
 	}
 
+	const std::string visible_name = itemp ? itemp->getName() :
+		(mWearable ? mWearable->getName() : LLStringUtil::null);
+	if (mTitle) mTitle->setToolTip(visible_name);
+	if (mTitleNoModify) mTitleNoModify->setToolTip(visible_name);
+	if (mTitleNotWorn) mTitleNotWorn->setToolTip(visible_name);
+	if (mTitleLoading) mTitleLoading->setToolTip(visible_name);
 	setMaxLayers();
 
 	if (mButtonSave)
@@ -782,6 +795,7 @@ void LLPanelEditWearable::draw()
 			gInventory.appendPath(item_id, path);
 			mPath->setVisible(true);
 			mPath->setTextArg("[PATH]", path);
+			mPath->setToolTip("Located in " + path);
 		}
 
 		hideTextureControls();
@@ -803,6 +817,7 @@ void LLPanelEditWearable::draw()
 			gInventory.appendPath(item_id, path);
 			mPath->setVisible(true);
 			mPath->setTextArg("[PATH]", path);
+			mPath->setToolTip("Located in " + path);
 		}
 
 		for (param_map_t::iterator iter = mTextureList.begin(),

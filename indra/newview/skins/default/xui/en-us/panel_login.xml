@@ -1,6 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <panel name="panel_login" left="0" bottom="0" width="800" height="600" follows="left|top|right|bottom" background_visible="true" background_opaque="false" bg_alpha_color="0.055 0.13 0.145 0.95">
-	<web_browser name="login_html" border_visible="false" left="0" right="0" top="0" bottom="124" follows="top|left|bottom|right" /><text name="saved_account_text" font="SansSerif" left="668" bottom="90" width="205" height="16" follows="left|bottom">Saved accounts:</text><combo_box name="saved_account_combo" font="SansSerif" allow_text_entry="false" max_chars="120" tool_tip="Select a remembered avatar and grid. Existing login fields and grid splash page are restored." left="668" bottom="62" width="345" height="20" follows="left|bottom" />
+	<web_browser name="login_html" border_visible="false" left="0" right="0" top="0" bottom="160" follows="top|left|bottom|right" />
+	<!-- The interface selector is part of the login tray, not the splash web page. -->
+	<text name="interface_style_label" font="SansSerif" left="22" bottom="136" width="86" height="16" follows="left|bottom">Interface:</text>
+	<combo_box name="interface_style_combo" font="SansSerif" allow_text_entry="false" left="110" bottom="132" width="150" height="22" follows="left|bottom" tool_tip="Modern uses the dark skin; Legacy uses the default skin. Switching the skin requires a restart.">
+		<combo_item name="modern" value="dark">Modern</combo_item>
+		<combo_item name="legacy" value="default">Legacy</combo_item>
+	</combo_box>
+	<text name="interface_style_restart_note" font="SansSerifSmall" left="276" bottom="136" width="300" height="16" follows="left|bottom">Restart viewer to apply a skin change</text><text name="saved_account_text" font="SansSerif" left="668" bottom="90" width="205" height="16" follows="left|bottom">Saved accounts:</text><combo_box name="saved_account_combo" font="SansSerif" allow_text_entry="false" max_chars="120" tool_tip="Select a remembered avatar and grid. Existing login fields and grid splash page are restored." left="668" bottom="62" width="345" height="20" follows="left|bottom" />
 	<text name="first_name_text" font="SansSerif" left="22" bottom="90" width="120" height="16" follows="left|bottom">
 		First name:
 	</text>
@@ -48,7 +55,7 @@
 	<!-- HACK: this is used to resize properly the web browser: if you change
 			   the panel layout, you may need to change this... See the code
 			   using it in LLPanelLogin::reshapeBrowser() -->
-	<string name="bottom_y_offset">125</string>
+	<string name="bottom_y_offset">161</string>
 	<string name="my_home">
 		My home
 	</string>

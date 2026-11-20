@@ -42,6 +42,16 @@ class LLPumpIO;
 
 constexpr F32 OVERDRIVEN_POWER_LEVEL = 0.7f;
 
+typedef enum e_voice_power_level
+{
+	VPL_MUTED,
+	VPL_PTT_Off,
+	VPL_PTT_On,
+	VPL_Level1,
+	VPL_Level2,
+	VPL_Level3
+} EVoicePowerLevel;
+
 class LLVoiceClientStatusObserver
 {
 public:
@@ -208,6 +218,11 @@ public:
 	// "power" is related to "amplitude" in a defined way. I'm just not sure
 	// what the formula is...
 	F32 getCurrentPower(const LLUUID& id);
+	EVoicePowerLevel getPowerLevel(const LLUUID& id);
+
+	static const F32 POWER_LEVEL_0;
+	static const F32 POWER_LEVEL_1;
+	static const F32 POWER_LEVEL_2;
 
 	// Used from llfloateractivespeakers.cpp
 	bool getIsModeratorMuted(const LLUUID& id);

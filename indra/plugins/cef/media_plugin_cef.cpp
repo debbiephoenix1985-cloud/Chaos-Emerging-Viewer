@@ -33,6 +33,7 @@
 
 #if LL_WINDOWS
 # include <process.h>				// For _getpid()
+# include <windows.h>				// Check stale cache PIDs without touching live plugins
 #else
 # include <unistd.h>				// For getpid()
 #endif
@@ -197,7 +198,6 @@ private:
 	bool						mCanSelectAll;
 	bool						mEnableMediaPluginDebugging;
 	bool						mInitialized;
-	bool						mPixelsDirty;
 	bool						mCleanupDone;
 };
 
@@ -223,7 +223,6 @@ MediaPluginCEF::MediaPluginCEF(LLPluginInstance::sendMessageFunction send_fn,
 	mCanSelectAll(false),
 	mEnableMediaPluginDebugging(false),
 	mInitialized(false),
-	mPixelsDirty(false),
 	mCleanupDone(false)
 {
 #if LL_WINDOWS
@@ -269,8 +268,14 @@ MediaPluginCEF::~MediaPluginCEF()
 	// sadly, under Windows, CEF will write more files at exit (which happens
 	// only *after* this destructor returns), so there will be leftovers in
 	// the per-session CEF caches directories... HB
+#if !LL_WINDOWS
 	LLDirIterator::deleteRecursivelyInDir(mInstanceCacheDir);
 	LLFile::rmdir(mInstanceCacheDir);
+#else
+	// CEF still has Windows handles open until this plugin process exits.
+	// Removing its own cache here generates locked-file warnings and may
+	// disrupt cleanup. The next plugin launch reclaims dead PID directories.
+#endif
 }
 
 bool MediaPluginCEF::initCEF()
@@ -343,7 +348,9 @@ bool MediaPluginCEF::initCEF()
 	settings.flip_mouse_y = false;
 	settings.flip_pixels_y = true;
 	settings.frame_rate = 60;
-	settings.force_wave_audio = false;
+	// Match Firestorm: route CEF audio through the Windows wave output path
+	// so VolumeCatcher (waveOutSetVolume) controls prim-media volume.
+	settings.force_wave_audio = true;
 	settings.autoplay_without_gesture = true;
 	settings.java_enabled = false;
 	settings.webgl_enabled = true;
@@ -388,6 +395,40 @@ void MediaPluginCEF::primeCache()
 	// by copying the files of a central cookie store into the instance cache
 	// and updating the central store on instance exit. HB
 	LLFile::mkdir(mRootCacheDir);
+#if LL_WINDOWS
+	// Delete only orphaned caches from PREVIOUS CEF plugin processes.
+	// Unlike destructor cleanup, CEF has released all file handles here.
+	// Never touch a directory belonging to a live process, including
+	// another simultaneously running Chaos Emerging viewer.
+	LLDirIterator stale_dirs(mRootCacheDir, "*");
+	std::string entry;
+	while (stale_dirs.next(entry))
+	{
+		char* end = NULL;
+		unsigned long pid = std::strtoul(entry.c_str(), &end, 10);
+		if (entry.empty() || !end || *end != '\0' || !pid ||
+			pid > 0xffffffffUL || entry == mPluginPidStr)
+		{
+			continue;
+		}
+		HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, (DWORD)pid);
+		if (process)
+		{
+			CloseHandle(process);
+			continue;
+		}
+		if (GetLastError() != ERROR_INVALID_PARAMETER)
+		{
+			continue; // Access denied or uncertain: leave it untouched.
+		}
+		std::string old_dir = mRootCacheDir + LL_DIR_DELIM_STR + entry;
+		if (LLFile::isdir(old_dir))
+		{
+			LLDirIterator::deleteRecursivelyInDir(old_dir);
+			LLFile::rmdir(old_dir);
+		}
+	}
+#endif
 	mInstanceCacheDir = mRootCacheDir + LL_DIR_DELIM_STR + mPluginPidStr;
 	// Create a private cache directory for this CEF instance. HB
 	bool success = LLFile::mkdir(mInstanceCacheDir);
@@ -523,15 +564,14 @@ void MediaPluginCEF::onPageChangedCallback(const unsigned char* pixels, int x,
 		if (mWidth == width && mHeight == height)
 		{
 			memcpy(mPixels, pixels, mWidth * mHeight * mDepth);
-			mPixelsDirty = true;	// Mark for update during idle()
 		}
 		else
 		{
 			mCEFLib->setSize(mWidth, mHeight);
-			// When size changes we need this to be certain that the page will
-			// get drawn. HB
-			mCEFLib->reload(true);	// true = ignore cache
 		}
+		// Match Firestorm 7.1.13: forward CEF's paint notification
+		// directly, without deferring the frame or reloading the page.
+		setDirty(0, 0, mWidth, mHeight);
 	}
 }
 
@@ -840,11 +880,6 @@ void MediaPluginCEF::receiveMessage(const char* msgstr)
 			mCEFLib->update();
 			mVolumeCatcher.pump();
 			checkEditState();
-			if (mPixelsDirty)
-			{
-				mPixelsDirty = false;
-				setDirty(0, 0, mWidth, mHeight);
-			}
 		}
 		else if (message_name == "cleanup")
 		{
@@ -916,7 +951,8 @@ void MediaPluginCEF::receiveMessage(const char* msgstr)
 		{
 			// Note: the paths always got a trailing platform-specific
 			// directory delimiter.
-			mRootCacheDir = message_in.getValue("cache") + "cef_cache";
+			// Isolate Chaos Emerging's browser cache from other Cool VL forks.
+			mRootCacheDir = message_in.getValue("cache") + "chaos_cef_cache";
 			mUserCookiesDir = message_in.getValue("path") + "cef_cookies";
 			primeCache();
 		}

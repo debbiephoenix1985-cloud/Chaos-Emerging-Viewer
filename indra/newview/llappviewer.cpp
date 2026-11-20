@@ -111,6 +111,7 @@
 #include "llxorcipher.h"
 
 #include "llagent.h"
+#include "llappearancelistener.h"
 #include "llagentpilot.h"
 #if LL_LINUX
 # include "llappviewerlinux.h"		// For pumpGlib()
@@ -2799,13 +2800,13 @@ LLApp::InitState LLAppViewer::initConfiguration()
 	std::string skin_name = gSavedSettings.getString("SkinCurrent");
 	if (skin_name.empty())
 	{
-		skin_name = "default";
+		skin_name = "dark";
 	}
 	else if (!gDirUtil.hasSkin(skin_name))
 	{
 		llwarns << "Invalid skin '" << skin_name
 				<< "', switching to the default skin." << llendl;
-		skin_name = "default";
+		skin_name = "dark";
 		gSavedSettings.setString("SkinCurrent", skin_name);
 	}
 	gDirUtil.setSkinFolder(skin_name);
@@ -2877,7 +2878,9 @@ LLApp::InitState LLAppViewer::initConfiguration()
 			// make sure the setting is *not* persisted.
 			LLControlVariable* disable_voice =
 				gSavedSettings.getControl("CmdLineDisableVoice");
-			if (disable_voice)
+			// Firestorm llappviewer.cpp: allow a second instance's voice when
+			// VoiceMultiInstance is enabled; never persist the CLI override.
+			if (disable_voice && !gSavedSettings.getBool("VoiceMultiInstance"))
 			{
 				disable_voice->setValue(LLSD(true), false);
 			}
@@ -2995,6 +2998,9 @@ bool LLAppViewer::initWindow()
 
 	// Finish view initialization
 	gViewerWindowp->initBase();
+
+	// Register Build184 viewer-side LLAppearance LEAP dispatch.
+	initAppearanceLeapAPI();
 
 	// We can now (potentially) enable this.
 	LLView::sDebugRects = gSavedSettings.getBool("DebugViews");

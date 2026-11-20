@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='utf-8'?>
+<menu name="Chaos Context Attachment Other" label="Attachment_Other" opaque="true">
+    <menu_item_call name="ChaosContext_attachment_other_173" label="View Profile">
+        <on_click function="ShowAgentProfile" userdata="hit object" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_174" label="Add Friend">
+        <on_click function="Avatar.AddFriend" />
+        <on_enable function="Avatar.EnableAddFriend" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_175" label="Add to Set">
+        <on_enable function="Chaos.ContextDisabled" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_176" label="IM">
+        <on_click function="Avatar.SendIM" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_177" label="Give Calling Card">
+        <on_click function="Avatar.GiveCard" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_178" label="Call">
+        <on_click function="Chaos.ContextAvatarAction" userdata="call" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_179" label="Invite to Group">
+        <on_click function="Avatar.InviteToGroup" />
+    </menu_item_call>
+    <menu_item_separator />
+    <menu_item_call name="ChaosContext_attachment_other_180" label="Reset Skeleton">
+        <on_click function="Chaos.ContextAvatarAction" userdata="skeleton" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_181" label="Reset Skeleton And Animations">
+        <on_click function="Chaos.ContextAvatarAction" userdata="skeletonanim" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_182" label="Reset Mesh LOD">
+        <on_click function="Chaos.ContextAvatarAction" userdata="mesh" />
+    </menu_item_call>
+    <menu_item_separator />
+    <menu name="ChaosContext_attachment_other_183" label="Annoyance">
+        <menu_item_call name="ChaosContext_attachment_other_184" label="Block">
+            <on_click function="Avatar.Mute" />
+            <on_visible function="Object.EnableMute" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_attachment_other_185" label="Unblock">
+            <on_click function="Avatar.Mute" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_attachment_other_186" label="Report">
+            <on_click function="Avatar.ReportAbuse" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_attachment_other_187" label="Freeze">
+            <on_click function="Avatar.Freeze" />
+            <on_visible function="Avatar.EnableFreezeEject" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_attachment_other_188" label="Eject">
+            <on_click function="Avatar.Eject" />
+            <on_visible function="Avatar.EnableFreezeEject" />
+        </menu_item_call>
+    </menu>
+    <menu_item_call name="ChaosContext_attachment_other_189" label="Dump XML">
+        <on_enable function="Chaos.ContextDisabled" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_190" label="Zoom In">
+        <on_click function="Tools.LookAtSelection" userdata="zoom" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_191" label="Pay">
+        <on_click function="PayObject" />
+    </menu_item_call>
+    <menu_item_separator />
+    <menu_item_call name="ChaosContext_attachment_other_192" label="Object Profile">
+        <on_click function="Object.Inspect" />
+    </menu_item_call>
+    <menu_item_separator />
+    <menu_item_call name="ChaosContext_attachment_other_193" label="Always Display Full Detail">
+        <on_click function="Avatar.Render" userdata="always" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_194" label="Never Display Full Detail">
+        <on_click function="Avatar.Render" userdata="never" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_195" label="Remove From Display Exceptions">
+        <on_click function="Avatar.Render" userdata="normal" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_196" label="Block Particle Owner">
+        <on_click function="Particle.Mute" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_197" label="Inspect">
+        <on_click function="ShowFloater" userdata="inspect" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_198" label="Script Info">
+        <on_enable function="Chaos.ContextDisabled" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_199" label="Derender">
+        <on_click function="Object.Derender" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_200" label="Derender + Blacklist">
+        <on_enable function="Chaos.ContextDisabled" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_201" label="Show Textures">
+        <on_click function="Avatar.Debug" />
+    </menu_item_call>
+    <menu_item_call name="ChaosContext_attachment_other_202" label="Texture Refresh">
+        <on_enable function="Chaos.ContextDisabled" />
+    </menu_item_call>
+    <menu name="ChaosContext_attachment_other_203" label="Save as">
+        <menu_item_call name="ChaosContext_attachment_other_204" label="Backup">
+            <on_click function="File.BackupObject" />
+        </menu_item_call>
+        <menu_item_call name="ChaosContext_attachment_other_205" label="Collada">
+            <on_click function="File.ExportDAE" />
+        </menu_item_call>
+    </menu>
+</menu>

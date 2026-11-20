@@ -32,7 +32,8 @@
 
 #include "llpreviewtexture.h"
 
-#include "llcombobox.h"
+#include "llcombobox.h" // LLFlyoutButton is declared here in the legacy UI
+#include "llimagepng.h"
 #include "llimagetga.h"
 #include "llinventory.h"
 #include "lllineeditor.h"
@@ -46,7 +47,7 @@
 #include "llviewertexturelist.h"
 #include "llviewerwindow.h"
 
-constexpr S32 PREVIEW_TEXTURE_MIN_WIDTH = 300;
+constexpr S32 PREVIEW_TEXTURE_MIN_WIDTH = 330;
 constexpr S32 PREVIEW_TEXTURE_MIN_HEIGHT = 120;
 
 constexpr F32 PREVIEW_TEXTURE_MAX_ASPECT = 200.f;
@@ -165,6 +166,11 @@ void LLPreviewTexture::init()
 	childSetVisible("Copy To Inventory", mCopyToInv);
 	childSetVisible("Keep", mShowKeepDiscard);
 	childSetVisible("Discard", mShowKeepDiscard);
+	// Firestorm-style texture export: PNG by default, TGA available from
+	// the Save As dropdown. The old button was hard-wired to TGA.
+	LLFlyoutButton* save_button = getChild<LLFlyoutButton>("Save As");
+	save_button->setCommitCallback(onSaveFormatChosen);
+	save_button->setCallbackUserData(this);
 
 	if (mCopyToInv)
 	{
@@ -174,37 +180,6 @@ void LLPreviewTexture::init()
 	{
 		childSetAction("Keep", onKeepBtn, this);
 		childSetAction("Discard", onDiscardBtn, this);
-	}
-	else
-	{
-		// If the buttons are hidden move stuff down to use the space.
-
-		LLRect keep_rect, old_rect, new_rect;
-		S32 diff;
-
-		childGetRect("Keep", keep_rect);
-		childGetRect("combo_aspect_ratio", old_rect);
-
-		diff = old_rect.mBottom - keep_rect.mBottom;
-
-		new_rect.setOriginAndSize(old_rect.mLeft, old_rect.mBottom - diff,
-								  old_rect.getWidth(), old_rect.getHeight());
-		childSetRect("combo_aspect_ratio", new_rect);
-
-		childGetRect("aspect_ratio", old_rect);
-		new_rect.setOriginAndSize(old_rect.mLeft, old_rect.mBottom - diff,
-								  old_rect.getWidth(), old_rect.getHeight());
-		childSetRect("aspect_ratio", new_rect);
-
-		childGetRect("dimensions", old_rect);
-		new_rect.setOriginAndSize(old_rect.mLeft, old_rect.mBottom - diff,
-								  old_rect.getWidth(), old_rect.getHeight());
-		childSetRect("dimensions", new_rect);
-
-		childGetRect("Refresh", old_rect);
-		new_rect.setOriginAndSize(old_rect.mLeft, old_rect.mBottom - diff,
-								  old_rect.getWidth(), old_rect.getHeight());
-		childSetRect("Refresh", new_rect);
 	}
 
 	if (!mCopyToInv)
@@ -228,6 +203,7 @@ void LLPreviewTexture::init()
 void LLPreviewTexture::draw()
 {
 	updateDimensions();
+	childSetEnabled("Save As", canSaveAs() && !HBFileSelector::isInUse());
 
 	LLPreview::draw();
 
@@ -334,6 +310,16 @@ void LLPreviewTexture::draw()
 	}
 }
 
+//static
+void LLPreviewTexture::onSaveAsBtn(void* data)
+{
+	LLPreviewTexture* self = (LLPreviewTexture*)data;
+	if (self && self->canSaveAs() && !HBFileSelector::isInUse())
+	{
+		self->saveAs();
+	}
+}
+
 //virtual
 bool LLPreviewTexture::canSaveAs() const
 {
@@ -354,13 +340,27 @@ void LLPreviewTexture::saveAsCallback(HBFileSelector::ESaveFilter type,
 
 	if (filename.empty()) return;
 
-	// Remember the user-approved/edited file name.
-	self->mSaveFileName = filename;
-	LLStringUtil::toLower(filename);
-	if (filename.rfind(".tga") != filename.length() - 4)
+	// Match the selected export type in BOTH filename and image encoding.
+	// Do not silently turn a requested PNG into a TGA file.
+	if (type != HBFileSelector::FFSAVE_PNG &&
+		type != HBFileSelector::FFSAVE_TGA)
 	{
-		self->mSaveFileName += ".tga";
+		llwarns << "Unsupported texture export format" << llendl;
+		return;
 	}
+	self->mSaveFileType = type;
+	self->mSaveFileName = filename;
+	std::string lower_name = filename;
+	LLStringUtil::toLower(lower_name);
+	if (lower_name.size() >= 4)
+	{
+		const std::string suffix = lower_name.substr(lower_name.size() - 4);
+		if (suffix == ".png" || suffix == ".tga")
+		{
+			self->mSaveFileName.erase(self->mSaveFileName.size() - 4);
+		}
+	}
+	self->mSaveFileName += type == HBFileSelector::FFSAVE_PNG ? ".png" : ".tga";
 	self->mLoadingFullImage = true;
 	gWindowp->incBusyCount();
 
@@ -375,17 +375,31 @@ void LLPreviewTexture::saveAsCallback(HBFileSelector::ESaveFilter type,
 //virtual
 void LLPreviewTexture::saveAs()
 {
-	if (mLoadingFullImage) return;
+	// Standard Save As now defaults to PNG, like Firestorm's configurable
+	// PNG texture export. The dropdown still offers legacy TGA explicitly.
+	saveAsWithFormat(HBFileSelector::FFSAVE_PNG);
+}
 
+//static
+void LLPreviewTexture::onSaveFormatChosen(LLUICtrl* ctrlp, void* userdata)
+{
+	LLPreviewTexture* self = (LLPreviewTexture*)userdata;
+	if (!self || !self->canSaveAs() || HBFileSelector::isInUse()) return;
+	const std::string choice = ctrlp ? ctrlp->getValue().asString() : "";
+	self->saveAsWithFormat(choice == "tga" ? HBFileSelector::FFSAVE_TGA :
+								 HBFileSelector::FFSAVE_PNG);
+}
+
+void LLPreviewTexture::saveAsWithFormat(HBFileSelector::ESaveFilter type)
+{
+	if (!canSaveAs() || HBFileSelector::isInUse()) return;
 	std::string suggestion;
 	const LLViewerInventoryItem* itemp = getItem();
 	if (itemp)
 	{
 		suggestion = LLDir::getScrubbedFileName(itemp->getName());
 	}
-
-	HBFileSelector::saveFile(HBFileSelector::FFSAVE_TGA, suggestion,
-							 saveAsCallback, this);
+	HBFileSelector::saveFile(type, suggestion, saveAsCallback, this);
 }
 
 //static
@@ -417,14 +431,24 @@ void LLPreviewTexture::onFileLoadedForSave(bool success,
 
 	if (self && is_final && success)
 	{
-		LLPointer<LLImageTGA> image_tga = new LLImageTGA;
-		if (!image_tga->encode(src))
+		// Encode as the actual requested file format, preserving the
+		// original full-resolution texture and alpha channel when present.
+		LLPointer<LLImageFormatted> encoded;
+		if (self->mSaveFileType == HBFileSelector::FFSAVE_PNG)
+		{
+			encoded = new LLImagePNG;
+		}
+		else
+		{
+			encoded = new LLImageTGA;
+		}
+		if (!encoded->encode(src))
 		{
 			LLSD args;
 			args["FILE"] = self->mSaveFileName;
 			gNotifications.add("CannotEncodeFile", args);
 		}
-		else if (!image_tga->save(self->mSaveFileName))
+		else if (!encoded->save(self->mSaveFileName))
 		{
 			LLSD args;
 			args["FILE"] = self->mSaveFileName;
@@ -494,14 +518,9 @@ void LLPreviewTexture::updateDimensions()
 	info_height += aspect_height + CLIENT_RECT_VPAD;
 	view_height += info_height;
 
-	S32 button_height = 0;
-	if (mShowKeepDiscard || mCopyToInv)
-	{
-
-		// add space for buttons
-		view_height += 	gBtnHeight + CLIENT_RECT_VPAD;
-		button_height = gBtnHeight + PREVIEW_PAD;
-	}
+	// The Save As button is present even when Keep/Discard is hidden.
+	view_height += gBtnHeight + CLIENT_RECT_VPAD;
+	S32 button_height = gBtnHeight + PREVIEW_PAD;
 
 	view_width = llmax(view_width, getMinWidth());
 	view_height = llmax(view_height, getMinHeight());

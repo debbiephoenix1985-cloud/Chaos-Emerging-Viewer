@@ -27,115 +27,145 @@
 
 #include "lleventtimer.h"
 
-class AOSet
-:	public LLEventTimer
+class LLInventoryItem;
+
+class AOSet : public LLEventTimer
 {
-	public:
-		AOSet(const LLUUID inventoryID);
-		~AOSet();
+public:
+    AOSet(const LLUUID& inventoryID);
+    ~AOSet();
 
-		// keep number and order in sync with list of names in the constructor
-		enum
-		{
-			Start = 0,		// convenience, so we don't have to know the name of the first state
-			Standing = 0,
-			Walking,
-			Running,
-			Sitting,
-			SittingOnGround,
-			Crouching,
-			CrouchWalking,
-			Landing,
-			SoftLanding,
-			StandingUp,
-			Falling,
-			FlyingDown,
-			FlyingUp,
-			Flying,
-			FlyingSlow,
-			Hovering,
-			Jumping,
-			PreJumping,
-			TurningRight,
-			TurningLeft,
-			Typing,
-			Floating,
-			SwimmingForward,
-			SwimmingUp,
-			SwimmingDown,
-			AOSTATES_MAX
-		};
+    // keep number and order in sync with list of names in the constructor
+    enum
+    {
+        Start    = 0, // convenience, so we don't have to know the name of the first state
+        Standing = 0,
+        Walking,
+        Running,
+        Sitting,
+        SittingOnGround,
+        Crouching,
+        CrouchWalking,
+        Landing,
+        SoftLanding,
+        StandingUp,
+        Falling,
+        FlyingDown,
+        FlyingUp,
+        Flying,
+        FlyingSlow,
+        Hovering,
+        Jumping,
+        PreJumping,
+        TurningRight,
+        TurningLeft,
+        Typing,
+        Floating,
+        SwimmingForward,
+        SwimmingUp,
+        SwimmingDown,
+        AlwaysPlay,
+        AOSTATES_MAX
+    };
 
-		struct AOAnimation
-		{
-			std::string mName;
-			LLUUID mAssetUUID;
-			LLUUID mInventoryUUID;
-			S32 mSortOrder;
-		};
+    struct AOAnimation
+    {
+        std::string mName;
+        LLUUID      mAssetUUID;
+        LLUUID      mInventoryUUID;
+        LLUUID      mOriginalUUID;
+        S32         mSortOrder;
+    };
 
-		struct AOState
-		{
-			std::string mName;
-			std::vector<std::string> mAlternateNames;
-			LLUUID mRemapID;
-			bool mCycle;
-			bool mRandom;
-			S32 mCycleTime;
-			std::vector<AOAnimation> mAnimations;
-			U32 mCurrentAnimation;
-			LLUUID mCurrentAnimationID;
-			LLUUID mInventoryUUID;
-			bool mDirty;
-		};
+    struct AOAnimationStep
+    {
+        std::string              mName;
+        LLUUID                   mInventoryUUID;
+        S32                      mSortOrder{ -1 };
+        bool                     mIsGroup{ false };
+        std::vector<AOAnimation> mMembers;
+    };
 
-		const LLUUID& getInventoryUUID() const;
-		void setInventoryUUID(const LLUUID& inventoryID);
+    struct AOTrack
+    {
+        std::string              mName;
+        LLUUID                   mInventoryUUID;
+        bool                     mCycle{ false };
+        bool                     mRandom{ false };
+        F32                      mCycleTime{ 0.f };
+        std::vector<AOAnimation> mAnimations;
+        U32                      mCurrentAnimation{ 0 };
+        LLUUID                   mCurrentAnimationID;
+    };
 
-		const std::string& getName() const;
-		void setName(const std::string& name);
+    struct AOState
+    {
+        std::string                         mName;
+        std::vector<std::string>            mAlternateNames;
+        std::vector<const LLInventoryItem*> mAddQueue;
+        S32                                 mNum{ 0 };
+        LLUUID                              mRemapID;
+        bool                                mCycle;
+        bool                                mRandom;
+        F32                                 mCycleTime;
+        std::vector<AOAnimationStep>        mSteps;
+        std::vector<AOTrack>                mTracks;
+        U32                                 mCurrentAnimation;
+        uuid_vec_t                          mCurrentAnimationIDs;
+        LLUUID                              mInventoryUUID;
+        bool                                mDirty;
+    };
 
-		bool getSitOverride() const;
-		void setSitOverride(bool override_sit);
+    const LLUUID& getInventoryUUID() const;
+    void          setInventoryUUID(const LLUUID& inventoryID);
 
-		bool getSmart() const;
-		void setSmart(bool smart);
+    const std::string& getName() const;
+    void               setName(std::string_view name);
 
-		bool getMouselookStandDisable() const;
-		void setMouselookStandDisable(bool disable);
+    bool getSitOverride() const;
+    void setSitOverride(bool override_sit);
 
-		bool getComplete() const;
-		void setComplete(bool complete);
+    bool getSmart() const;
+    void setSmart(bool smart);
 
-		const LLUUID& getMotion() const;
-		void setMotion(const LLUUID& motion);
+    bool getMouselookStandDisable() const;
+    void setMouselookStandDisable(bool disable);
 
-		bool getDirty() const;
-		void setDirty(bool dirty);
+    bool getComplete() const;
+    void setComplete(bool complete);
 
-		AOState* getState(S32 eName);
-		AOState* getStateByName(const std::string& name);
-		AOState* getStateByRemapID(const LLUUID& id);
-		const LLUUID& getAnimationForState(AOState* state) const;
+    const LLUUID& getMotion() const;
+    void          setMotion(const LLUUID& motion);
 
-		void startTimer(F32 timeout);
-		void stopTimer();
-		virtual bool tick();
+    bool getDirty() const;
+    void setDirty(bool dirty);
 
-		std::vector<std::string> mStateNames;
+    AOState*      getState(S32 eName);
+    AOState*      getStateByName(const std::string& name);
+    AOState*      getStateByRemapID(const LLUUID& id);
+    void          getAnimationsForState(AOState* state, uuid_vec_t& animations) const;
+    LLUUID        getAnimationForTrack(AOTrack& track) const;
+    static LLUUID resolveAssetUUID(AOAnimation& anim);
 
-	protected:
-		LLUUID mInventoryID;
+    void startTimer(F32 timeout);
+    void stopTimer();
+    void resetTimer();
+    bool tick() override;
 
-		std::string mName;
-		bool mSitOverride;
-		bool mSmart;
-		bool mMouselookStandDisable;
-		bool mComplete;
-		LLUUID mCurrentMotion;
-		bool mDirty;
+    std::vector<std::string> mStateNames;
 
-		AOState mStates[AOSTATES_MAX];
+protected:
+    LLUUID mInventoryID;
+
+    std::string mName;
+    bool        mSitOverride;
+    bool        mSmart;
+    bool        mMouselookStandDisable;
+    bool        mComplete;
+    LLUUID      mCurrentMotion;
+    bool        mDirty;
+
+    AOState mStates[AOSTATES_MAX];
 };
 
 #endif // AOSET_H

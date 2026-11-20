@@ -453,7 +453,12 @@ void update_inventory_item(const LLUUID& item_id, const LLSD& updates,
 						   LLPointer<LLInventoryCallback> cb = NULL_INV_CB);
 
 void update_inventory_category(const LLUUID& cat_id, const LLSD& updates,
-							   LLPointer<LLInventoryCallback> cb = NULL_INV_CB);
+                               LLPointer<LLInventoryCallback> cb = NULL_INV_CB);
+
+// Chaos Emerging: local fallback for OpenSim servers without AIS thumbnails.
+void save_local_folder_thumbnail(const LLUUID& category_id,
+                                 const LLUUID& thumbnail_id);
+void restore_local_folder_thumbnail(LLViewerInventoryCategory* category);
 
 void remove_inventory_items(LLInventoryObject::object_list_t& items,
 							LLPointer<LLInventoryCallback> cb = NULL_INV_CB);

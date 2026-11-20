@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<floater name="advanced_build" title="Chaos Emerging - Advanced Build"
+ can_close="true" can_drag_on_left="false" can_minimize="true" can_resize="false"
+ width="600" min_width="600" height="560" min_height="560" follows="left|top">
+    <text name="adv_header" left="12" bottom="-26" width="575" height="16"
+     font="SansSerifBold" follows="left|top">Precision construction and OpenSim building tools</text>
+    <button name="adv_measure" label="Measure selection" left="12" bottom="-53"
+     width="145" height="22" follows="left|top" />
+    <text name="adv_measure_result" left="166" bottom="-56" width="420" height="28"
+     font="SansSerifSmall" follows="left|top">Select an object and click Measure.</text>
+    <text name="move_header" left="12" bottom="-104" width="275" height="17"
+     font="SansSerifBold">Exact offset (metres)</text>
+    <spinner name="adv_move_x" label="X" label_width="14" left="12" bottom="-129"
+     width="86" height="19" decimal_digits="3" increment="0.001"
+     min_val="-256" max_val="256" initial_val="0"/>
+    <spinner name="adv_move_y" label="Y" label_width="14" left="107" bottom="-129"
+     width="86" height="19" decimal_digits="3" increment="0.001"
+     min_val="-256" max_val="256" initial_val="0"/>
+    <spinner name="adv_move_z" label="Z" label_width="14" left="202" bottom="-129"
+     width="86" height="19" decimal_digits="3" increment="0.001"
+     min_val="-256" max_val="256" initial_val="0"/>
+    <button name="adv_move" label="Move selection by offset" left="12"
+     bottom="-155" width="276" height="21"/>
+    <text name="rotate_header" left="12" bottom="-190" width="270" height="16"
+     font="SansSerifBold">Rotate selection (degrees, common pivot)</text>
+    <spinner name="adv_rot_x" label="X" label_width="14" left="12" bottom="-213"
+     width="86" height="19" decimal_digits="2" increment="1"
+     min_val="-360" max_val="360" initial_val="0"/>
+    <spinner name="adv_rot_y" label="Y" label_width="14" left="107" bottom="-213"
+     width="86" height="19" decimal_digits="2" increment="1"
+     min_val="-360" max_val="360" initial_val="0"/>
+    <spinner name="adv_rot_z" label="Z" label_width="14" left="202" bottom="-213"
+     width="86" height="19" decimal_digits="2" increment="1"
+     min_val="-360" max_val="360" initial_val="0"/>
+    <button name="adv_rotate" label="Rotate selection" left="12"
+     bottom="-239" width="276" height="21"/>
+    <text name="align_header" left="12" bottom="-271" width="276" height="17"
+     font="SansSerifBold">Align and distribute separate objects</text>
+    <combo_box name="adv_align_axis" left="12" bottom="-298" width="81" height="20">
+        <combo_item name="align_x" value="0">X axis</combo_item>
+        <combo_item name="align_y" value="1">Y axis</combo_item>
+        <combo_item name="align_z" value="2">Z axis</combo_item>
+    </combo_box>
+    <combo_box name="adv_align_mode" left="99" bottom="-298" width="102" height="20">
+        <combo_item name="edge_min" value="0">Near edge</combo_item>
+        <combo_item name="edge_middle" value="1">Centres</combo_item>
+        <combo_item name="edge_max" value="2">Far edge</combo_item>
+    </combo_box>
+    <button name="adv_align" label="Align" left="208" bottom="-298" width="80" height="20"/>
+    <combo_box name="adv_dist_axis" left="12" bottom="-325" width="113" height="20">
+        <combo_item name="dist_x" value="0">X axis</combo_item>
+        <combo_item name="dist_y" value="1">Y axis</combo_item>
+        <combo_item name="dist_z" value="2">Z axis</combo_item>
+    </combo_box>
+    <button name="adv_distribute" label="Equal gaps" left="135"
+     bottom="-325" width="153" height="20"/>
+    <text name="array_header" left="12" bottom="-363" width="276" height="17"
+     font="SansSerifBold">Duplicate array - counts X / Y / Z</text>
+    <spinner name="adv_array_nx" label="X" label_width="14" left="12" bottom="-390"
+     width="86" height="19" decimal_digits="0" increment="1"
+     min_val="1" max_val="6" initial_val="1"/>
+    <spinner name="adv_array_ny" label="Y" label_width="14" left="107" bottom="-390"
+     width="86" height="19" decimal_digits="0" increment="1"
+     min_val="1" max_val="6" initial_val="1"/>
+    <spinner name="adv_array_nz" label="Z" label_width="14" left="202" bottom="-390"
+     width="86" height="19" decimal_digits="0" increment="1"
+     min_val="1" max_val="6" initial_val="1"/>
+    <text name="array_spacing" left="12" bottom="-413" width="270" height="15"
+     font="SansSerifSmall">Spacing in metres along each axis:</text>
+    <spinner name="adv_array_dx" label="X" label_width="14" left="12" bottom="-438"
+     width="86" height="19" decimal_digits="3" increment="0.01"
+     min_val="-256" max_val="256" initial_val="1"/>
+    <spinner name="adv_array_dy" label="Y" label_width="14" left="107" bottom="-438"
+     width="86" height="19" decimal_digits="3" increment="0.01"
+     min_val="-256" max_val="256" initial_val="1"/>
+    <spinner name="adv_array_dz" label="Z" label_width="14" left="202" bottom="-438"
+     width="86" height="19" decimal_digits="3" increment="0.01"
+     min_val="-256" max_val="256" initial_val="1"/>
+    <button name="adv_array" label="Create array (up to 64)" left="12"
+     bottom="-465" width="276" height="21"/>
+    <text name="hud_header" left="12" bottom="-500" width="130" height="18"
+     font="SansSerifBold">HUD editing zoom</text>
+    <button name="adv_hud_minus" label="Zoom -" left="145" bottom="-501"
+     width="68" height="21"/>
+    <button name="adv_hud_plus" label="Zoom +" left="220" bottom="-501"
+     width="68" height="21"/>
+
+    <text name="texture_header" left="310" bottom="-103" width="278" height="18"
+     font="SansSerifBold">Bulk texture UV settings</text>
+    <button name="adv_uv_copy" label="Copy face UV" left="310"
+     bottom="-131" width="133" height="21"/>
+    <button name="adv_uv_paste" label="Paste selected faces" left="451"
+     bottom="-131" width="137" height="21"/>
+    <text name="texture_info" left="310" bottom="-163" width="275" height="30"
+     font="SansSerifSmall">Copies scale, offsets, rotation and mapping; does not alter texture UUIDs or media.</text>
+
+    <text name="preset_header" left="310" bottom="-199" width="278" height="18"
+     font="SansSerifBold">Named building presets</text>
+    <line_editor name="adv_preset_name" left="310" bottom="-231"
+     width="278" height="20" max_length="40"/>
+    <button name="adv_save_preset" label="Save preset" left="310"
+     bottom="-258" width="133" height="21"/>
+    <button name="adv_load_preset" label="Load preset" left="451"
+     bottom="-258" width="137" height="21"/>
+    <button name="adv_apply_shape" label="Apply saved prim shape and size"
+     left="310" bottom="-286" width="278" height="21"
+     tool_tip="Requires a selected editable standard parametric prim. Meshes and sculpts are excluded."/>
+
+    <text name="links_header" left="310" bottom="-314" width="278" height="18"
+     font="SansSerifBold">Linkset explorer</text>
+    <button name="adv_refresh_links" label="Read links" left="310"
+     bottom="-337" width="133" height="21"/>
+    <button name="adv_select_link" label="Select link" left="451"
+     bottom="-337" width="137" height="21"/>
+    <combo_box name="adv_links" left="310" bottom="-364"
+     width="278" height="22"/>
+    <line_editor name="adv_link_search" left="310" bottom="-392"
+     width="278" height="19" max_length="48" />
+    <spinner name="adv_face_index" label="Face #" label_width="52" left="310"
+     bottom="-421" width="133" height="20" decimal_digits="0"
+     min_val="0" max_val="63" increment="1" initial_val="0"/>
+    <button name="adv_select_face" label="Select face" left="451"
+     bottom="-421" width="137" height="21"/>
+    <text name="links_info" left="310" bottom="-467" width="278" height="34"
+     font="SansSerifSmall">Type a link number or UUID fragment and click Read links to filter. Select link or face to edit.</text>
+
+    <text name="adv_status" left="307" bottom="-528" width="280" height="40"
+     font="SansSerifSmall">Select objects in Build/Edit, then use these actions.</text>
+</floater>

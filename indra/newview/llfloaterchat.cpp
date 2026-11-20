@@ -457,8 +457,13 @@ bool LLFloaterChat::postBuild()
 	mHistoryWithoutMutes = getChild<LLViewerTextEditor>("Chat History Editor");
 	mHistoryWithoutMutes->setCustomMenuType("chat_history");
 	mHistoryWithMutes = getChild<LLViewerTextEditor>("Chat History Editor with mute");
-	mHistoryWithMutes->setVisible(false);
 	mHistoryWithMutes->setCustomMenuType("chat_history");
+
+	// Restore the last selected Nearby Chat mute-display mode at login.
+	const bool show_muted = gSavedSettings.getBool("ShowMutedNearbyChat");
+	getChild<LLCheckBoxCtrl>("show mutes")->setValue(LLSD(show_muted));
+	mHistoryWithoutMutes->setVisible(!show_muted);
+	mHistoryWithMutes->setVisible(show_muted);
 
 	mToggleActiveSpeakersBtn = getChild<LLButton>("toggle_active_speakers_btn");
 	mToggleActiveSpeakersBtn->setClickedCallback(onClickToggleActiveSpeakers,
@@ -668,6 +673,9 @@ void LLFloaterChat::onClickToggleShowMute(LLUICtrl* ctrl, void* data)
 		return;
 	}
 
+	// Previously this only switched editors, losing the choice on relog.
+	// Save it explicitly in the persisted global viewer settings.
+	gSavedSettings.setBool("ShowMutedNearbyChat", check->get());
 	if (check->get())
 	{
 		self->mHistoryWithoutMutes->setVisible(false);

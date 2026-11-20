@@ -167,20 +167,50 @@ void LLWorld::cleanupClass()
 LLViewerRegion* LLWorld::addRegion(const U64& region_handle,
 								   const LLHost& host, U32 width)
 {
-	LLViewerRegion* regionp = getRegionFromHandle(region_handle);
+	// A region announcement carries the simulator's origin handle. Unlike
+	// general position lookups, this must be an exact origin match: the
+	// varregion-aware getRegionFromHandle() accepts ANY point inside a
+	// large region and can therefore select a different simulator here.
+	LLViewerRegion* regionp = NULL;
+	bool restart_seed_after_resize = false;
+	for (region_list_t::iterator it = mRegionList.begin(),
+									 end = mRegionList.end(); it != end; ++it)
+	{
+		if ((*it)->getHandle() == region_handle)
+		{
+			regionp = *it;
+			break;
+		}
+	}
 	std::string seed_url;
 	if (regionp)
 	{
 		LLHost old_host = regionp->getHost();
-		// region already exists!
+		// Repeated EnableSimulator messages may omit the optional varregion
+		// dimensions. Never replace a known-large region with an implied 256m
+		// default; but DO rebuild a neighbour initially created at 256m when
+		// its actual larger size arrives. Otherwise its land/octree dimensions
+		// remain wrong until the user relogs.
 		if (host == old_host && regionp->isAlive())
 		{
-			// This is a duplicate for the same host and it is alive, do not
-			// bother.
-			llinfos << "Region already exists and is alive, using existing region"
-					<< llendl;
-			mDisabledRegionList.remove(regionp); // cancel any delayed removal
-			return regionp;
+			U32 old_width = (U32)regionp->getWidth();
+			bool keep_existing = width == old_width ||
+				(width == REGION_WIDTH_METERS && old_width > REGION_WIDTH_METERS);
+			// Recreating the agent's current region here would disconnect us.
+			if (keep_existing || regionp == gAgent.getRegion())
+			{
+				if (!keep_existing)
+				{
+					llwarns << "Agent region width changed from " << old_width
+							<< "m to " << width << "m. Keeping live region to avoid disconnect."
+							<< llendl;
+				}
+				mDisabledRegionList.remove(regionp);
+				return regionp;
+			}
+			restart_seed_after_resize = true;
+			llwarns << "Correcting neighbour varregion width from " << old_width
+					<< "m to " << width << "m for " << host << llendl;
 		}
 
 		if (host != old_host)
@@ -234,7 +264,7 @@ LLViewerRegion* LLWorld::addRegion(const U64& region_handle,
 		llerrs << "Unable to create new region !" << llendl;
 	}
 
-	if (!seed_url.empty())
+	if (!seed_url.empty() && !restart_seed_after_resize)
 	{
 		regionp->setCapability("Seed", seed_url);
 	}
@@ -242,28 +272,45 @@ LLViewerRegion* LLWorld::addRegion(const U64& region_handle,
 	mRegionList.push_back(regionp);
 	mActiveRegionList.push_back(regionp);
 	mCulledRegionList.push_back(regionp);
+	if (restart_seed_after_resize && !seed_url.empty())
+	{
+		// The new region is now discoverable by its handle. Re-request
+		// caps after rebuilding its land and neighbour dimensions rather
+		// than leaving it with a Seed URL but no running cap request.
+		regionp->setSeedCapability(seed_url);
+	}
 	mDisabledRegionList.remove(regionp); // cancel any delayed removal
 
-	// Find all the adjacent regions, and attach them in the correct way.
+	// Firestorm 6.6.14 OpenSim var-region edge traversal: inspect the
+	// entire edge in terrain-patch increments, not just one point.
 	F32 region_x = 0.f;
 	F32 region_y = 0.f;
 	from_region_handle(region_handle, &region_x, &region_y);
-
-	// Iterate through all directions, and connect neighbors if there.
 	U64 adj_handle = 0;
 	for (S32 dir = 0; dir < 8; ++dir)
 	{
+		LLViewerRegion* last_neighborp = NULL;
 		F32 adj_x = region_x + (F32)width * gDirAxes[dir][0];
 		F32 adj_y = region_y + (F32)width * gDirAxes[dir][1];
-		to_region_handle(adj_x, adj_y, &adj_handle);
+		if (gDirAxes[dir][0] < 0) adj_x = region_x - WORLD_PATCH_SIZE;
+		if (gDirAxes[dir][1] < 0) adj_y = region_y - WORLD_PATCH_SIZE;
 
-		LLViewerRegion* neighborp = getRegionFromHandle(adj_handle);
-		if (neighborp)
+		for (S32 offset = 0; offset < (S32)width; offset += WORLD_PATCH_SIZE)
 		{
-			LL_DEBUGS("World") << "Connecting " << region_x << ":"
-							   << region_y << " -> " << adj_x << ":" << adj_y
-							   << LL_ENDL;
-			regionp->connectNeighbor(neighborp, dir);
+			to_region_handle(adj_x, adj_y, &adj_handle);
+			LLViewerRegion* neighborp = getRegionFromHandle(adj_handle);
+			if (neighborp && last_neighborp != neighborp)
+			{
+				regionp->connectNeighbor(neighborp, dir);
+				last_neighborp = neighborp;
+			}
+			if (dir == NORTHEAST || dir == NORTHWEST ||
+				dir == SOUTHWEST || dir == SOUTHEAST)
+			{
+				break;
+			}
+			if (dir == NORTH || dir == SOUTH) adj_x += WORLD_PATCH_SIZE;
+			if (dir == EAST || dir == WEST) adj_y += WORLD_PATCH_SIZE;
 		}
 	}
 
@@ -312,20 +359,12 @@ void LLWorld::removeRegion(const LLHost& host)
 	mVisibleRegionList.remove(regionp);
 	mDisabledRegionList.remove(regionp);
 
-	// Remove all objects in this region from the mapped objects list. Note
-	// that this is normally automatically done whenever the objects get killed
-	// via ~LLViewerRegion(), but better safe than sorry. Also, I moved this
-	// call before the region is destroyed (avoids a "use after free" warning
-	// by gcc v12+) and changed the method itself (made it simpler and more
-	// efficient). HB
-	gObjectList.clearAllMapObjectsInRegion(regionp);
-
-	mRegionRemovedSignal(regionp);
-
-	// We can now safely destroy the region.
-	delete regionp;
-
-	updateWaterObjects();
+    // Firestorm region-removal sequence: notify, update, clear mapped objects,
+    // then destroy the region so its neighbour and resource cleanup runs.
+    mRegionRemovedSignal(regionp);
+    updateWaterObjects();
+    gObjectList.clearAllMapObjectsInRegion(regionp);
+    delete regionp;
 }
 
 LLViewerRegion* LLWorld::getRegion(const LLHost& host)
@@ -1440,33 +1479,14 @@ LLHTTPRegistration<LLEstablishAgentCommunication>
 //static
 void LLWorld::processDisableSimulator(LLMessageSystem* msg, void**)
 {
-	static LLCachedControl<bool> staged_sim_disabling(gSavedSettings,
-													  "StagedSimDisabling");
-	static LLCachedControl<U32> disabling_delay(gSavedSettings,
-												"StagedSimDisablingDelay");
-	F32 delay = disabling_delay > 0 ? (F32)disabling_delay : 1.f;
+    if (!msg) return;
 
-	if (!msg) return;
-
-	LLHost host = msg->getSender();
-	LLViewerRegion* regionp = gWorld.getRegion(host);
-	if (!regionp || !staged_sim_disabling ||
-		(gWorld.mDisabledRegionList.empty() &&
-		 gFrameTimeSeconds - gWorld.mLastRegionDisabling > delay))
-	{
-		llinfos << "Disabling simulator " << host << llendl;
-		gWorld.removeRegion(host);
-		msg->disableCircuit(host);
-		gWorld.mLastRegionDisabling = gFrameTimeSeconds;
-	}
-	else
-	{
-		llinfos << "Queuing simulator " << host << " for delayed removal."
-				<< llendl;
-		gWorld.mDisabledRegionList.push_back(regionp);
-	}
+    // Firestorm 7.1.13-style immediate removal: avoid retaining an obsolete
+    // region while a neighbour is re-enabled.
+    LLHost host = msg->getSender();
+    gWorld.removeRegion(host);
+    msg->disableCircuit(host);
 }
-
 //static
 void LLWorld::idleDisableQueuedSim()
 {

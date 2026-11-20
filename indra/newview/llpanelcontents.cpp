@@ -45,6 +45,7 @@
 #include "llselectmgr.h"
 #include "llviewercontrol.h"
 #include "llviewerobject.h"
+#include "llviewermenu.h"
 
 LLPanelContents::LLPanelContents(const std::string& name)
 :	LLPanel(name),
@@ -63,6 +64,9 @@ bool LLPanelContents::postBuild()
 	mButtonPermissions = getChild<LLButton>("button permissions");
 	mButtonPermissions->setClickedCallback(onClickPermissions, this);
 
+	mButtonResetScripts = getChild<LLButton>("button reset scripts");
+	mButtonResetScripts->setClickedCallback(onClickResetScripts, this);
+
 	return true;
 }
 
@@ -76,6 +80,7 @@ void LLPanelContents::getState(LLViewerObject* objectp)
 	{
 		mButtonNewScript->setEnabled(false);
 		mButtonPermissions->setEnabled(false);
+		mButtonResetScripts->setEnabled(false);
 		return;
 	}
 
@@ -98,6 +103,10 @@ void LLPanelContents::getState(LLViewerObject* objectp)
 				   (gSelectMgr.getSelection()->getRootObjectCount() == 1 ||
 					gSelectMgr.getSelection()->getObjectCount() == 1);
 	mButtonNewScript->setEnabled(enabled);
+
+	// Reset uses the same permissions and script queue as Tools > Selected Object.
+	mButtonResetScripts->setEnabled(editable && all_volume &&
+									 gSelectMgr.selectGetModify());
 
 	enabled = !objectp->isPermanentEnforced();
 	mButtonPermissions->setEnabled(enabled);
@@ -177,4 +186,27 @@ void LLPanelContents::onClickPermissions(void *userdata)
 			parentp->addDependentFloater(LLFloaterBulkPermission::showInstance());
 		}
 	}
+}
+
+
+//static
+void LLPanelContents::onClickResetScripts(void* userdata)
+{
+	LLPanelContents* self = (LLPanelContents*)userdata;
+	if (!self || !gSelectMgr.getSelection() ||
+		!gSelectMgr.getSelection()->getFirstRootObject(true) ||
+		!gSelectMgr.selectGetModify())
+	{
+		return;
+	}
+
+	// Match the RLV protection used by the original Tools menu action.
+	if (gRLenabled && !gRLInterface.canDetachAllSelectedObjects())
+	{
+		return;
+	}
+
+	// Native script reset queue: requests each selected prim's inventory,
+	// then sends ScriptReset for its scripts. No alternative script mechanism.
+	handle_reset_selection();
 }

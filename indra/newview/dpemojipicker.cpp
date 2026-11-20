@@ -243,6 +243,8 @@ void DPEmojiPicker::showFor(LLLineEditor* editor)
 {
     if (!editor) return;
     if (!sPicker) sPicker = new DPEmojiPicker();
+    sPicker->mLiveSuggestions = false;
+    sPicker->mLiveMatches.clear();
     sPicker->mInputHandle = editor->getHandle();
     sPicker->mSearch->setText("");
     // Show the full catalogue first; an empty recent list must not hide every emoji.
@@ -344,16 +346,159 @@ void DPEmojiPicker::insertEmoji(size_t index)
     if (view)
     {
         LLLineEditor* editor = static_cast<LLLineEditor*>(view);
-        editor->insert(wstring_to_utf8str(LLWString(1, entry->character)),
-                       editor->getCursor());
+        bool replaced = false;
+        if (mLiveSuggestions && mLiveStart >= 0 && mLiveStart < mLiveEnd &&
+            editor->getCursor() == mLiveEnd)
+        {
+            LLWString text = editor->getWText();
+            if (mLiveEnd <= (S32)text.size() && text[mLiveStart] == L':')
+            {
+                text.replace(mLiveStart, mLiveEnd - mLiveStart,
+                             LLWString(1, entry->character));
+                editor->setText(wstring_to_utf8str(text));
+                editor->setCursor(mLiveStart + 1);
+                replaced = true;
+            }
+        }
+        if (!replaced)
+        {
+            editor->insert(wstring_to_utf8str(LLWString(1, entry->character)),
+                           editor->getCursor());
+        }
         editor->setFocus(true);
     }
+    if (mLiveSuggestions) hideLiveSuggestions();
     sRecent.erase(std::remove(sRecent.begin(), sRecent.end(),
                                entry->character), sRecent.end());
     sRecent.insert(sRecent.begin(), entry->character);
     if (sRecent.size() > 60) sRecent.resize(60);
     saveRecent();
     if (mCategory == 0) rebuildGrid();
+}
+
+// Firestorm-style emoji autocomplete using Build 192's existing emoji
+// definitions and picker; the caller is solely LLChatBar's chat input.
+void DPEmojiPicker::hideLiveSuggestions(LLLineEditor* editor)
+{
+    if (!sPicker || !sPicker->mLiveSuggestions) return;
+    if (editor && sPicker->mInputHandle.get() != editor) return;
+    sPicker->mLiveSuggestions = false;
+    sPicker->mLiveMatches.clear();
+    sPicker->mLiveStart = sPicker->mLiveEnd = -1;
+    sPicker->setVisible(false);
+}
+
+bool DPEmojiPicker::handleLiveSuggestionKey(LLLineEditor* editor,
+                                            KEY key, MASK mask)
+{
+    if (!editor || mask != MASK_NONE || !sPicker ||
+        !sPicker->mLiveSuggestions || sPicker->mInputHandle.get() != editor)
+        return false;
+
+    if (key == KEY_ESCAPE)
+    {
+        hideLiveSuggestions(editor);
+        return true;
+    }
+    const size_t count = sPicker->mLiveMatches.size();
+    if (!count) return false;
+    if (key == KEY_UP || key == KEY_DOWN)
+    {
+        sPicker->mLiveSelected = (sPicker->mLiveSelected +
+            (key == KEY_DOWN ? 1 : count - 1)) % count;
+        if (sPicker->mPreview)
+        {
+            sPicker->mPreview->setText(
+                sDictionary[sPicker->mLiveMatches[sPicker->mLiveSelected]].short_code);
+        }
+        return true;
+    }
+    if (key == KEY_TAB || key == KEY_RETURN)
+    {
+        sPicker->insertEmoji(sPicker->mLiveMatches[sPicker->mLiveSelected]);
+        return true;
+    }
+    return false;
+}
+
+void DPEmojiPicker::updateLiveSuggestions(LLLineEditor* editor)
+{
+    if (!editor) return;
+    const LLWString text = editor->getWText();
+    const S32 cursor = editor->getCursor();
+    if (cursor < 2 || cursor > (S32)text.size())
+    {
+        hideLiveSuggestions(editor);
+        return;
+    }
+    auto isCodeChar = [](llwchar ch) -> bool
+    {
+        return (ch >= L'a' && ch <= L'z') ||
+               (ch >= L'A' && ch <= L'Z') ||
+               (ch >= L'0' && ch <= L'9') ||
+               ch == L'_' || ch == L'-' || ch == L'+';
+    };
+
+    S32 start = cursor - 1;
+    const bool closing_colon = text[start] == L':';
+    if (closing_colon) --start;
+    while (start >= 0 && isCodeChar(text[start])) --start;
+    if (start < 0 || text[start] != L':' ||
+        cursor - start > 55 || cursor - start < 3 ||
+        (start > 0 && text[start - 1] >= L'0' && text[start - 1] <= L'9'))
+    {
+        hideLiveSuggestions(editor);
+        return;
+    }
+
+    std::string prefix = wstring_to_utf8str(text.substr(start, cursor - start));
+    LLStringUtil::toLower(prefix);
+    if (closing_colon)
+    {
+        // Insertion occurs immediately when a full :emoji_shortcode: is typed.
+        const std::string replacement = expandShortcodes(prefix);
+        if (replacement != prefix)
+        {
+            LLWString next(text);
+            const LLWString emoji = utf8str_to_wstring(replacement);
+            next.replace(start, cursor - start, emoji);
+            editor->setText(wstring_to_utf8str(next));
+            editor->setCursor(start + (S32)emoji.size());
+        }
+        hideLiveSuggestions(editor);
+        return;
+    }
+
+    if (!sPicker) sPicker = new DPEmojiPicker();
+    sPicker->mLiveMatches.clear();
+    for (size_t i = 0; i < sDictionary.size(); ++i)
+    {
+        if (sDictionary[i].short_code.compare(0, prefix.size(), prefix) == 0)
+        {
+            sPicker->mLiveMatches.push_back(i);
+            if (sPicker->mLiveMatches.size() == 30) break;
+        }
+    }
+    if (sPicker->mLiveMatches.empty())
+    {
+        hideLiveSuggestions(editor);
+        return;
+    }
+    sPicker->mInputHandle = editor->getHandle();
+    sPicker->mLiveSuggestions = true;
+    sPicker->mLiveStart = start;
+    sPicker->mLiveEnd = cursor;
+    sPicker->mLiveSelected = 0;
+    if (sPicker->mGrid) sPicker->mGrid->update(sPicker->mLiveMatches);
+    if (sPicker->mScroll) sPicker->mScroll->goToTop();
+    if (sPicker->mPreview)
+        sPicker->mPreview->setText(
+            sDictionary[sPicker->mLiveMatches.front()].short_code);
+    if (!sPicker->getVisible())
+    {
+        sPicker->open();
+        editor->setFocus(true); // Suggestions must not take chat-input focus.
+    }
 }
 
 std::string DPEmojiPicker::expandShortcodes(const std::string& input)

@@ -30,6 +30,10 @@ public:
     bool postBuild() override;
     static void showFor(LLLineEditor* editor);
     static std::string expandShortcodes(const std::string& text);
+    // Live emoji suggestions, only for the existing local chat input.
+    static void updateLiveSuggestions(LLLineEditor* editor);
+    static bool handleLiveSuggestionKey(LLLineEditor* editor, KEY key, MASK mask);
+    static void hideLiveSuggestions(LLLineEditor* editor = NULL);
     void insertEmoji(size_t index);
     std::string tooltipFor(size_t index) const;
     const DPEmojiEntry* entryAt(size_t index) const;
@@ -45,6 +49,11 @@ private:
     static std::vector<DPEmojiEntry> sDictionary;
     static std::vector<llwchar> sRecent;
     static bool sLoaded;
+    bool mLiveSuggestions = false;
+    S32 mLiveStart = -1;
+    S32 mLiveEnd = -1;
+    size_t mLiveSelected = 0;
+    std::vector<size_t> mLiveMatches;
     S32 mCategory = 0;
     LLHandle<LLView> mInputHandle;
     LLScrollableContainer* mScroll = NULL;

@@ -79,9 +79,8 @@ public:
 
 		FT_GESTURE = 21,
 
-#if 0	// Viewer 2 folder: useless for v1 ! HB
+		// Shared Firestorm/OpenSim Favorites inventory folder type.
 		FT_FAVORITE = 23,
-#endif
 
 		FT_CURRENT_OUTFIT = 46,
 

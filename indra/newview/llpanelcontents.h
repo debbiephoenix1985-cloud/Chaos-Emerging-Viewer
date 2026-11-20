@@ -49,6 +49,7 @@ private:
 
 	static void onClickNewScript(void* userdata);
 	static void onClickPermissions(void* userdata);
+	static void onClickResetScripts(void* userdata);
 
 public:
 	LLPanelInventory* mPanelInventory;
@@ -56,4 +57,5 @@ public:
 private:
 	LLButton* mButtonNewScript;
 	LLButton* mButtonPermissions;
+	LLButton* mButtonResetScripts;
 };

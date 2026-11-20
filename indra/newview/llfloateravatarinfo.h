@@ -84,6 +84,10 @@ public:
 
 	static std::string getProfileURL(const std::string& user_name);
 
+	// Copy identifiers for the avatar this particular profile displays.
+	static void onCopyAvatarUUID(void* userdata);
+	static void onCopyAvatarProfileURL(void* userdata);
+
 private:
 	LLUUID			mAvatarID;			// For which avatar is this window ?
 	LLPanelAvatar*	mPanelAvatarp;

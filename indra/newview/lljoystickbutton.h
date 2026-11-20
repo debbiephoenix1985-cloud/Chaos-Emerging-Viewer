@@ -153,7 +153,7 @@ public:
 protected:
 	F32 getOrbitRate();
 	void updateSlop() override;
-	void drawRotatedImage(LLGLTexture* image, S32 rotations);
+	void drawRotatedImage(LLUIImagePtr image, S32 rotations);
 
 protected:
 	bool			mInLeft;

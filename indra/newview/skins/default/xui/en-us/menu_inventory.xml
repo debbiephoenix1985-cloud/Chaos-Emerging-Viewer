@@ -210,6 +210,10 @@
 	<menu_item_call name="Copy" label="Copy">
 		<on_click filter="" function="Inventory.DoToSelected" userdata="copy" />
 	</menu_item_call>
+    <!-- Firestorm 7.2.5 inventory FIRE-36793: extend original Chaos menu only. -->
+    <menu_item_call name="Copy Name" label="Copy Name">
+        <on_click function="Inventory.DoToSelected" userdata="copy_name" />
+    </menu_item_call>
 	<menu_item_call name="Paste" label="Paste">
 		<on_click filter="" function="Inventory.DoToSelected" userdata="paste" />
 	</menu_item_call>

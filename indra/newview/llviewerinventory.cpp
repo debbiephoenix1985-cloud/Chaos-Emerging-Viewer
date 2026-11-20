@@ -32,8 +32,12 @@
 
 #include "llviewerinventory.h"
 
+#include <fstream>
+#include <map>
+
 #include "llcallbacklist.h"
 #include "llcorehttputil.h"
+#include "lldir.h"
 #include "llnotifications.h"
 #include "llsdutil.h"
 #include "llmessage.h"
@@ -67,6 +71,102 @@ using namespace std::placeholders;
 constexpr F32 FETCH_TIMER_EXPIRY = 30.f;
 // Keep in sinc with HTTP timeout (also AIS_TIMEOUT) in llaisapi.cpp. HB
 constexpr F32 AIS_TIMEOUT = 180.f;
+
+// Chaos Emerging: persist thumbnails for OpenSim inventory servers that lack
+// the AIS category-thumbnail update facility.  The existing per-account
+// directory is grid-scoped (see llstartup.cpp); the agent UUID in the file
+// name also prevents cross-avatar collisions.  Only UUID associations, not
+// image data or unrelated inventory metadata, are saved.
+namespace
+{
+std::string sLocalThumbFile;
+std::map<LLUUID, LLUUID> sLocalFolderThumbs;
+
+void loadLocalFolderThumbnails()
+{
+    if (gAgentID.isNull() || gIsInSecondLife)
+    {
+        return;
+    }
+    const std::string filename = gDirUtil.getFullPath(
+        LL_PATH_PER_ACCOUNT,
+        "chaos_folder_thumbnails_" + gAgentID.asString() + ".txt");
+    if (filename == sLocalThumbFile)
+    {
+        return;
+    }
+    sLocalThumbFile = filename;
+    sLocalFolderThumbs.clear();
+
+    std::ifstream file(filename.c_str());
+    std::string category, thumbnail;
+    while (file >> category >> thumbnail)
+    {
+        LLUUID category_id, thumbnail_id;
+        category_id.set(category);
+        thumbnail_id.set(thumbnail);
+        if (category_id.notNull() && thumbnail_id.notNull())
+        {
+            sLocalFolderThumbs[category_id] = thumbnail_id;
+        }
+    }
+}
+} // anonymous namespace
+
+void save_local_folder_thumbnail(const LLUUID& category_id,
+                                 const LLUUID& thumbnail_id)
+{
+    if (category_id.isNull() || gAgentID.isNull() || gIsInSecondLife)
+    {
+        return;
+    }
+    loadLocalFolderThumbnails();
+    if (sLocalThumbFile.empty())
+    {
+        return;
+    }
+    if (thumbnail_id.isNull())
+    {
+        sLocalFolderThumbs.erase(category_id);
+    }
+    else
+    {
+        sLocalFolderThumbs[category_id] = thumbnail_id;
+    }
+
+    std::ofstream file(sLocalThumbFile.c_str(), std::ios::trunc);
+    if (!file.is_open())
+    {
+        llwarns << "Cannot save local folder thumbnail associations: "
+                << sLocalThumbFile << llendl;
+        return;
+    }
+    for (const auto& entry : sLocalFolderThumbs)
+    {
+        file << entry.first << " " << entry.second << "\n";
+    }
+    if (!file.good())
+    {
+        llwarns << "Failed to write local folder thumbnail associations: "
+                << sLocalThumbFile << llendl;
+    }
+}
+
+void restore_local_folder_thumbnail(LLViewerInventoryCategory* category)
+{
+    if (!category || category->getUUID().isNull() ||
+        category->getThumbnailUUID().notNull() ||
+        gAgentID.isNull() || gIsInSecondLife)
+    {
+        return;
+    }
+    loadLocalFolderThumbnails();
+    const auto it = sLocalFolderThumbs.find(category->getUUID());
+    if (it != sLocalFolderThumbs.end())
+    {
+        category->setThumbnailUUID(it->second);
+    }
+}
 
 // Do-nothing ops for use in callbacks:
 
@@ -700,7 +800,7 @@ bool LLViewerInventoryCategory::importLLSD(const LLSD& cat_data)
 	{
 		mThumbnailUUID.setNull();
 		const LLSD& thumb_data = cat_data["thumbnail"];
-		if (cat_data.has("asset_id"))
+		if (thumb_data.has("asset_id"))
 		{
 			mThumbnailUUID = thumb_data["asset_id"].asUUID();
 		}

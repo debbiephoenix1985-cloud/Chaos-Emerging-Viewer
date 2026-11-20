@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file llviewermenu.cpp
  * @brief Builds menus out of items.
  *
@@ -117,6 +117,7 @@
 #include "llcheckboxctrl.h"
 #include "llfloaterchat.h"
 #include "llfloaterchatterbox.h"
+#include "llfloatercontactsets.h"
 #include "llfloatercustomize.h"
 #include "hbfloatermakenewoutfit.h"
 #include "hbfloaterthumbnail.h"
@@ -274,6 +275,38 @@ LLPieMenu* gPieObjectp = NULL;
 LLPieMenu* gPieAttachmentp = NULL;
 LLPieMenu* gPieLandp = NULL;
 LLPieMenu* gPieParticlep = NULL;
+
+// Firestorm-positioned context menus use the same LLMenuGL implementation
+// already used by Chaos's Area Search. Separate from the legacy pie menus.
+static LLMenuGL* sChaosWorldContextMenus[6] = { NULL, NULL, NULL, NULL, NULL, NULL };
+
+bool useChaosContextMenu()
+{
+    // An explicit preference always wins over the skin. "auto" follows it.
+    const std::string choice = gSavedSettings.getString("ChaosRightClickMenuStyle");
+    // Recognize the 229 saved numeric radio indexes even before Preferences
+    // is opened in 230; HBPrefsCoolImpl migrates them to these string names.
+    if (choice == "context" || choice == "1") return true;
+    if (choice == "pie" || choice == "2") return false;
+    return gSavedSettings.getString("SkinCurrent") == "dark";
+}
+
+void showChaosContextMenu(const char* kind, S32 x, S32 y)
+{
+    if (!gViewerWindowp || !gMenuHolderp || !kind) return;
+    const std::string target(kind);
+    const S32 index = target == "object" ? 0 :
+                      target == "avatar" ? 1 :
+                      target == "self" ? 2 :
+                      target == "attachment" ? 3 :
+                      target == "attachment_other" ? 4 :
+                      target == "land" ? 5 : -1;
+    if (index < 0 || !sChaosWorldContextMenus[index]) return;
+    LLMenuGL* menu = sChaosWorldContextMenus[index];
+    menu->buildDrawLabels();
+    menu->updateParent(gMenuHolderp);
+    LLMenuGL::showPopup(gViewerWindowp->getRootView(), menu, x, y);
+}
 // Pie sub-menus
 LLPieMenu* gAttachScreenPieMenup = NULL;
 LLPieMenu* gAttachPieMenup = NULL;
@@ -291,7 +324,7 @@ LLMenuGL* gDetachSubMenup = NULL;
 static S32 s2KTextureCost = 0;
 
 // Local constants.
-static const std::string CLIENT_MENU_NAME("Advanced");
+static const std::string CLIENT_MENU_NAME("Developer");
 static const std::string SERVER_MENU_NAME("Admin");
 
 typedef LLMemberListener<LLView> view_listener_t;
@@ -615,8 +648,33 @@ void init_menus()
 	gPieLandp = factoryp->buildPieMenu("menu_pie_land.xml", gMenuHolderp);
 
 	gPieParticlep = factoryp->buildPieMenu("menu_pie_particle.xml",
-										   gMenuHolderp);
-	new HBLuaPieMenu();
+                                           gMenuHolderp);
+    // Use the tested Area Search popup infrastructure, rather than modifying
+    // the pie parser or substituting unregistered Firestorm callbacks.
+    static const char* context_files[6] =
+    {
+        "menu_chaos_context_object.xml",
+        "menu_chaos_context_avatar.xml",
+        "menu_chaos_context_self.xml",
+        "menu_chaos_context_attachment.xml",
+        "menu_chaos_context_attachment_other.xml",
+        "menu_chaos_context_land.xml"
+    };
+    for (S32 i = 0; i < 6; ++i)
+    {
+        sChaosWorldContextMenus[i] = factoryp->buildMenu(context_files[i],
+                                                         gMenuHolderp);
+        if (sChaosWorldContextMenus[i])
+        {
+            sChaosWorldContextMenus[i]->setVisible(false);
+            sChaosWorldContextMenus[i]->updateParent(gMenuHolderp);
+        }
+        else
+        {
+            llwarns << "Missing world context menu: " << context_files[i] << llendl;
+        }
+    }
+    new HBLuaPieMenu();
 
 	//
 	// Set up the colors
@@ -661,14 +719,20 @@ void init_menus()
 
 	gDetachSubMenup = gMenuBarViewp->getChildMenuByName("Detach Object", true);
 
-	LLMenuGL* menu = new LLMenuGL(CLIENT_MENU_NAME);
-	init_client_menu(menu);
-	gMenuBarViewp->appendMenu(menu);
-	menu->updateParent(gMenuHolderp);
+	// Populate the Firestorm-positioned RLVa dropdown from the real Chaos RLV engine.
+	LLMenuGL* menu = gMenuBarViewp->getChildMenuByName("RLVa", true);
+	if (menu)
+	{
+		init_rlva_menu(menu);
+	}
+	else
+	{
+		llwarns << "RLVa menu placeholder missing from menu_viewer.xml" << llendl;
+	}
 
-	// Expose the existing, real RLV engine in a dedicated dropdown.
-	menu = new LLMenuGL("RLVa");
-	init_rlva_menu(menu);
+	// The debug tools are the Firestorm-style Developer menu, not a second Advanced.
+	menu = new LLMenuGL(CLIENT_MENU_NAME);
+	init_client_menu(menu);
 	gMenuBarViewp->appendMenu(menu);
 	menu->updateParent(gMenuHolderp);
 
@@ -8235,6 +8299,25 @@ class LLChaosAvatarHealth final : public view_listener_t
 		{
 			gAgent.stopCurrentAnimations(true);
 		}
+		else if (action == "resync")
+		{
+			// Firestorm's Tools.ResyncAnimations: restart each nearby avatar's
+			// playing motions locally without stopping the simulator's animations.
+			for (S32 i = 0; i < gObjectList.getNumObjects(); ++i)
+			{
+				LLViewerObject* objectp = gObjectList.getObject(i);
+				if (objectp && objectp->isAvatar())
+				{
+					LLVOAvatar* avatarp = (LLVOAvatar*)objectp;
+					for (LLVOAvatar::anim_it_t it = avatarp->mPlayingAnimations.begin();
+						 it != avatarp->mPlayingAnimations.end(); ++it)
+					{
+						avatarp->stopMotion(it->first, true);
+						avatarp->startMotion(it->first);
+					}
+				}
+			}
+		}
 		else if (action == "undeform")
 		{
 			if (isAgentAvatarValid())
@@ -9636,25 +9719,13 @@ class LLChaosAppearance final :
     static void onAddMore(void*) { LLFloaterInventory::showAgentInventory(); }
     void editWearable(LLScrollListCtrl* selected_list)
     {
-        if (!gAgentWearables.areWearablesLoaded()) return;
-        LLWearableType::EType type = LLWearableType::WT_SHAPE;
-        if (selected_list)
+        if (!gAgentWearables.areWearablesLoaded() || !selected_list) return;
+        const LLUUID item_id = selected_list->getCurrentID();
+        // Never silently substitute Shape for an absent/invalid selection.
+        if (item_id.notNull() && LLFloaterCustomize::editWearable(item_id))
         {
-            const LLUUID id = selected_list->getCurrentID();
-            const LLViewerInventoryItem* item = gInventory.getItem(id);
-            if (item)
-            {
-                const LLWearableType::EType chosen = item->getWearableType();
-                if (chosen >= LLWearableType::WT_SHAPE &&
-                    chosen < LLWearableType::WT_COUNT)
-                    type = chosen;
-            }
+            setVisible(false);
         }
-        setVisible(false);
-        // Use Firestorm's selected-wearable editing flow while preserving
-        // Cool VL's real avatar customization and save/permission logic.
-        gAgent.changeCameraToCustomizeAvatar();
-        LLFloaterCustomize::setCurrentWearableType(type);
     }
     static void onEditClothing(void* p)
     {
@@ -12009,7 +12080,7 @@ void upload_pick(HBFileSelector::ELoadFilter type)
 		gAgent.changeCameraToDefault();
 	}
 
-	HBFileSelector::loadFile(type, upload_pick_callback);
+	HBFileSelector::loadUploadFile(type, upload_pick_callback);
 }
 
 class LLFileUploadImage final : public view_listener_t
@@ -12060,7 +12131,7 @@ class LLFileUploadBulk final : public view_listener_t
 			gAgent.changeCameraToDefault();
 		}
 
-		HBFileSelector::loadFiles(HBFileSelector::FFLOAD_ALL,
+		HBFileSelector::loadUploadFiles(HBFileSelector::FFLOAD_ALL,
 								  upload_bulk_callback);
 		return true;
 	}
@@ -12283,6 +12354,43 @@ class LLChaosQuickPreferences final : public LLFloater,
 			LLHUDEffectLookAt::sDebugLookAt = control->getValue().asBoolean();
 		}
 	}
+	// Match General Preferences' integer-index based RenderName handling.
+	// Never save combo item strings into the S32 setting.
+	static void onNameTagsChanged(LLUICtrl* control, void*)
+	{
+		if (!control) return;
+		LLComboBox* combo = static_cast<LLComboBox*>(control);
+		const S32 index = combo->getCurrentIndex();
+		if (index >= 0 && index <= 2)
+		{
+			gSavedSettings.setS32("RenderName", index);
+		}
+	}
+	// QuickPrefs shares its state with General Preferences and the native
+	// Debug > Show look at menu, including changes made while this is open.
+	void syncNativeControls()
+	{
+		LLComboBox* names = getChild<LLComboBox>("qp_nametags");
+		const S32 index = llclamp(gSavedSettings.getS32("RenderName"), 0, 2);
+		if (names->getCurrentIndex() != index)
+		{
+			names->setCurrentByIndex(index);
+		}
+		LLCheckBoxCtrl* lookat = getChild<LLCheckBoxCtrl>("qp_lookat");
+		if (lookat->getValue().asBoolean() != LLHUDEffectLookAt::sDebugLookAt)
+		{
+			lookat->setValue(LLHUDEffectLookAt::sDebugLookAt);
+		}
+	}
+	// Keep the live impostor threshold in sync with the Quick Preferences slider.
+	static void onMaxAvatarsChanged(LLUICtrl* control, void*)
+	{
+		if (!control) return;
+		const U32 max_avatars = (U32)control->getValue().asInteger();
+		gSavedSettings.setU32("RenderAvatarMaxNonImpostors", max_avatars);
+		LLVOAvatar::updateSettings();
+		LLVOAvatar::setAvatarCullingDirty();
+	}
 	static void onSkyChanged(LLUICtrl* control, void*)
 	{
 		if (control)
@@ -12325,7 +12433,10 @@ public:
 	{
 		LLCheckBoxCtrl* look_at = getChild<LLCheckBoxCtrl>("qp_lookat");
 		look_at->setCommitCallback(onLookAtChanged);
+		getChild<LLComboBox>("qp_nametags")->setCommitCallback(onNameTagsChanged);
 		look_at->setValue(LLHUDEffectLookAt::sDebugLookAt);
+		syncNativeControls();
+		childSetCommitCallback("qp_max_avatars", onMaxAvatarsChanged, this);
 		getChild<LLComboBox>("qp_sky")->setCommitCallback(onSkyChanged);
 		getChild<LLComboBox>("qp_water")->setCommitCallback(onWaterChanged);
 		getChild<LLComboBox>("qp_daycycle")->setCommitCallback(onDayCycleChanged);
@@ -12334,6 +12445,7 @@ public:
 	}
 	void onOpen() override
 	{
+		syncNativeControls();
 		getChild<LLCheckBoxCtrl>("qp_lookat")->setValue(
 			LLHUDEffectLookAt::sDebugLookAt);
 		// Use the same genuine Windlight presets as the original viewer.
@@ -12352,6 +12464,11 @@ public:
 		LLWLDayCycle::findPresets();
 		for (const auto& preset : LLWLDayCycle::sPresetNames)
 			day->add(preset);
+	}
+	void draw() override
+	{
+		syncNativeControls();
+		LLFloater::draw();
 	}
 };
 
@@ -12688,6 +12805,90 @@ class LLAvatarReportAbuse final : public view_listener_t
 
 ///////////////////////////////////////////////////////////////////////////////
 
+// Firestorm-style world context callbacks adapted to real Chaos functionality.
+// The Area Search menu and these world menus use LLMenuGL, not fake pie rings.
+class LLChaosContextDisabled final : public view_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent>, const LLSD& userdata) override
+    {
+        LLControlVariable* enabled =
+            gMenuHolderp->findControl(userdata["control"].asString());
+        if (enabled) enabled->setValue(false);
+        return true;
+    }
+};
+
+class LLChaosContextAvatarAction final : public view_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent>, const LLSD& userdata) override
+    {
+        LLVOAvatar* avatarp =
+            find_avatar_from_object(gSelectMgr.getSelection()->getPrimaryObject());
+        if (!avatarp) return false;
+        const std::string action = userdata.asString();
+        if (action == "skeleton")
+        {
+            avatarp->resetSkeleton();
+        }
+        else if (action == "skeletonanim" || action == "mesh")
+        {
+            // The existing Chaos avatar refresh code revalidates skinned
+            // meshes, resets skeleton and replays animations if needed.
+            handle_refresh_avatar(avatarp, true);
+        }
+        else if (action == "textures")
+        {
+            handle_refresh_avatar(avatarp, false);
+        }
+        else if (action == "call")
+        {
+            if (gRLenabled &&
+                (gRLInterface.mContainsShownames ||
+                 gRLInterface.mContainsShownametags)) return false;
+            if (gIMMgrp)
+            {
+                const LLUUID session = gIMMgrp->addSession(
+                    avatarp->getFullname(), IM_NOTHING_SPECIAL, avatarp->getID());
+                if (session.notNull()) gIMMgrp->startCall(session);
+            }
+        }
+        return true;
+    }
+};
+
+class LLChaosContextSelfAction final : public view_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent>, const LLSD& userdata) override
+    {
+        const std::string action = userdata.asString();
+        if (action == "fly")
+        {
+            gAgent.toggleFlying();
+        }
+        else if (action == "stopanimations")
+        {
+            gAgent.stopCurrentAnimations(false);
+        }
+        else if (isAgentAvatarValid())
+        {
+            if (action == "sit" && !gAgentAvatarp->mIsSitting)
+                sit_on_ground();
+            else if (action == "stand" && gAgentAvatarp->mIsSitting)
+                stand_up();
+        }
+        return true;
+    }
+};
+
+class LLChaosContextTake final : public view_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent>, const LLSD&) override
+    {
+        handle_take(); // Uses Chaos's normal take/confirmation/permissions path.
+        return true;
+    }
+};
+
 static void addMenu(view_listener_t* menup, const std::string& name)
 {
 	sMenus.push_back(menup);
@@ -12696,6 +12897,12 @@ static void addMenu(view_listener_t* menup, const std::string& name)
 
 void initialize_menus()
 {
+    // Registered before any Firestorm-positioned context XML is parsed.
+    addMenu(new LLChaosContextDisabled(), "Chaos.ContextDisabled");
+    addMenu(new LLChaosContextAvatarAction(), "Chaos.ContextAvatarAction");
+    addMenu(new LLChaosContextSelfAction(), "Chaos.ContextSelfAction");
+    addMenu(new LLChaosContextTake(), "Chaos.ContextTake");
+
 	// File menu
 	addMenu(new LLFileBackupObject(), "File.BackupObject");
 	addMenu(new LLFileExportOBJ(), "File.ExportOBJ");

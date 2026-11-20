@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file llfloatertools.h
  * @brief The edit tools, including move, position, land, etc.
  *
@@ -140,6 +140,7 @@ private:
 	static void onClickBtnDeleteMedia(void*);
 
 	static void onClickGridOptions(void* datap);
+	static void onClickAdvancedBuild(void* datap);
 	static void onClickLink(void*);
 	static void onClickUnlink(void*);
 
@@ -186,6 +187,7 @@ private:
 	LLComboBox*				mComboGridMode;
 	LLCheckBoxCtrl*			mCheckStretchUniform;
 	LLCheckBoxCtrl*			mCheckStretchTexture;
+	LLCheckBoxCtrl* mCheckSnapToGrid;
 	LLCheckBoxCtrl*			mCheckUseRootForPivot;
 
 	LLButton*				mBtnRotateLeft;

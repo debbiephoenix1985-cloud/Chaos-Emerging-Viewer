@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!-- Contact Sets is the third native Contacts tab alongside Friends and Groups.
+     Same 452x333 embedded content size as their existing floaters. -->
+<floater name="contact_sets" title="Contact Sets" can_resize="true" can_minimize="false" can_close="false" can_tear_off="false" can_drag_on_left="false" width="452" min_width="360" height="333" min_height="270" follows="all">
+  <combo_box name="sets" left="6" bottom="304" width="235" height="22" follows="left|right|top" tool_tip="Select a named contact set" />
+  <button name="config_btn" label="" image_overlay="Icon_Gear.png" image_overlay_alignment="center" left="245" bottom="304" width="27" height="22" follows="top|right" tool_tip="Configure / rename the selected contact set" />
+  <button name="new_set" label="" image_overlay="AddItem_Press" image_overlay_alignment="center" left="277" bottom="304" width="27" height="22" follows="top|right" tool_tip="Create a new contact set" />
+  <button name="delete_set" label="" image_overlay="TrashItem_Press" image_overlay_alignment="center" left="309" bottom="304" width="27" height="22" follows="top|right" tool_tip="Delete the selected contact set" />
+  <scroll_list name="contact_list" left="6" bottom="27" width="330" height="274" multi_select="true" draw_heading="false" draw_stripes="false" draw_border="true" background_visible="true" bg_writeable_color="0.10 0.10 0.12 1" fg_unselected_color="0.78 0.78 0.80 1" bg_selected_color="0.24 0.22 0.32 1" column_padding="0" search_column="1" follows="all" tool_tip="Ctrl-click to select multiple contacts. Double-click to start IM.">
+    <column name="online" label="Online" width="20" tool_tip="Online status" />
+    <column name="name" label="Contact name" dynamicwidth="true" />
+    <column name="show_online" label="See online" width="18" tool_tip="Contact can see your online status" />
+    <column name="show_map" label="See map" width="18" tool_tip="Contact can find your location" />
+    <column name="edit_mine" label="Edit mine" width="18" tool_tip="Contact can modify your objects" />
+    <column name="see_theirs" label="See theirs" width="18" tool_tip="You can see the contact online or on the map" />
+    <column name="edit_theirs" label="Edit theirs" width="18" tool_tip="You may modify this contact's objects" />
+  </scroll_list>
+  <button name="add_contact" label="Add..." left="346" bottom="307" width="99" height="23" follows="top|right" tool_tip="Add avatars to the selected contact set" />
+  <button name="remove_contact" label="Remove..." left="346" bottom="279" width="99" height="23" follows="top|right" tool_tip="Remove the selected avatars from this set" />
+  <button name="profile" label="Profile..." left="346" bottom="251" width="99" height="23" follows="top|right" />
+  <button name="im_call" label="IM..." left="346" bottom="223" width="99" height="23" follows="top|right" tool_tip="Open IM or conference for selected avatars; Start Call for voice" />
+  <button name="offer_tp" label="Teleport..." left="346" bottom="195" width="99" height="23" follows="top|right" />
+  <button name="set_alias" label="Set Alias..." left="346" bottom="163" width="99" height="23" follows="top|right" />
+  <button name="clear_alias" label="Rem Alias..." left="346" bottom="135" width="99" height="23" follows="top|right" />
+  <button name="remove_dn" label="Rem DN..." left="346" bottom="107" width="99" height="23" follows="top|right" tool_tip="Display the legacy name in Contact Sets" />
+  <check_box visible="false" name="set_notifications" label="Notify" left="346" bottom="47" width="75" height="19" follows="right|bottom" tool_tip="Online / offline notices for this set" />
+  <color_swatch visible="false" name="set_color" left="415" bottom="39" width="28" height="30" color="0.5 0.5 0.5 1" can_apply_immediately="true" follows="right|bottom" tool_tip="Set contact colour" />
+  <text name="contact_status" left="7" bottom="5" width="330" height="17" font="SansSerifSmall" follows="left|right|bottom">Members: 0</text>
+</floater>

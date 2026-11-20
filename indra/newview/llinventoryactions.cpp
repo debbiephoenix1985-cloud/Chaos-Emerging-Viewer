@@ -526,6 +526,43 @@ class LLHideEmptySystemFolders : public inventory_listener_t
 	}
 };
 
+// Firestorm 7.2.5 custom inventory tabs, native Chaos actions.
+class LLAddCustomInventoryTab : public inventory_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent>, const LLSD&) override
+	{
+		mPtr->addCustomFilterTab();
+		return true;
+	}
+};
+
+class LLCloneCustomInventoryTab : public inventory_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent>, const LLSD&) override
+	{
+		mPtr->cloneCustomFilterTab();
+		return true;
+	}
+};
+
+class LLRenameCustomInventoryTab : public inventory_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent>, const LLSD&) override
+	{
+		mPtr->renameCustomFilterTab();
+		return true;
+	}
+};
+
+class LLCloseCustomInventoryTab : public inventory_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent>, const LLSD&) override
+	{
+		mPtr->requestCloseCustomFilterTab(mPtr->getActivePanel());
+		return true;
+	}
+};
+
 class LLHideMarketplaceFolder : public inventory_listener_t
 {
 	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
@@ -536,6 +573,20 @@ class LLHideMarketplaceFolder : public inventory_listener_t
 		mPtr->getActivePanel()->getFilter()->setModified();
 		return true;
 	}
+};
+
+// Firestorm 7.2.5 FIRE-34881 inventory Library visibility, using
+// the existing Chaos inventory panel and folder-filter implementation.
+class LLHideLibraryFolder : public inventory_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+    {
+        bool hide = !gSavedSettings.getBool("HideLibraryFolder");
+        gSavedSettings.setBool("HideLibraryFolder", hide);
+        // Invalidate this panel's filter so the current folder tree redraws.
+        mPtr->getActivePanel()->getFilter()->setModified();
+        return true;
+    }
 };
 
 class LLHideCurrentOutfitFolder : public inventory_listener_t
@@ -1219,6 +1270,10 @@ void init_object_inventory_panel_actions(LLPanelInventory* panelp)
 
 void init_inventory_actions(LLFloaterInventory* floaterp)
 {
+	(new LLAddCustomInventoryTab())->registerListener(floaterp, "Inventory.CustomTabAdd");
+	(new LLCloneCustomInventoryTab())->registerListener(floaterp, "Inventory.CustomTabClone");
+	(new LLRenameCustomInventoryTab())->registerListener(floaterp, "Inventory.CustomTabRename");
+	(new LLCloseCustomInventoryTab())->registerListener(floaterp, "Inventory.CustomTabClose");
 	(new LLDoToSelectedFloater())->registerListener(floaterp,
 													"Inventory.DoToSelected");
 	(new LLCloseAllFoldersFloater())->registerListener(floaterp,
@@ -1227,6 +1282,8 @@ void init_inventory_actions(LLFloaterInventory* floaterp)
 													   "Inventory.HideEmptySystemFolders");
 	(new LLHideMarketplaceFolder())->registerListener(floaterp,
 													  "Inventory.HideMarketplaceFolder");
+	(new LLHideLibraryFolder())->registerListener(floaterp,
+                                              "Inventory.HideLibraryFolder");
 	(new LLHideCurrentOutfitFolder())->registerListener(floaterp,
 														"Inventory.HideCurrentOutfitFolder");
 	(new LLResyncCallingCards())->registerListener(floaterp,

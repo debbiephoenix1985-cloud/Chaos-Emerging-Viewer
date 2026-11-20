@@ -60,6 +60,7 @@
 #include "llviewerwindow.h"
 #include "llvoavatar.h"
 #include "llvoicechannel.h"
+#include "llvoicewebrtc.h"
 #include "llworld.h"
 
 using namespace std::placeholders;
@@ -104,19 +105,25 @@ LLSpeaker::LLSpeaker(const LLUUID& id, const std::string& name,
 	mActivityTimer.resetWithExpiry(SPEAKER_TIMEOUT);
 }
 
+bool LLSpeaker::isInVoiceChannel()
+{
+	return mStatus <= LLSpeaker::STATUS_VOICE_ACTIVE || mStatus == LLSpeaker::STATUS_MUTED;
+}
 void LLSpeaker::lookupName()
 {
+	// Capture a weak speaker handle by value. Pending name lookups may never
+	// resolve; owning a heap-allocated handle until callback would leak it.
 	LLAvatarNameCache::get(mID,
 						   std::bind(&LLSpeaker::onAvatarNameLookup, _1, _2,
-									 new LLHandle<LLSpeaker>(getHandle())));
+									 getHandle()));
 }
 
 //static
 void LLSpeaker::onAvatarNameLookup(const LLUUID& id,
 								   const LLAvatarName& avatar_name,
-								   void* userdatap)
+								   LLHandle<LLSpeaker> speaker_handle)
 {
-	LLSpeaker* speaker_ptr = ((LLHandle<LLSpeaker>*)userdatap)->get();
+	LLSpeaker* speaker_ptr = speaker_handle.get();
 
 	if (speaker_ptr)
 	{
@@ -135,7 +142,7 @@ void LLSpeaker::onAvatarNameLookup(const LLUUID& id,
 		}
 	}
 
-	delete (LLHandle<LLSpeaker>*)userdatap;
+	// The weak handle is released automatically with the callback.
 }
 
 LLSpeakerTextModerationEvent::LLSpeakerTextModerationEvent(LLSpeaker* source)
@@ -493,7 +500,11 @@ void LLPanelActiveSpeakers::addSpeaker(const LLUUID& speaker_id, bool force)
 
 void LLPanelActiveSpeakers::removeSpeaker(const LLUUID& speaker_id)
 {
-	mSpeakerList->deleteSingleItem(mSpeakerList->getItemIndex(speaker_id));
+	S32 index = mSpeakerList->getItemIndex(speaker_id);
+	if (index >= 0)
+	{
+		mSpeakerList->deleteSingleItem(index);
+	}
 }
 
 void LLPanelActiveSpeakers::handleSpeakerSelect()
@@ -575,6 +586,7 @@ void LLPanelActiveSpeakers::refreshSpeakers(bool force)
 	mSpeakerMgr->update(sort_ok);
 
 	LLScrollListCtrl::items_vec_t items = mSpeakerList->getAllData();
+	std::vector<LLUUID> orphaned_rows;
 
 	LLSpeakerMgr::speaker_list_t speaker_list;
 	mSpeakerMgr->getSpeakerList(&speaker_list, mShowTextChatters);
@@ -587,6 +599,9 @@ void LLPanelActiveSpeakers::refreshSpeakers(bool force)
 		LLPointer<LLSpeaker> speakerp = mSpeakerMgr->findSpeaker(speaker_id);
 		if (speakerp.isNull())
 		{
+			// A voice participant was removed while its UI row survived.
+			// Defer deletion until after iterating the row snapshot.
+			orphaned_rows.push_back(speaker_id);
 			continue;
 		}
 
@@ -703,6 +718,13 @@ void LLPanelActiveSpeakers::refreshSpeakers(bool force)
 			// Print speaking ordinal in a text-sorting friendly manner
 			speaking_status_cell->setValue(speaking_order_sort_string);
 		}
+	}
+
+	// The speaker manager and UI list can get out of sync after a voice
+	// disconnect. Remove only rows whose speaker records no longer exist.
+	for (const LLUUID& speaker_id : orphaned_rows)
+	{
+		removeSpeaker(speaker_id);
 	}
 
 	// We potentially modified the sort order by touching the list items
@@ -1600,22 +1622,152 @@ void LLIMSpeakerMgr::updateSpeakers(const LLSD& update)
 LLActiveSpeakerMgr::LLActiveSpeakerMgr()
 :	LLSpeakerMgr(NULL)
 {
+	mPresenceTimer.start();
+	mRosterConnection = gVoiceWebRTC.addParticipantListObserver(
+		[this]() { mParticipantRosterChanged = true; });
+}
+
+void LLActiveSpeakerMgr::update(bool resort_ok)
+{
+	LLViewerRegion* regionp = gAgent.getRegion();
+	bool proximal = regionp && gVoiceClient.inProximalChannel() &&
+		LLVoiceChannel::getCurrentVoiceChannel() ==
+			LLVoiceChannelProximal::getInstance();
+
+	if (!proximal)
+	{
+		// Do not impose region membership on private or group voice calls.
+		mPresenceRegionID.setNull();
+		mPreviouslySeenInRegion.clear();
+		mDepartedFromRegion.clear();
+	}
+	else
+	{
+		const LLUUID& region_id = regionp->getRegionID();
+		if (region_id != mPresenceRegionID)
+		{
+			mPresenceRegionID = region_id;
+			mPreviouslySeenInRegion.clear();
+			mDepartedFromRegion.clear();
+			// Check promptly when the region changes.
+			mPresenceTimer.setTimerExpirySec(0.f);
+		}
+
+		// Use the same avatar presence source as the radar. A departure from
+		// the region is more reliable than the WebRTC participant timeout:
+		// the voice server can keep reporting an already departed avatar.
+		if (mPresenceTimer.getElapsedTimeF32() >= 0.35f)
+		{
+			uuid_vec_t ids;
+			std::vector<LLVector3d> positions;
+			gWorld.getAvatars(ids, &positions, NULL,
+							  gAgent.getPositionGlobal(), 65536.f);
+			std::set<LLUUID> present;
+			for (size_t i = 0, count = llmin(ids.size(), positions.size());
+				 i < count; ++i)
+			{
+				if (!regionp->pointInRegionGlobal(positions[i])) continue;
+				LLVOAvatar* avatarp = gObjectList.findAvatar(ids[i]);
+				if (avatarp && avatarp->getRegion() &&
+					avatarp->getRegion() != regionp) continue;
+				present.insert(ids[i]);
+			}
+
+			mDepartedFromRegion.clear();
+			for (const LLUUID& id : mPreviouslySeenInRegion)
+			{
+				if (!present.count(id)) mDepartedFromRegion.insert(id);
+			}
+			mPreviouslySeenInRegion.insert(present.begin(), present.end());
+
+			// Remove a departed avatar immediately from both the speaker
+			// manager and its UI. Never wait for the 10-second voice timer.
+			for (speaker_list_t::iterator it = mSpeakersSorted.begin();
+				 it != mSpeakersSorted.end(); )
+			{
+				const LLUUID id = (*it)->mID;
+				if (id != gAgentID && mDepartedFromRegion.count(id))
+				{
+					fireEvent(new LLSpeakerListChangeEvent(this, id), "remove");
+					mSpeakers.erase(id);
+					it = mSpeakersSorted.erase(it);
+				}
+				else
+				{
+					++it;
+				}
+			}
+			mPresenceTimer.reset();
+		}
+	}
+	// Join/leave events must refresh the participant list even when the
+	// mouse is over a volume control (normal re-sorting is paused then).
+	LLSpeakerMgr::update(resort_ok || mParticipantRosterChanged);
+	mParticipantRosterChanged = false;
 }
 
 void LLActiveSpeakerMgr::updateSpeakerList()
 {
-	// Point to whatever the current voice channel is
-	mVoiceChannel = LLVoiceChannel::getCurrentVoiceChannel();
+	// Check BEFORE assigning: otherwise the old and new channel can never
+	// differ and speakers from the previous voice session remain cached.
+	LLVoiceChannel* current_channelp = LLVoiceChannel::getCurrentVoiceChannel();
 
 	// Always populate from active voice channel
-	if (LLVoiceChannel::getCurrentVoiceChannel() != mVoiceChannel)
+	if (current_channelp != mVoiceChannel)
 	{
 		fireEvent(new LLSpeakerListChangeEvent(this, LLUUID::null), "clear");
 		mSpeakers.clear();
 		mSpeakersSorted.clear();
-		mVoiceChannel = LLVoiceChannel::getCurrentVoiceChannel();
+		mVoiceChannel = current_channelp;
 	}
-	LLSpeakerMgr::updateSpeakerList();
+	// WebRTC can retain a participant after their avatar leaves a region.
+	// Exclude confirmed departures when repopulating the nearby mixer, so
+	// the stale voice record cannot recreate the removed UI row.
+	if (gVoiceClient.inProximalChannel() &&
+		mVoiceChannel == LLVoiceChannelProximal::getInstance() &&
+		mVoiceChannel->isActive())
+	{
+		LLVoiceClient::participants_vec_t participants;
+		if (gVoiceClient.getParticipants(participants))
+		{
+			std::set<LLUUID> active_ids;
+			for (const LLVoiceClient::ParticipantData& data : participants)
+			{
+				// A stale WebRTC record must not re-add a confirmed region exit.
+				if (mDepartedFromRegion.count(data.mId)) continue;
+				active_ids.insert(data.mId);
+				setSpeaker(data.mId, data.mName,
+						   LLSpeaker::STATUS_VOICE_ACTIVE,
+						   data.mIsAvatar ? LLSpeaker::SPEAKER_AGENT :
+												LLSpeaker::SPEAKER_EXTERNAL);
+			}
+
+			if (mParticipantRosterChanged)
+			{
+				// Firestorm-style participant reconciliation: when WebRTC
+				// announces a leave, remove missing entries and notify the UI.
+				for (speaker_list_t::iterator it = mSpeakersSorted.begin();
+					 it != mSpeakersSorted.end(); )
+				{
+					const LLUUID id = (*it)->mID;
+					if (id != gAgentID && !active_ids.count(id))
+					{
+						fireEvent(new LLSpeakerListChangeEvent(this, id), "remove");
+						mSpeakers.erase(id);
+						it = mSpeakersSorted.erase(it);
+					}
+					else
+					{
+						++it;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		LLSpeakerMgr::updateSpeakerList();
+	}
 
 	// Clean up text only speakers
 	for (speaker_map_t::iterator it = mSpeakers.begin(), end = mSpeakers.end();

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<panel background_opaque="true" background_visible="true" can_close="true" can_minimize="false" can_resize="false" follows="left|right|bottom" height="26" name="panel_toolbar" width="1024">
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="chat_btn" tool_tip="Talk to people nearby. (Enter)" width="50"  label_selected=""  image_overlay="toolbar_icons/chat.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="quickprefs_btn" tool_tip="Quick Preferences (Ctrl+Shift+Q)" width="50" label_selected="" halign="center"  image_overlay="toolbar_icons/preferences.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="teleport_history_btn" tool_tip="Show Teleport History" width="50" label_selected="" halign="center"  image_overlay="toolbar_icons/teleporthistory.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="area_search_btn" tool_tip="Find objects in this region by name, description, owner or group (Ctrl+Shift+A)." width="50"  label_selected=""  image_overlay="toolbar_icons/areasearch.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" label_selected="" left="0" name="fly_btn" tool_tip="Start flying. Use E/C or PgUp/PgDn to fly up and down." width="50"  image_overlay="toolbar_icons/Move_Fly_Off.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="snapshot_btn" tool_tip="Save a screen shot to disk or inventory." width="50"  label_selected=""  image_overlay="toolbar_icons/snapshot.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="directory_btn" tool_tip="Search for places, events, people, and more." width="50"  label_selected=""  image_overlay="toolbar_icons/search.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="build_btn" tool_tip="Create new objects." width="50"  label_selected=""  image_overlay="toolbar_icons/build.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="radar_btn" tool_tip="List of the avatars in the sim (Ctrl-Alt-Shift-R)" width="50"  label_selected=""  image_overlay="toolbar_icons/radar.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="minimap_btn" tool_tip="Map of the area around you. (Ctrl-Alt-M)" width="50"  label_selected=""  image_overlay="toolbar_icons/mini_map.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="map_btn" tool_tip="Map of the world. (Ctrl-M)" width="50"  label_selected=""  image_overlay="toolbar_icons/map.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="region_info_btn" tool_tip="Region Details (About Region): region settings and information." width="50" image_overlay="toolbar_icons/region.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="statistics_btn" tool_tip="Statistics: open or close the viewer statistics window." width="50" image_overlay="toolbar_icons/statistics.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="camera_controls_btn" tool_tip="Open Camera Controls" width="50" image_overlay="toolbar_icons/view.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="inventory_btn" tool_tip="Your items. (Ctrl-I)" width="50"  label_selected=""  image_overlay="toolbar_icons/inventory.png" />
+	<button bottom="0" font="SansSerif" height="24" label="" left="0" name="wearable_favorites_btn" tool_tip="Favourite Wearables: quick attach and detach of HUDs and clothing" width="50"  label_selected=""  image_overlay="toolbar_icons/wearable_favorites.png" />
+	<!-- AO only: Firestorm Vintage split button; right of Favourite Wearables. -->
+	<button bottom="2" font="SansSerif" height="20" label="" label_selected="" halign="center" left="0" name="chaos_ao_toggle_btn" scale_image="true" tool_tip="Enable/disable animation overrider" is_toggle="true" image_unselected="button_enabled_32x128.tga" image_selected="button_enabled_selected_32x128.tga" image_disabled="button_disabled_32x128.tga" width="40"  image_overlay="toolbar_icons/animation_override.png" />
+	<button bottom="2" font="SansSerif" height="20" label="" left="0" name="chaos_ao_editor_arrow_btn" scale_image="true" tool_tip="Open AO editor" image_overlay="ChaosAO_ArrowUp" image_unselected="button_enabled_32x128.tga" image_selected="button_enabled_selected_32x128.tga" image_disabled="button_disabled_32x128.tga" width="20" />
+</panel>

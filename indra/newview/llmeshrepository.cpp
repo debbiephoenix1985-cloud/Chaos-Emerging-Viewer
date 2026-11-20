@@ -1946,8 +1946,11 @@ bool LLMeshRepoThread::fetchMeshHeader(const LLVolumeParams& mesh_params,
 		S32 bytes = llmin(size, MESH_HEADER_SIZE);
 		LLMeshRepository::sCacheBytesRead += bytes;
 		++LLMeshRepository::sCacheReads;
-		file.read(buffer, bytes);
-		if (headerReceived(mesh_params, buffer, bytes))
+		// A successful file read may be short: never decode uninitialised
+		// header bytes. Fall through to a fresh network fetch instead.
+		if (file.read(buffer, bytes) &&
+			file.getLastBytesRead() == bytes &&
+			headerReceived(mesh_params, buffer, bytes))
 		{
 			// Found mesh in cache
 			return true;
@@ -1991,7 +1994,8 @@ bool LLMeshRepoThread::fetchMeshHeader(const LLVolumeParams& mesh_params,
 bool LLMeshRepoThread::fetchMeshLOD(const LLVolumeParams& mesh_params, S32 lod,
 									bool can_retry)
 {
-	if (lod < 0)
+	// A malformed or stale LOD request must not index past the header.
+	if (lod < 0 || lod >= LLModel::NUM_LODS)
 	{
 		return false;
 	}
@@ -2021,7 +2025,10 @@ bool LLMeshRepoThread::fetchMeshLOD(const LLVolumeParams& mesh_params, S32 lod,
 	{
 		// Check cache for mesh asset
 		LLFileSystem file(mesh_id);
-		if (file.getSize() >= offset + size)
+		// Validate the range without overflowing S32 on offset + size.
+		// A short/invalid cache entry is fetched afresh from the grid.
+		S32 cached_size = file.getSize();
+		if (offset <= cached_size && size <= cached_size - offset)
 		{
 			U8* buffer = new(std::nothrow) U8[size];
 			if (!buffer)
@@ -2033,18 +2040,20 @@ bool LLMeshRepoThread::fetchMeshLOD(const LLVolumeParams& mesh_params, S32 lod,
 			}
 			LLMeshRepository::sCacheBytesRead += size;
 			++LLMeshRepository::sCacheReads;
-			file.seek(offset);
-			file.read(buffer, size);
+			const bool cache_read_complete = file.seek(offset) &&
+				file.read(buffer, size) && file.getLastBytesRead() == size;
 
 			// Make sure the buffer is not all zeros by checking the first 128
 			// bytes (reserved block but not written)
 			bool zero = true;
-			for (S32 i = 0, count = llmin(size, 128); i < count && zero; ++i)
+			for (S32 i = 0,
+				 count = cache_read_complete ? llmin(size, 128) : 0;
+				 i < count && zero; ++i)
 			{
 				zero = buffer[i] == 0;
 			}
 
-			if (!zero)
+			if (cache_read_complete && !zero)
 			{
 				// Attempt to parse
 				if (lodReceived(mesh_params, lod, buffer, size))
@@ -2110,7 +2119,9 @@ bool LLMeshRepoThread::headerReceived(const LLVolumeParams& mesh_params,
 	{
 		static char deprecated_header[] = "<? LLSD/Binary ?>";
 		static size_t deprecated_header_size = strlen(deprecated_header);
-		if (!strncmp((char*)data, deprecated_header, deprecated_header_size))
+		// Even a malformed short HTTP response must not be read past its end.
+		if (data_size >= (S32)deprecated_header_size &&
+			!strncmp((char*)data, deprecated_header, deprecated_header_size))
 		{
 			data += deprecated_header_size;
 			data_size -= deprecated_header_size;
@@ -3623,7 +3634,9 @@ void LLMeshLODHandler::processData(LLCore::BufferArray*, S32, U8* datap,
 
 		S32 offset = mOffset;
 		S32 size = mRequestedBytes;
-		if (file.getSize() >= MESH_HEADER_SIZE)
+		// A simulator may return a truncated 206 response. Never cache
+		// beyond the actual downloaded buffer (or write partial mesh data).
+		if (data_size >= size && file.getSize() >= MESH_HEADER_SIZE)
 		{
 			file.seek(offset);	// Note: pads data if necessary. HB
 			file.write(datap, size);

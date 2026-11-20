@@ -466,6 +466,13 @@ U32 LLVOVolume::processUpdateMessage(LLMessageSystem* mesgsys,
 		return retval;
 	}
 
+	// FIRE-37146: Base update processing may have marked this object dead.
+	// Continuing to read its region/texture/mesh state would be unsafe.
+	if (isDead())
+	{
+		return retval;
+	}
+
 	LLUUID sculpt_id;
 	U8 sculpt_type = 0;
 	if (isSculpted())
@@ -1779,6 +1786,19 @@ bool LLVOVolume::calcLOD()
 bool LLVOVolume::updateLOD()
 {
 	if (mDrawable.isNull())
+	{
+		return false;
+	}
+
+	// Match Firestorm's unloaded-mesh LOD guard using the existing Chaos
+	// volume state (Chaos does not have Firestorm's LLSculptIDSize cache).
+	// Do not change the requested LOD while static mesh geometry is pending.
+	// Once the mesh arrives, notifyMeshLoaded() schedules its normal rebuild.
+	LLVolume* volp = getVolume();
+	if (volp &&
+		(volp->getParams().getSculptType() & LL_SCULPT_TYPE_MASK) ==
+			LL_SCULPT_TYPE_MESH &&
+		!volp->isMeshAssetLoaded())
 	{
 		return false;
 	}

@@ -37,6 +37,7 @@
     	<column name="description" label="Description" dynamicwidth="true" tool_tip="Double click on any entry to get a position beacon"/>
     	<column name="owner" label="Owner" dynamicwidth="true" tool_tip="Double click on any entry to get a position beacon"/>
 		<column name="group" label="Group" dynamicwidth="true" tool_tip="Double click on any entry to get a position beacon"/>
+		<column name="distance" label="Distance" width="82" tool_tip="Distance from your avatar to the object in metres"/>
 	</scroll_list>
 	<flyout_button name="mute" label="Mute" font="SansSerif" enabled="false"
 	 tool_tip="Mutes the object by UUID: this is suitable for permanent objects. Other options are available from the drop down button."

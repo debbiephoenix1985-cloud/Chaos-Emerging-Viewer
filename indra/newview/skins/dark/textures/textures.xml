@@ -1,4 +1,7 @@
 <textures version="101">
+  <!-- Original Firestorm Favorites bar button artwork and 9-slice scaling. -->
+  <texture name="ChaosFavoriteButtonOff" file_name="widgets/PushButton_Off.png" preload="true" scale_left="4" scale_top="19" scale_right="28" scale_bottom="4" />
+  <texture name="ChaosFavoriteButtonOver" file_name="navbar/Favorite_Link_Over.png" preload="false" />
  <texture name="button_disabled_32x128.tga" preload="true" scale_left="8" scale_top="16" scale_right="120" scale_bottom="8"/>
  <texture name="button_enabled_32x128.tga" preload="true" scale_left="8" scale_top="16" scale_right="120" scale_bottom="8"/>
  <texture name="button_enabled_selected_32x128.tga" preload="true" scale_left="12" scale_top="12" scale_right="118" scale_bottom="14"/>
@@ -26,4 +29,22 @@
  <texture name="flyout_btn_left_selected.tga" scale_left="6" scale_top="12" scale_right="122" scale_bottom="12"/>
  <texture name="flyout_btn_left.tga" scale_left="6" scale_top="12" scale_right="122" scale_bottom="12"/>
  <texture name="flyout_btn_left_disabled.tga" scale_left="6" scale_top="12" scale_right="122" scale_bottom="12"/>
+
+ <texture name="ChaosDarkFS_chat_btn" file_name="toolbar_icons/chat.png" preload="true" />
+ <texture name="ChaosDarkFS_quickprefs_btn" file_name="toolbar_icons/preferences.png" preload="true" />
+ <texture name="ChaosDarkFS_teleport_history_btn" file_name="toolbar_icons/teleporthistory.png" preload="true" />
+ <texture name="ChaosDarkFS_area_search_btn" file_name="toolbar_icons/areasearch.png" preload="true" />
+ <texture name="ChaosDarkFS_fly_btn" file_name="toolbar_icons/Move_Fly_Off.png" preload="true" />
+ <texture name="ChaosDarkFS_snapshot_btn" file_name="toolbar_icons/snapshot.png" preload="true" />
+ <texture name="ChaosDarkFS_directory_btn" file_name="toolbar_icons/search.png" preload="true" />
+ <texture name="ChaosDarkFS_build_btn" file_name="toolbar_icons/build.png" preload="true" />
+ <texture name="ChaosDarkFS_radar_btn" file_name="toolbar_icons/radar.png" preload="true" />
+ <texture name="ChaosDarkFS_minimap_btn" file_name="toolbar_icons/mini_map.png" preload="true" />
+ <texture name="ChaosDarkFS_map_btn" file_name="toolbar_icons/map.png" preload="true" />
+<texture name="ChaosDarkFS_region_info_btn" file_name="toolbar_icons/region.png" preload="true" />
+<texture name="ChaosDarkFS_statistics_btn" file_name="toolbar_icons/statistics.png" preload="true" />
+<texture name="ChaosDarkFS_camera_controls_btn" file_name="toolbar_icons/view.png" preload="true" />
+ <texture name="ChaosDarkFS_inventory_btn" file_name="toolbar_icons/inventory.png" preload="true" />
+ <texture name="ChaosDarkFS_wearable_favorites_btn" file_name="toolbar_icons/wearable_favorites.png" preload="true" />
+ <texture name="ChaosDarkFS_chaos_ao_toggle_btn" file_name="toolbar_icons/animation_override.png" preload="true" />
 </textures>

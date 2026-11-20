@@ -129,9 +129,11 @@ LLViewerFolderDictionary::LLViewerFolderDictionary()
 
 	addEntry(LLFolderType::FT_NONE,					new ViewerFolderEntry("New Folder",				"inv_folder_plain_closed.tga",	plain_icon,			false,	false,	"default"));
 
+	// Re-enable the inventory category shared with Firestorm's Favorites bar.
+	addEntry(LLFolderType::FT_FAVORITE,				new ViewerFolderEntry("Favorites",
+				"inv_folder_plain_closed.tga", plain_icon, true, false));
 #if 0	// Viewer 2 folders: useless for v1 !
 	addEntry(LLFolderType::FT_BASIC_ROOT,			new ViewerFolderEntry("Basic Root",				"inv_folder_plain_closed.tga",	plain_icon,			true,	false));
-	addEntry(LLFolderType::FT_FAVORITE,				new ViewerFolderEntry("Favorites",				"inv_folder_plain_closed.tga",	plain_icon,			true,	false));
 	addEntry(LLFolderType::FT_OUTFIT,				new ViewerFolderEntry("New Outfit",				"inv_folder_plain_closed.tga",	plain_icon,			true,	false));
 	addEntry(LLFolderType::FT_MY_OUTFITS,			new ViewerFolderEntry("My Outfits",				"inv_folder_plain_closed.tga",	plain_icon,			true,	false));
 #endif

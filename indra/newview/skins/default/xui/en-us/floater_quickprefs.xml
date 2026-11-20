@@ -1,22 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <floater name="quickprefs" title="Quick Preferences" width="354" height="488" can_close="true" can_minimize="false" can_resize="false" mouse_opaque="true" follows="top|right">
-  
-  <slider name="qp_draw_distance" left="8" bottom="439" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="8" min_val="32" label="Draw Distance:" max_val="1024" control_name="RenderFarClip" font="SansSerifSmall" show_text="true" />
+  <slider name="qp_draw_distance" left="8" bottom="439" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="8" min_val="32" label="Draw Distance:" max_val="512" control_name="RenderFarClip" font="SansSerifSmall" show_text="true" />
   <slider name="qp_particles" left="8" bottom="418" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="256" min_val="0" label="Max Particles:" max_val="8192" control_name="RenderMaxPartCount" font="SansSerifSmall" show_text="true" />
   <slider name="qp_avatar_physics" left="8" bottom="397" width="338" height="19" follows="top|left" decimal_digits="2" label_width="125" can_edit_text="false" increment="0.05" min_val="0" label="Avatar Physics LOD:" max_val="1" control_name="RenderAvatarPhysicsLODFactor" font="SansSerifSmall" show_text="true" />
-  <slider name="qp_object_lod" left="8" bottom="376" width="338" height="19" follows="top|left" decimal_digits="2" label_width="125" can_edit_text="false" increment="0.125" min_val="0" label="LOD Factor:" max_val="4" control_name="RenderVolumeLODFactor" font="SansSerifSmall" show_text="true" />
-  <slider name="qp_max_avatars" left="8" bottom="355" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="1" min_val="1" label="Max Avatars:" max_val="66" control_name="RenderAvatarMaxNonImpostors" font="SansSerifSmall" show_text="true" />
+  <slider name="qp_object_lod" left="8" bottom="376" width="338" height="19" follows="top|left" decimal_digits="3" label_width="125" can_edit_text="false" increment="0.125" min_val="0" label="LOD Factor:" max_val="3" control_name="RenderVolumeLODFactor" font="SansSerifSmall" show_text="true" />
+  <slider name="qp_max_avatars" left="8" bottom="355" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="1" min_val="0" label="Max Avatars:" max_val="65" control_name="RenderAvatarMaxNonImpostors" font="SansSerifSmall" show_text="true" />
   <text name="qp_nametags_title" left="10" bottom="328" width="118" height="18" follows="top|left" font="SansSerifSmall">Name Tags:</text>
-  <combo_box name="qp_nametags" left="133" bottom="326" width="211" height="21" follows="top|left" allow_text_entry="false" control_name="RenderName">
-    <combo_item name="Never" value="0">Never</combo_item>
-    <combo_item name="Fade" value="1">Fade</combo_item>
-    <combo_item name="Always" value="2">Always</combo_item>
+  <combo_box name="qp_nametags" left="133" bottom="326" width="211" height="21" follows="top|left" allow_text_entry="false">
+    <combo_item name="Never">Never</combo_item>
+    <combo_item name="Fade">Fade</combo_item>
+    <combo_item name="Always">Always</combo_item>
   </combo_box>
   <check_box name="qp_lookat" left="12" bottom="301" width="166" height="18" follows="top|left" font="SansSerifSmall" label="LookAt Target" />
   <check_box name="qp_color_under_cursor" left="177" bottom="301" width="166" height="18" follows="top|left" label="Color Under Cursor" control_name="DebugShowColor" font="SansSerifSmall" />
   <slider name="qp_hover_height" left="8" bottom="279" width="338" height="19" follows="top|left" decimal_digits="2" label_width="125" can_edit_text="false" increment="0.05" min_val="-2" label="Hover Height:" max_val="2" tool_tip="Viewer avatar animation height offset (local viewer setting)" control_name="AvatarOffsetZ" font="SansSerifSmall" show_text="true" />
   <slider name="qp_max_bandwidth" left="8" bottom="258" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="128" min_val="128" label="Max Bandwidth:" max_val="4096" tool_tip="OpenSim UDP bandwidth in kbps. Set according to your grid and connection; higher speeds are allowed." control_name="ThrottleBandwidthKbpsOS" font="SansSerifSmall" show_text="true" />
-  <slider name="qp_max_complexity" left="8" bottom="237" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="10000" min_val="0" label="Max Complexity:" max_val="400000" tool_tip="0 = no avatar complexity limit" control_name="RenderAvatarMaxComplexity" font="SansSerifSmall" show_text="true" />
+  <slider name="qp_max_complexity" left="8" bottom="237" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="10000" min_val="0" label="Max Complexity:" max_val="500000" tool_tip="0 = OFF (no avatar complexity limit). Uses the same setting and range as Graphics &gt; Maximum avatar complexity." control_name="RenderAvatarMaxComplexity" font="SansSerifSmall" show_text="true" />
   <slider name="qp_shadow_detail" left="8" bottom="216" width="338" height="19" follows="top|left" decimal_digits="0" label_width="125" can_edit_text="false" increment="1" min_val="0" label="Shadow Detail:" max_val="3" control_name="RenderShadowDetail" font="SansSerifSmall" show_text="true" />
   <text name="qp_environment_title" left="10" bottom="190" width="326" height="18" follows="top|left" font="SansSerifSmall">Environment presets (Windlight)</text>
   <text name="qp_sky_label" left="12" bottom="167" width="88" height="18" follows="top|left" font="SansSerifSmall">Sky:</text>

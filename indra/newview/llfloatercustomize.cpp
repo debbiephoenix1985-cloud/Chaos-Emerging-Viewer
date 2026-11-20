@@ -85,6 +85,7 @@ LLFloaterCustomize* gFloaterCustomizep = NULL;
 //static
 LLWearableType::EType LLFloaterCustomize::sCurrentWearableType =
 	LLWearableType::WT_INVALID;
+LLUUID LLFloaterCustomize::sRequestedWearableItemID;
 uuid_list_t LLFloaterCustomize::sFetchingRequests;
 
 struct WearablePanelData
@@ -218,6 +219,7 @@ void LLFloaterCustomize::open()
 	// floater is opened, which confuses the enable check functions for the
 	// menu bar... Let's reset it to avoid problems...
 	gSelectMgr.clearSelections();
+	applyRequestedWearableEdit();
 }
 
 //static
@@ -249,6 +251,87 @@ void LLFloaterCustomize::updateAvatarHeightDisplay()
 }
 
 //static
+bool LLFloaterCustomize::editWearable(const LLUUID& item_id)
+{
+	// Match Firestorm's LLAgentWearables::editWearable: resolve inventory
+	// links and the actual worn wearable, never just a guessed type.
+	const LLUUID linked_id = gInventory.getLinkedItemID(item_id);
+	LLViewerInventoryItem* item = gInventory.getItem(linked_id);
+	if (!item || !item->isFinished() ||
+		!gAgentWearables.isWearableModifiable(linked_id))
+	{
+		llwarns << "Cannot edit wearable: item unavailable or not modifiable"
+				<< llendl;
+		return false;
+	}
+	LLViewerWearable* wearable =
+		gAgentWearables.getWearableFromItemID(linked_id);
+	if (!wearable || wearable->getType() < LLWearableType::WT_SHAPE ||
+		wearable->getType() >= LLWearableType::WT_COUNT)
+	{
+		llwarns << "Cannot edit wearable: inventory item is not worn"
+				<< llendl;
+		return false;
+	}
+
+	// Queue BEFORE camera transition. The morph view creates the editor
+	// after the camera changes, and its initial Shape tab is reset at open.
+	sRequestedWearableItemID = linked_id;
+	gAgent.changeCameraToCustomizeAvatar();
+	applyRequestedWearableEdit();
+	return true;
+}
+
+bool LLFloaterCustomize::applyRequestedWearableEdit()
+{
+	if (!gFloaterCustomizep || sRequestedWearableItemID.isNull() ||
+		!isAgentAvatarValid()) return false;
+
+	LLViewerWearable* wearable =
+		gAgentWearables.getWearableFromItemID(sRequestedWearableItemID);
+	if (!wearable)
+	{
+		// The outfit changed while the editor was opening.
+		sRequestedWearableItemID.setNull();
+		return false;
+	}
+	const LLWearableType::EType type = wearable->getType();
+	if (type < LLWearableType::WT_SHAPE || type >= LLWearableType::WT_COUNT)
+	{
+		sRequestedWearableItemID.setNull();
+		return false;
+	}
+	LLPanelEditWearable* panel = gFloaterCustomizep->mWearablePanelList[type];
+	LLTabContainer* tabs = gFloaterCustomizep->
+		getChild<LLTabContainer>("customize tab container", true, false);
+	if (!panel || !tabs) return false;
+
+	// Same object-based selection used by Firestorm, adapted to Chaos's
+	// existing native editor and multi-layer spinner. This chooses the
+	// precise worn instance even when multiple Shirts are worn.
+	gFloaterCustomizep->updateWearableType(type, wearable);
+	if (tabs->getCurrentPanel() != panel)
+	{
+		tabs->selectTabPanel(panel);
+	}
+	if (sCurrentWearableType != type)
+	{
+		setCurrentWearableType(type);
+	}
+	gFloaterCustomizep->updateScrollingPanelUI();
+
+	// Do not consume a request until BOTH the exact item and its editor
+	// tab are selected; any pending startup reset can then be recovered.
+	if (panel->getWearable() == wearable &&
+		tabs->getCurrentPanel() == panel &&
+		sCurrentWearableType == type)
+	{
+		sRequestedWearableItemID.setNull();
+		return true;
+	}
+	return false;
+}
+
 void LLFloaterCustomize::setCurrentWearableType(LLWearableType::EType type)
 {
 	// Firestorm's wearable editor heading: the active native wearable panel
@@ -263,16 +346,25 @@ void LLFloaterCustomize::setCurrentWearableType(LLWearableType::EType type)
 				"panel_container", true, false);
 		if (scrollp)
 		{
-			// The floater's XUI already positions the scrolling pane using
-			// top-relative negative XML coordinates. LLRect::setRect() expects
-			// local bottom-origin coordinates: never pass XUI offsets here.
-			// Keep the XUI's valid top/bottom and only adjust horizontal bounds.
-			LLRect rect = scrollp->getRect();
-			S32 left = type == LLWearableType::WT_SHAPE ||
-					type == LLWearableType::WT_PHYSICS ? 11 : 180;
-			rect.mLeft = left;
-			rect.mRight = 568;
-			scrollp->setRect(rect);
+			// A plain setRect() moves the container's outer rectangle but
+			// does NOT recalculate its inner clipping area or scrollbar.
+			// This left a full-width vertical scrollbar far off the right
+			// edge of the wearable editor for Shirt, Tattoo, Universal, etc.
+			const S32 left = type == LLWearableType::WT_SHAPE ||
+							type == LLWearableType::WT_PHYSICS ? 11 : 180;
+			const S32 width = 568 - left;
+			const LLRect current = scrollp->getRect();
+			if (current.getWidth() != width)
+			{
+				// LLScrollableContainer::reshape() also updates mInnerRect
+				// and its scrollbar positions and scroll limits.
+				scrollp->reshape(width, current.getHeight());
+			}
+			const S32 delta_x = left - scrollp->getRect().mLeft;
+			if (delta_x)
+			{
+				scrollp->translate(delta_x, 0);
+			}
 		}
 	}
 	if (LLFloaterCustomize::sCurrentWearableType != type)
@@ -858,6 +950,9 @@ void LLFloaterCustomize::draw()
 		// *TODO: This is a sort of expensive call, which only needs to be
 		// called when the tabs change or an inventory item arrives. Figure
 		// out some way to avoid this if possible.
+		// The first appearance frame may follow an asynchronous camera
+		// transition; reapply any edit request still pending after open().
+		applyRequestedWearableEdit();
 		updateInventoryUI();
 
 		updateAvatarHeightDisplay();
@@ -1153,8 +1248,13 @@ void LLFloaterCustomize::updateInventoryUI()
 			{
 				panelp->setUIPermissions(perm_mask, is_complete);
 			}
+			// Keep the parameter scrollbar for layers with visual sliders.
+			// Tattoo, Universal and Alpha are texture-only, so their
+			// empty panel list must not draw a large blank rectangle.
+			const bool has_param_panels = mScrollingPanelList &&
+				mScrollingPanelList->getRect().getHeight() > 1;
 			bool is_vis = panelp && itemp && is_complete &&
-						  (perm_mask & PERM_MODIFY);
+						  (perm_mask & PERM_MODIFY) && has_param_panels;
 			childSetVisible("panel_container", is_vis);
 		}
 	}

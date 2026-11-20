@@ -48,6 +48,18 @@
 #include "lltextbox.h"
 #include "lluictrlfactory.h"
 
+#if LL_WINDOWS
+// Native Explorer file chooser, using the same Windows common-dialog API as
+// Firestorm llfilepicker.cpp. Only explicit upload requests use this path.
+# include <windows.h>
+# include <commdlg.h>
+# include <shobjidl.h>
+# include <shlobj.h>
+# pragma comment(lib, "Comdlg32.lib")
+# pragma comment(lib, "Ole32.lib")
+# pragma comment(lib, "Shell32.lib")
+#endif
+
 // Position in a path string where the root delimiter is found, i.e. position
 // of "\" in (e.g.) "C:\" for Windows and position of "/" (0) for other OSes
 #if LL_WINDOWS
@@ -881,6 +893,126 @@ void HBFileSelector::doCallback()
 }
 
 //static
+// Native upload selection only. Save dialogs, inventory file browsing and
+// other HBFileSelector users retain their original in-viewer selector.
+#if LL_WINDOWS
+static bool native_upload_file_dialog(HBFileSelector::ELoadFilter filter,
+									  bool multiple,
+									  std::deque<std::string>& files)
+{
+	const wchar_t* extensions = L"All files (*.*)\0*.*\0\0";
+	const wchar_t* title = L"Select files to upload";
+	switch (filter)
+	{
+		case HBFileSelector::FFLOAD_IMAGE:
+			extensions = L"Image files (*.png;*.jpg;*.jpeg;*.tga;*.bmp;*.j2c)\0*.png;*.jpg;*.jpeg;*.tga;*.bmp;*.j2c\0All files (*.*)\0*.*\0\0";
+			title = L"Select image to upload";
+			break;
+		case HBFileSelector::FFLOAD_SOUND:
+			extensions = L"Sound files (*.wav;*.ogg;*.dsf)\0*.wav;*.ogg;*.dsf\0All files (*.*)\0*.*\0\0";
+			title = L"Select sound to upload";
+			break;
+		case HBFileSelector::FFLOAD_ANIM:
+			extensions = L"Animation files (*.bvh;*.anim)\0*.bvh;*.anim\0All files (*.*)\0*.*\0\0";
+			title = L"Select animation to upload";
+			break;
+		case HBFileSelector::FFLOAD_MODEL:
+			extensions = L"Mesh models (*.dae)\0*.dae\0All files (*.*)\0*.*\0\0";
+			title = L"Select mesh model to upload";
+			break;
+		case HBFileSelector::FFLOAD_GLTF:
+			extensions = L"Material files (*.gltf;*.glb)\0*.gltf;*.glb\0All files (*.*)\0*.*\0\0";
+			title = L"Select material to upload";
+			break;
+		default: break;
+	}
+
+	// Firestorm's native Windows chooser uses a wide-character buffer and
+	// OFN_EXPLORER for standard Windows navigation and multiple selection.
+	std::vector<wchar_t> file_buffer(65536, L'\0');
+	OPENFILENAMEW ofn = {};
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = GetActiveWindow();
+	ofn.lpstrFile = file_buffer.data();
+	ofn.nMaxFile = (DWORD)file_buffer.size();
+	ofn.lpstrFilter = extensions;
+	ofn.nFilterIndex = 1;
+	ofn.lpstrTitle = title;
+	ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST |
+				OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+	if (multiple)
+	{
+		ofn.Flags |= OFN_ALLOWMULTISELECT;
+	}
+	if (!GetOpenFileNameW(&ofn))
+	{
+		return false;
+	}
+
+	const wchar_t* first = file_buffer.data();
+	const auto from_native = [](const std::wstring& wide) {
+		return utf16str_to_utf8str(llutf16string(wide.begin(), wide.end()));
+	};
+	if (!multiple)
+	{
+		files.emplace_back(from_native(std::wstring(first)));
+		return true;
+	}
+
+	const wchar_t* next = first + wcslen(first) + 1;
+	if (!*next)
+	{
+		files.emplace_back(from_native(std::wstring(first)));
+	}
+	else
+	{
+		std::wstring folder(first);
+		if (!folder.empty() && folder.back() != L'\\' && folder.back() != L'/')
+		{
+			folder += L'\\';
+		}
+		while (*next)
+		{
+			files.emplace_back(from_native(folder + next));
+			next += wcslen(next) + 1;
+		}
+	}
+	return !files.empty();
+}
+#endif
+
+//static
+void HBFileSelector::loadUploadFile(ELoadFilter filter,
+								   HBLoadFileCallback callback, void* userdatap)
+{
+#if LL_WINDOWS
+	std::deque<std::string> files;
+	native_upload_file_dialog(filter, false, files);
+	std::string filename = files.empty() ? std::string() : files.front();
+	if (callback)
+	{
+		callback(filter, filename, userdatap);
+	}
+#else
+	loadFile(filter, callback, userdatap);
+#endif
+}
+
+//static
+void HBFileSelector::loadUploadFiles(ELoadFilter filter,
+									HBLoadFilesCallback callback, void* userdatap)
+{
+#if LL_WINDOWS
+	std::deque<std::string> files;
+	native_upload_file_dialog(filter, true, files);
+	if (callback)
+	{
+		callback(filter, files, userdatap);
+	}
+#else
+	loadFiles(filter, callback, userdatap);
+#endif
+}
 void HBFileSelector::loadFile(ELoadFilter filter,
 							  HBLoadFileCallback callback, void* userdatap)
 {
@@ -916,6 +1048,204 @@ void HBFileSelector::loadFiles(ELoadFilter filter,
 void HBFileSelector::saveFile(ESaveFilter filter, std::string suggestion,
 							  HBSaveFileCallback callback, void* userdatap)
 {
+#if LL_WINDOWS
+	// Use precisely the Windows Explorer common-dialog family employed by
+	// loadUploadFile(), with Save As semantics for EVERY save-file caller.
+	// Keep each caller's file type, default extension and callback contract.
+	if (sInstance)
+	{
+		llwarns << "Cannot open native Save As while another file selector is open."
+				<< llendl;
+		return;
+	}
+	if (!callback) return;
+
+	const wchar_t* file_filter = L"All files (*.*)\0*.*\0\0";
+	const wchar_t* default_ext = NULL;
+	EContext context = CONTEXT_DEFAULT;
+	switch (filter)
+	{
+		case FFSAVE_TXT:
+			file_filter = L"Text files (*.txt)\0*.txt\0\0";
+			default_ext = L"txt";
+			context = CONTEXT_TXT;
+			break;
+		case FFSAVE_XML:
+			file_filter = L"XML files (*.xml)\0*.xml\0\0";
+			default_ext = L"xml";
+			context = CONTEXT_XML;
+			break;
+		case FFSAVE_XUI:
+			file_filter = L"XUI files (*.xml)\0*.xml\0\0";
+			default_ext = L"xml";
+			context = CONTEXT_XUI;
+			break;
+		case FFSAVE_LSL:
+			file_filter = L"LSL scripts (*.lsl)\0*.lsl\0\0";
+			default_ext = L"lsl";
+			context = CONTEXT_LSL;
+			break;
+		case FFSAVE_SLUA:
+			file_filter = L"SLua scripts (*.slua)\0*.slua\0\0";
+			default_ext = L"slua";
+			context = CONTEXT_LSL;
+			break;
+		case FFSAVE_WAV:
+			file_filter = L"WAV audio (*.wav)\0*.wav\0\0";
+			default_ext = L"wav";
+			context = CONTEXT_SOUND;
+			break;
+		case FFSAVE_BVH:
+			file_filter = L"BVH animations (*.bvh)\0*.bvh\0\0";
+			default_ext = L"bvh";
+			context = CONTEXT_ANIM;
+			break;
+		case FFSAVE_DAE:
+			file_filter = L"Collada mesh (*.dae)\0*.dae\0\0";
+			default_ext = L"dae";
+			context = CONTEXT_MODEL;
+			break;
+		case FFSAVE_OBJ:
+			file_filter = L"Wavefront objects (*.obj)\0*.obj\0\0";
+			default_ext = L"obj";
+			context = CONTEXT_MODEL;
+			break;
+		case FFSAVE_RAW:
+			file_filter = L"RAW terrain (*.raw)\0*.raw\0\0";
+			default_ext = L"raw";
+			context = CONTEXT_RAW;
+			break;
+		case FFSAVE_TGA:
+			file_filter = L"TGA images (*.tga)\0*.tga\0\0";
+			default_ext = L"tga";
+			context = CONTEXT_IMAGE;
+			break;
+		case FFSAVE_PNG:
+			file_filter = L"PNG images (*.png)\0*.png\0\0";
+			default_ext = L"png";
+			context = CONTEXT_IMAGE;
+			break;
+		case FFSAVE_JPG:
+			file_filter = L"JPEG images (*.jpg;*.jpeg)\0*.jpg;*.jpeg\0\0";
+			default_ext = L"jpg";
+			context = CONTEXT_IMAGE;
+			break;
+		case FFSAVE_J2C:
+			file_filter = L"JPEG2000 images (*.j2c)\0*.j2c\0\0";
+			default_ext = L"j2c";
+			context = CONTEXT_IMAGE;
+			break;
+		case FFSAVE_BMP:
+			file_filter = L"BMP images (*.bmp)\0*.bmp\0\0";
+			default_ext = L"bmp";
+			context = CONTEXT_IMAGE;
+			break;
+		case FFSAVE_GLTF:
+			file_filter = L"glTF scenes (*.gltf)\0*.gltf\0\0";
+			default_ext = L"gltf";
+			context = CONTEXT_MATERIAL;
+			break;
+		default:
+			break;
+	}
+
+	// Preserve the old selector's per-file-type starting directories.
+	std::string initial_path;
+	context_map_t::const_iterator existing = sContextToPathMap.find(context);
+	if (existing != sContextToPathMap.end() && LLFile::isdir(existing->second))
+	{
+		initial_path = existing->second;
+	}
+	else if (!sLastPath.empty() && LLFile::isdir(sLastPath))
+	{
+		initial_path = sLastPath;
+	}
+	else if (context == CONTEXT_XUI)
+	{
+		initial_path = gDirUtil.getSkinDir() + LL_DIR_DELIM_STR +
+					   "xui" + LL_DIR_DELIM_STR + "en-us";
+	}
+	llutf16string utf16_dir = utf8str_to_utf16str(initial_path);
+	std::wstring native_dir(utf16_dir.begin(), utf16_dir.end());
+
+	std::vector<wchar_t> file_buffer(32768, L'\0');
+	llutf16string utf16_name = utf8str_to_utf16str(suggestion);
+	size_t length = llmin(utf16_name.size(), file_buffer.size() - 1);
+	for (size_t i = 0; i < length; ++i)
+	{
+		file_buffer[i] = (wchar_t)utf16_name[i];
+	}
+
+	OPENFILENAMEW ofn = {};
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = GetActiveWindow();
+	ofn.lpstrFile = file_buffer.data();
+	ofn.nMaxFile = (DWORD)file_buffer.size();
+	ofn.lpstrFilter = file_filter;
+	ofn.nFilterIndex = 1;
+	ofn.lpstrDefExt = default_ext;
+	ofn.lpstrInitialDir = native_dir.empty() ? NULL : native_dir.c_str();
+	ofn.lpstrTitle = L"Save As";
+	ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST |
+				OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR;
+
+	std::string filename;
+	if (GetSaveFileNameW(&ofn))
+	{
+		std::wstring native_name(file_buffer.data());
+		filename = utf16str_to_utf8str(llutf16string(native_name.begin(),
+													 native_name.end()));
+
+		// Like the previous HBFileSelector, ensure the selected export type
+		// matches the resulting extension. JPEG accepts both jpg and jpeg.
+		if (default_ext)
+		{
+			std::string lower = filename;
+			LLStringUtil::toLower(lower);
+			std::string suffix = "." + utf16str_to_utf8str(
+				llutf16string(default_ext, default_ext + wcslen(default_ext)));
+			bool valid = lower.size() >= suffix.size() &&
+						 lower.compare(lower.size() - suffix.size(),
+									   suffix.size(), suffix) == 0;
+			if (!valid && filter == FFSAVE_JPG && lower.size() >= 5)
+			{
+				valid = lower.compare(lower.size() - 5, 5, ".jpeg") == 0;
+			}
+			if (!valid)
+			{
+				filename += suffix;
+				// The native dialog's overwrite prompt covered the selected
+				// name; when fixing a different extension, check again.
+				if (LLFile::isfile(filename))
+				{
+					llutf16string utf16_final = utf8str_to_utf16str(filename);
+					std::wstring native_final(utf16_final.begin(),
+											  utf16_final.end());
+					if (MessageBoxW(ofn.hwndOwner, native_final.c_str(),
+									L"Overwrite existing file?",
+									MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2) != IDYES)
+					{
+						filename.clear();
+					}
+				}
+			}
+		}
+
+		if (!filename.empty())
+		{
+			size_t pos = filename.find_last_of("\\/");
+			if (pos != std::string::npos)
+			{
+				sLastPath = filename.substr(0, pos);
+				sContextToPathMap[context] = sLastPath;
+				sUsedPaths.insert(sLastPath);
+			}
+		}
+	}
+
+	// Existing save callbacks also receive an empty filename on Cancel.
+	callback(filter, filename, userdatap);
+#else
 	if (sInstance)
 	{
 		llwarns << "Call done while a file selector instance already exists !  Aborting."
@@ -926,12 +1256,84 @@ void HBFileSelector::saveFile(ESaveFilter filter, std::string suggestion,
 	{
 		new HBFileSelector(filter, suggestion, callback, userdatap);
 	}
+#endif
 }
 
 //static
 void HBFileSelector::pickDirectory(std::string suggestion,
 								   HBDirPickCallback callback, void* userdatap)
 {
+#if LL_WINDOWS
+	// Native Explorer folder chooser, consistent with the upload and Save As
+	// file dialogs. IFileOpenDialog(FOS_PICKFOLDERS) allows selecting drives,
+	// mapped/network folders and creating a new folder in the Windows shell.
+	// Keep the original prefs callback contract, including Cancel = empty.
+	if (!callback) return;
+	std::string selected_path;
+	const HRESULT init_hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+											 COINIT_DISABLE_OLE1DDE);
+	const bool uninit_com = SUCCEEDED(init_hr);
+	if (SUCCEEDED(init_hr) || init_hr == RPC_E_CHANGED_MODE)
+	{
+		IFileOpenDialog* dialog = NULL;
+		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL,
+									 CLSCTX_INPROC_SERVER,
+									 IID_PPV_ARGS(&dialog));
+		if (SUCCEEDED(hr) && dialog)
+		{
+			FILEOPENDIALOGOPTIONS flags = 0;
+			if (SUCCEEDED(dialog->GetOptions(&flags)))
+			{
+				dialog->SetOptions(flags | FOS_PICKFOLDERS |
+									  FOS_FORCEFILESYSTEM | FOS_NOCHANGEDIR);
+			}
+
+			if (!suggestion.empty() && LLFile::isdir(suggestion))
+			{
+				llutf16string utf16_path = utf8str_to_utf16str(suggestion);
+				std::wstring initial_path(utf16_path.begin(), utf16_path.end());
+				IShellItem* folder_item = NULL;
+				if (SUCCEEDED(SHCreateItemFromParsingName(initial_path.c_str(),
+									 NULL, IID_PPV_ARGS(&folder_item))) &&
+					folder_item)
+				{
+					dialog->SetFolder(folder_item);
+					folder_item->Release();
+				}
+			}
+			if (SUCCEEDED(dialog->Show(GetActiveWindow())))
+			{
+				IShellItem* result = NULL;
+				if (SUCCEEDED(dialog->GetResult(&result)) && result)
+				{
+					PWSTR path = NULL;
+					if (SUCCEEDED(result->GetDisplayName(SIGDN_FILESYSPATH,
+															&path)) && path)
+					{
+						std::wstring wide_path(path);
+						llutf16string utf16_path(wide_path.begin(), wide_path.end());
+						selected_path = utf16str_to_utf8str(utf16_path);
+						CoTaskMemFree(path);
+					}
+					result->Release();
+				}
+			}
+			dialog->Release();
+		}
+		else
+		{
+			llwarns << "Windows folder selection dialog unavailable (HRESULT "
+					<< std::hex << hr << std::dec << ")." << llendl;
+		}
+	}
+	else
+	{
+		llwarns << "Cannot initialize native Windows folder selector."
+				<< llendl;
+	}
+	if (uninit_com) CoUninitialize();
+	callback(selected_path, userdatap);
+#else
 	if (sInstance)
 	{
 		llwarns << "Call done while a file selector instance already exists !  Aborting."
@@ -942,6 +1344,7 @@ void HBFileSelector::pickDirectory(std::string suggestion,
 	{
 		new HBFileSelector(suggestion, callback, userdatap);
 	}
+#endif
 }
 
 //static

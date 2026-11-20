@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include <map>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -45,6 +47,7 @@ class LLInventoryFilter;
 class LLInventoryPanel;
 class LLSaveFolderState;
 class LLSearchEditor;
+class LLMenuGL;
 class LLSpinCtrl;
 class LLTabContainer;
 
@@ -100,6 +103,24 @@ class LLFloaterInventory final : public LLFloater, LLInventoryObserver
 {
 friend class LLFloaterInventoryFilters;
 
+// Firestorm 7.2.5 custom-filter tabs: native Chaos inventory-panel adapter.
+// The existing Build 155 inventory floater and default tabs remain intact.
+public:
+	LLInventoryPanel* createCustomFilterTab(const std::string& label);
+	void addCustomFilterTab();
+	void cloneCustomFilterTab();
+	void closeCustomFilterTab();
+	void requestCloseCustomFilterTab(LLInventoryPanel* panel);
+	void renameCustomFilterTab();
+	bool isCustomFilterTab(LLInventoryPanel* panel) const;
+	void removeCustomFilterTabByName(const std::string& panel_name);
+	void hideCustomFilterTab(LLInventoryPanel* panel);
+	void showCustomFilterTab(LLInventoryPanel* panel);
+	void showHiddenCustomTabMenu();
+	void updateShowHiddenCustomTab();
+	void loadCustomFilterTabs();
+	void saveCustomFilterTabs();
+
 protected:
 	LOG_CLASS(LLFloaterInventory);
 
@@ -144,6 +165,7 @@ public:
 	void setVisible(bool visible) override;
 	void draw() override;
 	bool handleKeyHere(KEY key, MASK mask) override;
+	bool handleRightMouseDown(S32 x, S32 y, MASK mask) override;
 
 	bool handleDragAndDrop(S32 x, S32 y, MASK mask, bool drop,
 						   EDragAndDropType cargo_type, void* cargo_data,
@@ -185,6 +207,29 @@ protected:
 	LLInventoryPanel*	mRecentPanel;
 	LLInventoryPanel*	mWornPanel;
 	LLInventoryPanel*	mLastOpenPanel;
+	std::vector<LLInventoryPanel*> mCustomFilterPanels;
+	std::set<LLInventoryPanel*> mHiddenCustomFilterPanels;
+	std::map<LLInventoryPanel*, std::string> mCustomTabLabels;
+	LLPanel* mAddCustomTabPanel = nullptr;
+	LLPanel* mShowHiddenCustomTabPanel = nullptr;
+	LLMenuGL* mCustomTabContextMenu = nullptr;
+	LLMenuGL* mHiddenCustomTabMenu = nullptr;
+	LLInventoryPanel* mContextCustomFilterPanel = nullptr;
+	bool mLoadingCustomFilterTabs = false;
+	bool mCustomFilterTabsLoadOK = true;
+	struct HiddenTabAction
+	{
+		LLHandle<LLView> owner;
+		std::string panel_name;
+	};
+	std::vector<std::unique_ptr<HiddenTabAction>> mHiddenTabActions;
+	static void onAddCustomTabPrecommit(void* data, bool);
+	static void onShowHiddenCustomTabPrecommit(void* data, bool);
+	static void contextRenameCustomTab(void* data);
+	static void contextCloneCustomTab(void* data);
+	static void contextHideCustomTab(void* data);
+	static void contextCloseCustomTab(void* data);
+	static void restoreHiddenCustomTabAction(void* data);
 	LLSaveFolderState*	mSavedFolderState;
 	LLCheckBoxCtrl*		mLockLastOpenCheck;
 	LLView*				mNewSettingsMenuItem;

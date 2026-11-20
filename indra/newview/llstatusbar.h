@@ -1,4 +1,4 @@
-/** 
+﻿/** 
  * @file llstatusbar.h
  * @brief LLStatusBar class definition
  *
@@ -38,6 +38,7 @@
 extern S32 gStatusBarHeight;
 
 class LLButton;
+class LLMediaRemoteCtrl;
 class LLLineEditor;
 class LLStatGraph;
 class LLTextBox;
@@ -129,6 +130,7 @@ private:
 
 	static void onClickParcelInfo(void* data);
 	static void onClickTime(void* data);
+	static void onClickHome(void* data);
 	static void onClickMaterials(void*);
 	static void onClickBalance(void*);
 	static void onClickHealth(void* data);
@@ -174,6 +176,11 @@ private:
 	LLLineEditor*	mLineEditSearch;
 
 	LLButton*		mBtnHealth;
+	LLButton*		mBtnHome;
+	LLMediaRemoteCtrl* mTopSharedMediaRemote;
+	LLMediaRemoteCtrl* mTopParcelMediaRemote;
+	LLMediaRemoteCtrl* mTopParcelMusicRemote;
+	LLMediaRemoteCtrl* mTopMasterRemote;
 	LLButton*		mBtnNoFly;
 	LLButton*		mBtnBuyLand;
 	LLButton*		mBtnNoBuild;

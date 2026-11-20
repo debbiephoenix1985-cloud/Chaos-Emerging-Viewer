@@ -489,11 +489,13 @@ void LLWorldMap::sendItemRequest(U32 type, U64 handle)
 	gAgent.sendReliableMessage();
 }
 
-bool LLWorldMap::isTrackedUnknownLocation(U32 x, U32 y) const
+bool LLWorldMap::isTrackedUnknownLocation(U32 x, U32 y,
+										 U32 width, U32 height) const
 {
 	return mIsTrackingUnknownLocation && mUnknownLocation.mdV[0] >= x &&
-		   mUnknownLocation.mdV[0] < x + 256 && mUnknownLocation.mdV[1] >= y &&
-		   mUnknownLocation.mdV[1] < y + 256;
+		   mUnknownLocation.mdV[0] < (F64)x + width &&
+		   mUnknownLocation.mdV[1] >= y &&
+		   mUnknownLocation.mdV[1] < (F64)y + height;
 }
 
 //static
@@ -689,7 +691,8 @@ void LLWorldMap::mapLayerRequestCallback(LLSD result)
 				siminfo->mOverlayImage = NULL;
 			}
 
-			if (gWorldMap.isTrackedUnknownLocation(x_meters, y_meters))
+			if (gWorldMap.isTrackedUnknownLocation(x_meters, y_meters,
+					siminfo->getSizeX(), siminfo->getSizeY()))
 			{
 				if (siminfo->mAccess == SIM_ACCESS_DOWN)
 				{
@@ -1100,7 +1103,8 @@ void LLWorldMap::processMapBlockReply(LLMessageSystem* msg, void**)
 				siminfo->mOverlayImage = NULL;
 			}
 
-			if (gWorldMap.isTrackedUnknownLocation(x_meters, y_meters))
+			if (gWorldMap.isTrackedUnknownLocation(x_meters, y_meters,
+					siminfo->getSizeX(), siminfo->getSizeY()))
 			{
 				if (siminfo->mAccess == SIM_ACCESS_DOWN)
 				{

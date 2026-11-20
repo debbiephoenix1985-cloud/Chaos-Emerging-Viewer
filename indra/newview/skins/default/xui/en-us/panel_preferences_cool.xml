@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<panel name="cool" label="Cool features" border="true" top="20" width="517" height="454" follows="left|top|right|bottom">
-	<tab_container name="Cool Prefs" label="Cool prefs" tab_position="top" left="0" bottom="-454" width="500" height="448">
-		<panel name="User Interface" label="User interface" border="true" mouse_opaque="true" left="1" bottom="-450" width="500" height="448" follows="left|top|right|bottom">
-			<view_border name="border1" bevel_style="none" border_thickness="1" bottom_delta="-68" left="10" height="60" width="470" follows="left|top" />
+<panel name="cool" label="Cool features" border="true" top="20" width="517" height="544" follows="left|top|right|bottom">
+	<tab_container name="Cool Prefs" label="Cool prefs" tab_position="top" left="0" bottom="-544" width="500" height="538">
+		<panel name="User Interface" label="User interface" border="true" mouse_opaque="true" left="1" bottom="-540" width="500" height="538" follows="left|top|right|bottom">
+			<view_border name="border1" bevel_style="none" border_thickness="1" bottom_delta="-88" left="10" height="80" width="470" follows="left|top" />
 			<text name="toolbar_buttons" font="SansSerifSmall" halign="left" bottom="-30" left="20" height="18" width="300" follows="left|top">
 				Show the following buttons in the toolbar:
 			</text>
@@ -18,8 +18,27 @@
 			<check_box name="show_minimap_button_check" control_name="ShowMiniMapButton" label="Mini-map" font="SansSerifSmall" height="16" follows="left|top" left="297" bottom="-64" width="81" />
 			<check_box name="show_map_button_check" control_name="ShowMapButton" label="Map" font="SansSerifSmall" height="16" follows="left|top" left="380" bottom="-64" width="47" />
 			<check_box name="show_inventory_button_check" control_name="ShowInventoryButton" label="Inventory" font="SansSerifSmall" height="16" follows="left|top" left="429" bottom="-64" width="60" />
+			<check_box name="show_fav_wearables_button_check" control_name="ShowFavWearablesButton" label="Fav Wearables" font="SansSerifSmall" height="16" follows="left|top" left="15" bottom="-82" width="140" />
+			<check_box name="show_ao_button_check" control_name="ShowAOButton" label="AO" tool_tip="Show/hide the AO toggle and editor arrow on the toolbar" font="SansSerifSmall" height="16" follows="left|top" left="165" bottom="-82" width="90" />
+			<check_box name="show_region_info_button_check" control_name="ShowRegionInfoButton" label="Region Details" tool_tip="Show/hide the Region Details toolbar button" font="SansSerifSmall" height="16" follows="left|top" left="260" bottom="-82" width="119" />
+			<check_box name="show_statistics_button_check" control_name="ShowStatisticsButton" label="Statistics" tool_tip="Show/hide the Statistics toolbar button" font="SansSerifSmall" height="16" follows="left|top" left="381" bottom="-82" width="100" />
+			<check_box name="show_favorites_bar_check" control_name="ShowFavoritesBar" label="Favourites bar" tool_tip="Show or hide the account Favorites landmark teleport bar" font="SansSerifSmall" height="16" follows="left|top" left="15" bottom="-102" width="180" />
+			<check_box name="show_camera_controls_button_check" control_name="ShowCameraControlsButton" label="Camera Controls" tool_tip="Show or hide the Camera Controls button on the bottom toolbar" font="SansSerifSmall" height="16" follows="left|top" left="208" bottom="-102" width="169" />
+			<text name="world_right_click_style_label" font="SansSerifSmall" left="15" bottom="-124" width="150" height="18" follows="left|top">World right-click menu:</text>
+			<radio_group name="chaos_right_click_menu_style" draw_border="false" left="169" bottom="-124" width="304" height="18" follows="left|top" tool_tip="Auto uses Firestorm-style context menus for Modern and classic pie menus for Legacy. Manual choices persist when changing skins.">
+				<radio_item name="auto" left="0" bottom="-16" width="100" height="16" follows="left|top">Auto (skin)</radio_item>
+				<radio_item name="context" left="101" bottom="-16" width="116" height="16" follows="left|top">Context</radio_item>
+				<radio_item name="pie" left="218" bottom="-16" width="78" height="16" follows="left|top">Pie</radio_item>
+			</radio_group>
 			<check_box name="hide_master_remote_check" control_name="HideMasterRemote" label="Hide the 'Master remote' volume control when useless" font="SansSerifSmall" tool_tip="With this setting enabled, the small master volume button above the toolbar is automatically hidden when no voice, no media and no parcel music stream are present." left="15" bottom_delta="-28" width="400" height="16" follows="left|top" />
-			<spinner name="fade_mouselook_exit_tip" control_name="FadeMouselookExitTip" label="Fade mouselook mode exit tip/instruction after:" font="SansSerifSmall" label_width="250" tool_tip="When entering mouselook mode, a 'Press SHIFT ESC to leave Mouselook' tip is displayed in the upper left corner of the screen. With this setting you can make the tip fade out after a number of seconds (minimum is 5s, with 0s meaning 'never fade out')." decimal_digits="0" min_val="0" max_val="995" increment="5" left="18" bottom_delta="-20" width="300" height="16" follows="left|top" />
+			<text name="media_remote_location_label" font="SansSerifSmall" left="15" bottom="-170" width="284" height="18" follows="left|top">
+				Media, stream and volume location:
+			</text>
+			<radio_group name="media_remote_bar_location" draw_border="false" left="306" bottom="-170" width="174" height="18" follows="left|top" tool_tip="Switch media, stream and volume between the top bar beside Home and the bottom bar">
+				<radio_item name="top" value="top" left="0" bottom="-16" width="76" height="16" follows="left|top">Top bar</radio_item>
+				<radio_item name="bottom" value="bottom" left="80" bottom="-16" width="91" height="16" follows="left|top">Bottom bar</radio_item>
+			</radio_group>
+			<spinner name="fade_mouselook_exit_tip" control_name="FadeMouselookExitTip" label="Fade mouselook mode exit tip/instruction after:" font="SansSerifSmall" label_width="250" tool_tip="When entering mouselook mode, a 'Press SHIFT ESC to leave Mouselook' tip is displayed in the upper left corner of the screen. With this setting you can make the tip fade out after a number of seconds (minimum is 5s, with 0s meaning 'never fade out')." decimal_digits="0" min_val="0" max_val="995" increment="5" left="18" bottom="-202" width="300" height="16" follows="left|top" />
 			<text name="fade_mouselook_exit_seconds" left_delta="304" bottom_delta="0" width="160" height="16" follows="left|top">
 				seconds (0 = never fade out)
 			</text>

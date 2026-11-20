@@ -52,6 +52,9 @@ public:
 		STATE_CONNECTED
 	} EState;
 
+	// Firestorm 7.1.13 records call direction explicitly at call start.
+	enum EDirection { INCOMING_CALL, OUTGOING_CALL };
+
 	LLVoiceChannel(const LLUUID& session_id, const std::string& session_name);
 	virtual ~LLVoiceChannel();
 
@@ -64,7 +67,20 @@ public:
 	virtual void deactivate();
 	virtual void activate();
 	virtual void setChannelInfo(const LLSD& channel_info);
+	virtual void resetChannelInfo();
 	virtual void requestChannelInfo();
+	LL_INLINE void setCallDirection(EDirection direction)
+	{
+		mOutgoingCall = direction == OUTGOING_CALL;
+	}
+	LL_INLINE EDirection getCallDirection() const
+	{
+		return mOutgoingCall ? OUTGOING_CALL : INCOMING_CALL;
+	}
+	LL_INLINE bool isThisVoiceChannel(const LLSD& info) const
+	{
+		return gVoiceClient.compareChannels(mChannelInfo, info);
+	}
 	virtual bool isActive();
 	LL_INLINE virtual bool isP2P() const			{ return false; }
 

@@ -76,7 +76,14 @@ public:
 	static void onClickRadar(void* data);
 	static void onClickMiniMap(void* data);
 	static void onClickMap(void* data);
+	static void onClickRegionInfo(void* data);
+	static void onClickStatistics(void* data);
+	static void onClickCameraControls(void* data);
 	static void onClickInventory(void* data);
+	static void onClickFavorites(void* data);
+	// AO-only: on/off toggle and separate editor arrow.
+	static void onClickAOToggle(void* data);
+	static void onClickAOEditor(void* data);
 
 	static F32 sInventoryAutoOpenTime;
 
@@ -92,7 +99,13 @@ private:
 	LLButton*				mRadarButton;
 	LLButton*				mMiniMapButton;
 	LLButton*				mMapButton;
+	LLButton*				mRegionInfoButton;
+	LLButton*				mStatisticsButton;
+	LLButton*				mCameraControlsButton;
 	LLButton*				mInventoryButton;
+	LLButton*				mFavoritesButton;
+	LLButton*				mAOButton;
+	LLButton*				mAOEditorArrow;
 	LLFrameTimer			mInventoryAutoOpenTimer;
 #if LL_DARWIN
 	LLFakeResizeHandle*		mResizeHandle;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <floater name="texture preview"
  can_close="true" can_drag_on_left="false" can_minimize="true" can_resize="true"
- bottom="-331" height="324" left="300" min_height="120" min_width="300" width="335">
+ bottom="-331" height="324" left="300" min_height="120" min_width="330" width="335">
 	<text
 	     bottom="-40" drop_shadow_visible="true" enabled="true" follows="left|top"
 	     font="SansSerif" halign="left" height="19" left="13"
@@ -23,6 +23,13 @@
 	<button bottom="8" enabled="true" follows="left|bottom" font="SansSerif"
 	     halign="center" height="20" label="Copy to inventory" left="9"
 	     mouse_opaque="true" name="Copy To Inventory" scale_image="true" width="170" />
+	<flyout_button bottom="8" enabled="false" follows="right|bottom" font="SansSerif"
+	     halign="center" height="20" label="Save As..." right="-9"
+	     mouse_opaque="true" name="Save As" scale_image="true" width="116"
+	     tool_tip="Save a copyable texture to your computer as PNG or TGA">
+		<flyout_button_item name="save_png" value="png">Save as PNG...</flyout_button_item>
+		<flyout_button_item name="save_tga" value="tga">Save as TGA...</flyout_button_item>
+	</flyout_button>
 	<text
 	     bottom="35" drop_shadow_visible="true" enabled="true" follows="left|bottom"
 	     font="SansSerifSmall" halign="left" height="14" left="13"

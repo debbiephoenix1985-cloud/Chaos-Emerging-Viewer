@@ -102,15 +102,11 @@ bool LLVoiceRemoteCtrl::postBuild()
 
 void LLVoiceRemoteCtrl::draw()
 {
-	bool voice_active = false;
-	if (gViewerParcelMgr.allowAgentVoice())
-	{
-		LLVoiceChannel* channelp = LLVoiceChannel::getCurrentVoiceChannel();
-		if (channelp)
-		{
-			voice_active = channelp->isActive();
-		}
-	}
+	// Firestorm derives the microphone controls from the active voice
+	// channel, not parcel spatial-voice permission. Private calls can remain
+	// available when local parcel voice is unavailable.
+	LLVoiceChannel* channelp = LLVoiceChannel::getCurrentVoiceChannel();
+	bool voice_active = channelp && channelp->isActive();
 	mTalkBtn->setEnabled(voice_active);
 	mTalkLockBtn->setEnabled(voice_active);
 

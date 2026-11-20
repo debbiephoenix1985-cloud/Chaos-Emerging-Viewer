@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file hbprefscool.cpp
  * @author Henri Beauchamp
  * @brief Cool VL Viewer preferences panel
@@ -55,7 +55,10 @@
 #include "llpreviewscript.h"
 #include "mkrlinterface.h"
 #include "llstartup.h"
+#include "lltoolbar.h"
 #include "llviewercontrol.h"
+#include "lloverlaybar.h"
+#include "llstatusbar.h"
 #include "llvoavatarself.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -302,6 +305,7 @@ private:
 	static void onTabChanged(void* user_data, bool);
 
 	static void onCommitCheckBoxShowButton(LLUICtrl* ctrl, void* user_data);
+	static void onCommitMediaBarLocation(LLUICtrl* ctrl, void* user_data);
 	static void onCommitCheckBoxSpellCheck(LLUICtrl* ctrl, void* user_data);
 	static void onCommitCheckBoxRestrainedLove(LLUICtrl* ctrl, void* user_data);
 	static void onCommitCheckBoxSpeedRez(LLUICtrl* ctrl, void* user_data);
@@ -349,6 +353,7 @@ private:
 	bool mShowMiniMapButton;
 	bool mShowMapButton;
 	bool mShowInventoryButton;
+	bool mShowFavWearablesButton;
 	bool mHideMasterRemote;
 	bool mUseOldChatHistory;
 	bool mAutoOpenTextInput;
@@ -411,6 +416,8 @@ private:
 	U32 mRestrainedLoveReattachDelay;
 	LLColor4 mOwnNameChatColor;
 	std::string mHighlightNicknames;
+	std::string mChaosRightClickMenuStyle;
+	std::string mMediaRemoteBarLocation;
 	std::string mSpellCheckLanguage;
 	std::string mExternalEditor;
 	std::string mRestrainedLoveRecvimMessage;
@@ -432,6 +439,34 @@ HBPrefsCoolImpl::HBPrefsCoolImpl()
 	LLUICtrlFactory::getInstance()->buildPanel(this,
 											   "panel_preferences_cool.xml");
 
+	// Chaos 229 accidentally saved 0/1/2 (radio indexes) in a String setting.
+	// Preserve that user's choice: 0=Auto, 1=Context, 2=Pie.
+	std::string menu_style = gSavedSettings.getString("ChaosRightClickMenuStyle");
+	if (menu_style == "0") menu_style = "auto";
+	else if (menu_style == "1") menu_style = "context";
+	else if (menu_style == "2") menu_style = "pie";
+	else if (menu_style != "auto" && menu_style != "context" &&
+			 menu_style != "pie") menu_style = "auto";
+	gSavedSettings.setString("ChaosRightClickMenuStyle", menu_style);
+	// Unlike LLRadioGroup's control_name binding, this unbound radio is
+	// saved by apply() as its item name, never a numeric button index.
+	LLRadioGroup* menu_picker =
+		getChild<LLRadioGroup>("chaos_right_click_menu_style");
+	if (menu_picker) menu_picker->setValue(LLSD(menu_style));
+
+	// Builds 207-209 saved "0" or "1" from the old auto-bound radio widget.
+	// Convert those values and keep the selection and stored setting in sync.
+	std::string remote_bar_location = gSavedSettings.getString("MediaRemoteBarLocation");
+	if (remote_bar_location == "0") remote_bar_location = "bottom";
+	else if (remote_bar_location == "1") remote_bar_location = "bottom";
+	else if (remote_bar_location != "top" && remote_bar_location != "bottom")
+		remote_bar_location = "bottom";
+	gSavedSettings.setString("MediaRemoteBarLocation", remote_bar_location);
+	LLRadioGroup* location_picker =
+		getChild<LLRadioGroup>("media_remote_bar_location");
+	if (location_picker) location_picker->setValue(LLSD(remote_bar_location));
+	childSetCommitCallback("media_remote_bar_location",
+						   onCommitMediaBarLocation, this);
 	childSetCommitCallback("show_chat_button_check",
 						   onCommitCheckBoxShowButton, this);
 	childSetCommitCallback("show_im_button_check",
@@ -455,6 +490,8 @@ HBPrefsCoolImpl::HBPrefsCoolImpl()
 	childSetCommitCallback("show_map_button_check",
 						   onCommitCheckBoxShowButton, this);
 	childSetCommitCallback("show_inventory_button_check",
+						   onCommitCheckBoxShowButton, this);
+	childSetCommitCallback("show_fav_wearables_button_check",
 						   onCommitCheckBoxShowButton, this);
 	childSetCommitCallback("use_old_chat_history_check",
 						   onCommitCheckBoxAfterRestart, this);
@@ -727,7 +764,10 @@ void HBPrefsCoolImpl::refreshValues()
 	mShowMiniMapButton					= gSavedSettings.getBool("ShowMiniMapButton");
 	mShowMapButton						= gSavedSettings.getBool("ShowMapButton");
 	mShowInventoryButton				= gSavedSettings.getBool("ShowInventoryButton");
+	mShowFavWearablesButton = gSavedSettings.getBool("ShowFavWearablesButton");
 	mHideMasterRemote					= gSavedSettings.getBool("HideMasterRemote");
+	mChaosRightClickMenuStyle = gSavedSettings.getString("ChaosRightClickMenuStyle");
+	mMediaRemoteBarLocation = gSavedSettings.getString("MediaRemoteBarLocation");
 	mFadeMouselookExitTip				= gSavedSettings.getU32("FadeMouselookExitTip");
 	mUseOldChatHistory					= gSavedSettings.getBool("UseOldChatHistory");
 	mAutoOpenTextInput					= gSavedSettings.getBool("AutoOpenTextInput");
@@ -851,6 +891,10 @@ void HBPrefsCoolImpl::refresh()
 	refreshValues();
 
 	// User Interface
+	// Keep the unbound radio in sync when Preferences are reopened/refreshed.
+	LLRadioGroup* menu_picker =
+		getChild<LLRadioGroup>("chaos_right_click_menu_style");
+	if (menu_picker) menu_picker->setValue(LLSD(mChaosRightClickMenuStyle));
 
 	std::string format = gSavedSettings.getString("ShortTimeFormat");
 	if (format.find("%p") == std::string::npos)
@@ -954,7 +998,16 @@ void HBPrefsCoolImpl::cancel()
 	gSavedSettings.setBool("ShowMiniMapButton",					mShowMiniMapButton);
 	gSavedSettings.setBool("ShowMapButton",						mShowMapButton);
 	gSavedSettings.setBool("ShowInventoryButton",				mShowInventoryButton);
+	gSavedSettings.setBool("ShowFavWearablesButton", mShowFavWearablesButton);
+	if (gToolBarp) gToolBarp->layoutButtons();
 	gSavedSettings.setBool("HideMasterRemote",					mHideMasterRemote);
+	gSavedSettings.setString("ChaosRightClickMenuStyle", mChaosRightClickMenuStyle);
+	LLRadioGroup* menu_picker =
+		getChild<LLRadioGroup>("chaos_right_click_menu_style");
+	if (menu_picker) menu_picker->setValue(LLSD(mChaosRightClickMenuStyle));
+	gSavedSettings.setString("MediaRemoteBarLocation", mMediaRemoteBarLocation);
+	if (gOverlayBarp) gOverlayBarp->setDirty();
+	if (gStatusBarp) gStatusBarp->setDirty();
 	gSavedSettings.setU32("FadeMouselookExitTip",				mFadeMouselookExitTip);
 	gSavedSettings.setBool("UseOldChatHistory",					mUseOldChatHistory);
 	gSavedSettings.setBool("AutoOpenTextInput",					mAutoOpenTextInput);
@@ -1039,6 +1092,32 @@ void HBPrefsCoolImpl::cancel()
 
 void HBPrefsCoolImpl::apply()
 {
+	// The legacy radio group returns its radio_item NAME as a string,
+	// while its auto-bound control writes numeric button indexes.
+	// Commit the names explicitly, never the indexes.
+	LLRadioGroup* menu_picker =
+		getChild<LLRadioGroup>("chaos_right_click_menu_style");
+	if (menu_picker)
+	{
+		const std::string style = menu_picker->getValue().asString();
+		if (style == "auto" || style == "context" || style == "pie")
+		{
+			gSavedSettings.setString("ChaosRightClickMenuStyle", style);
+			mChaosRightClickMenuStyle = style;
+		}
+	}
+	LLRadioGroup* remote_location = getChild<LLRadioGroup>("media_remote_bar_location");
+	if (remote_location)
+	{
+		const std::string value = remote_location->getValue().asString();
+		if (value == "top" || value == "bottom")
+		{
+			gSavedSettings.setString("MediaRemoteBarLocation", value);
+			mMediaRemoteBarLocation = value;
+			if (gOverlayBarp) gOverlayBarp->setDirty();
+			if (gStatusBarp) gStatusBarp->setDirty();
+		}
+	}
 	// User Interface
 
 	std::string short_date, long_date, short_time, long_time, timestamp;
@@ -1241,6 +1320,20 @@ void HBPrefsCoolImpl::onCommitCheckBoxAfterRestart(LLUICtrl* ctrl,
 }
 
 //static
+void HBPrefsCoolImpl::onCommitMediaBarLocation(LLUICtrl* ctrl, void* user_data)
+{
+	HBPrefsCoolImpl* self = (HBPrefsCoolImpl*)user_data;
+	if (!self || !ctrl) return;
+
+	const std::string value = ctrl->getValue().asString();
+	if (value != "top" && value != "bottom") return;
+	// Bind the UI selection immediately to the actual viewer control setting.
+	gSavedSettings.setString("MediaRemoteBarLocation", value);
+	if (gOverlayBarp) gOverlayBarp->setDirty();
+	if (gStatusBarp) gStatusBarp->setDirty();
+}
+
+//static
 void HBPrefsCoolImpl::onCommitCheckBoxShowButton(LLUICtrl* ctrl,
 												 void* user_data)
 {
@@ -1253,6 +1346,8 @@ void HBPrefsCoolImpl::onCommitCheckBoxShowButton(LLUICtrl* ctrl,
 	{
 		gSavedSettings.setBool("ShowToolBar", true);
 	}
+	// Reflect toolbar show/hide choices without needing a window resize.
+	if (gToolBarp) gToolBarp->layoutButtons();
 }
 
 //static

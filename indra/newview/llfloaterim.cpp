@@ -43,6 +43,7 @@
 #include "llmessage.h"
 #include "llnotifications.h"
 #include "llsliderctrl.h"
+#include "llspinctrl.h"
 #include "llstylemap.h"
 #include "lltabcontainer.h"
 #include "lltextbox.h"
@@ -209,6 +210,62 @@ LLFloaterIMSession::LLFloaterIMSession(const std::string& session_label,
 	init(session_label);
 }
 
+void LLFloaterIMSession::setVoiceChannelInfo(const LLSD& voice_channel_info)
+{
+	if (!voice_channel_info.isMap() || voice_channel_info.size() == 0)
+	{
+		return;
+	}
+
+	// Firestorm's LLIMSession::initVoiceChannel() reinitializes the voice
+	// channel whenever an existing text IM receives different voice credentials.
+	// Merely replacing LLVoiceChannel::mChannelInfo does NOT update the voice
+	// provider, its connection lifecycle, or the speaker manager.
+	if (mVoiceChannel && mVoiceChannel->isThisVoiceChannel(voice_channel_info) &&
+		mVoiceChannelInfo["channel_uri"].asString() == voice_channel_info["channel_uri"].asString() &&
+		mVoiceChannelInfo["channel_credentials"].asString() == voice_channel_info["channel_credentials"].asString())
+	{
+		return;
+	}
+	mVoiceChannelInfo = voice_channel_info;
+
+	if (mVoiceChannel)
+	{
+		mVoiceChannel->deactivate();
+		delete mVoiceChannel;
+		mVoiceChannel = NULL;
+	}
+
+	const bool p2p = mDialog == IM_NOTHING_SPECIAL ||
+					 mDialog == IM_SESSION_P2P_INVITE;
+	if (p2p)
+	{
+		U32 server_type = gVoiceClient.getVoiceServerType(mVoiceChannelInfo);
+		if (server_type == LLVoiceClient::VIVOX_SERVER)
+		{
+			mVoiceChannel = new LLVoiceChannelP2P(mSessionUUID,
+											  mSessionLabel, mOtherParticipantUUID,
+											  server_type);
+		}
+		else
+		{
+			mVoiceChannel = new LLVoiceChannelGroup(mSessionUUID,
+											   mSessionLabel, true);
+		}
+	}
+	else
+	{
+		mVoiceChannel = new LLVoiceChannelGroup(mSessionUUID,
+										   mSessionLabel, false);
+	}
+
+	if (mSpeakers)
+	{
+		mSpeakers->setVoiceChannel(mVoiceChannel);
+	}
+	mVoiceChannel->setChannelInfo(mVoiceChannelInfo);
+}
+
 void LLFloaterIMSession::init(const std::string& session_label)
 {
 	LL_DEBUGS("InstantMessaging") << "Initializing session '" << session_label
@@ -222,6 +279,14 @@ void LLFloaterIMSession::init(const std::string& session_label)
 	if (mVoiceChannelInfo.isDefined())
 	{
 		server_type = gVoiceClient.getVoiceServerType(mVoiceChannelInfo);
+	}
+
+	// Firestorm selects P2P signalling only for providers that implement it.
+	// WebRTC private calls are ad-hoc voice sessions, not Vivox P2P calls.
+	if (!server_type)
+	{
+		server_type = gSavedSettings.getString("VoiceServerType") == "webrtc" ?
+			LLVoiceClient::WEBRTC_SERVER : LLVoiceClient::VIVOX_SERVER;
 	}
 
 	bool use_p2p = false;
@@ -260,18 +325,18 @@ void LLFloaterIMSession::init(const std::string& session_label)
 			{
 				mSessionLabel = LLCacheName::cleanFullName(mSessionLabel);
 			}
-			if (server_type)
+			if (server_type == LLVoiceClient::VIVOX_SERVER)
 			{
 				mVoiceChannel = new LLVoiceChannelP2P(mSessionUUID,
 													  mSessionLabel,
 													  mOtherParticipantUUID,
 													  server_type);
-				use_p2p = server_type == LLVoiceClient::WEBRTC_SERVER;
 			}
 			else
 			{
 				mVoiceChannel = new LLVoiceChannelGroup(mSessionUUID,
 														mSessionLabel, true);
+				use_p2p = true;
 			}
 			break;
 
@@ -290,18 +355,18 @@ void LLFloaterIMSession::init(const std::string& session_label)
 			{
 				mSessionLabel = LLCacheName::cleanFullName(mSessionLabel);
 			}
-			if (server_type)
+			if (server_type == LLVoiceClient::VIVOX_SERVER)
 			{
 				mVoiceChannel = new LLVoiceChannelP2P(mSessionUUID,
 													  mSessionLabel,
 													  mOtherParticipantUUID,
 													  server_type);
-				use_p2p = server_type == LLVoiceClient::WEBRTC_SERVER;
 			}
 			else
 			{
 				mVoiceChannel = new LLVoiceChannelGroup(mSessionUUID,
 														mSessionLabel, true);
+				use_p2p = true;
 			}
 			break;
 
@@ -1138,27 +1203,122 @@ void LLFloaterIMSession::onCommitAvatar(LLUICtrl* ctrl, void* userdata)
 	}
 }
 
+// Firestorm 6.6.14 built-in Conversation History behaviour adapted to the
+// existing Chaos IM log format, LLViewerTextEditor and LLFloater controls.
+// The saved transcript is displayed in-world and paged, not handed to the OS.
+class LLFloaterChaosConversationPreview final : public LLFloater
+{
+public:
+    LLFloaterChaosConversationPreview(const std::string& filename,
+                                     const std::string& session_label)
+    : LLFloater("chaos_conversation_preview"),
+      mFilename(filename), mSessionLabel(session_label),
+      mEditor(NULL), mPageSpinner(NULL), mCurrentPage(0)
+    {
+    }
+
+    bool postBuild() override
+    {
+        mEditor = getChild<LLViewerTextEditor>("chat_history");
+        mPageSpinner = getChild<LLSpinCtrl>("history_page_spin");
+        mPageSpinner->setCommitCallback(onPageSelected);
+        mPageSpinner->setCallbackUserData(this);
+        setTitle("Conversation: " + mSessionLabel);
+        // Firestorm loads all conversation-history pages rather than the
+        // short LogShowHistoryMaxSize tail shown when an IM first opens.
+        llifstream input(mFilename.c_str());
+        std::string line;
+        while (std::getline(input, line))
+        {
+            if (!line.empty() && line.back() == '\r')
+            {
+                line.pop_back();
+            }
+            mLines.push_back(line);
+        }
+        const size_t count = mLines.size();
+        const S32 page_count = count ?
+            (S32)((count - 1) / PAGE_SIZE + 1) : 1;
+        mPageSpinner->setMinValue(1);
+        mPageSpinner->setMaxValue(page_count);
+        mCurrentPage = page_count - 1;
+        mPageSpinner->setValue(page_count);
+        mPageSpinner->setEnabled(page_count > 1);
+        showHistoryPage();
+        return LLFloater::postBuild();
+    }
+
+    static void show(const std::string& filename,
+                     const std::string& session_label)
+    {
+        LLFloaterChaosConversationPreview* floater =
+            new LLFloaterChaosConversationPreview(filename, session_label);
+        if (LLUICtrlFactory::getInstance()->buildFloater(
+                floater, "floater_chaos_conversation_preview.xml"))
+        {
+            floater->center();
+            floater->open();
+        }
+        else
+        {
+            delete floater;
+        }
+    }
+
+private:
+    enum { PAGE_SIZE = 200 };
+
+    static void onPageSelected(LLUICtrl*, void* userdata)
+    {
+        LLFloaterChaosConversationPreview* self =
+            static_cast<LLFloaterChaosConversationPreview*>(userdata);
+        if (self && self->mPageSpinner)
+        {
+            self->mCurrentPage = self->mPageSpinner->getValue().asInteger() - 1;
+            self->showHistoryPage();
+        }
+    }
+
+    void showHistoryPage()
+    {
+        if (!mEditor || !mPageSpinner) return;
+        const size_t page_count = mLines.empty() ? 1 :
+            (mLines.size() - 1) / PAGE_SIZE + 1;
+        mCurrentPage = llclamp(mCurrentPage, 0, (S32)page_count - 1);
+        const size_t start = (size_t)mCurrentPage * PAGE_SIZE;
+        const size_t end = llmin(start + PAGE_SIZE, mLines.size());
+        std::string text;
+        for (size_t i = start; i < end; ++i)
+        {
+            text += mLines[i];
+            text += '\n';
+        }
+        if (mLines.empty())
+        {
+            text = "No saved conversation history found.";
+        }
+        mEditor->setText(text);
+        childSetValue("page_total", llformat("/ %u", (U32)page_count));
+    }
+
+    std::string mFilename;
+    std::string mSessionLabel;
+    std::vector<std::string> mLines;
+    LLViewerTextEditor* mEditor;
+    LLSpinCtrl* mPageSpinner;
+    S32 mCurrentPage;
+};
+
 //static
 void LLFloaterIMSession::onClickViewLog(void* userdata)
 {
-	LLFloaterIMSession* self = (LLFloaterIMSession*)userdata;
-	if (self && !self->mLogFileName.empty() && gViewerWindowp)
-	{
-#if LL_WINDOWS
-		std::string url = "file:///";
-#else
-		std::string url = "file://";
-#endif
-		url += LLWeb::escapeURL(self->mLogFileName);
-		if (gSavedPerAccountSettings.getBool("OpenIMLogsInBuiltInBrowser"))
-		{
-			LLFloaterMediaBrowser::showInstance(url);
-		}
-		else
-		{
-			gWindowp->spawnWebBrowser(url, true);
-		}
-	}
+    LLFloaterIMSession* self = (LLFloaterIMSession*)userdata;
+    if (self && !self->mLogFileName.empty() &&
+        LLFile::exists(self->mLogFileName))
+    {
+        LLFloaterChaosConversationPreview::show(self->mLogFileName,
+                                                self->mSessionLabel);
+    }
 }
 
 //static
@@ -1199,9 +1359,11 @@ void LLFloaterIMSession::onClickSnooze(void* userdata)
 void LLFloaterIMSession::onClickStartCall(void* userdata)
 {
 	LLFloaterIMSession* self = (LLFloaterIMSession*)userdata;
-	if (self && self->mVoiceChannel)
+	if (self && gIMMgrp)
 	{
-		self->mVoiceChannel->activate();
+		// Same central call entry point as Firestorm 7.1.13.
+		gIMMgrp->startCall(self->mSessionUUID,
+							  LLVoiceChannel::OUTGOING_CALL);
 	}
 }
 
@@ -1209,9 +1371,9 @@ void LLFloaterIMSession::onClickStartCall(void* userdata)
 void LLFloaterIMSession::onClickEndCall(void* userdata)
 {
 	LLFloaterIMSession* self = (LLFloaterIMSession*)userdata;
-	if (self && self->mVoiceChannel)
+	if (self && gIMMgrp)
 	{
-		self->mVoiceChannel->deactivate();
+		gIMMgrp->endCall(self->mSessionUUID);
 	}
 }
 

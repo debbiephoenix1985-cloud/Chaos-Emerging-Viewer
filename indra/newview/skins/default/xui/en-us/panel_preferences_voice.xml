@@ -15,8 +15,12 @@
 	</text_editor>
 	<check_box name="enable_voice_check" label="Enable voice chat" font="SansSerifSmall"
 	 left="8" bottom_delta="0" width="200" height="16" follows="left|top" />
+	<check_box name="voice_multi_instance_check" control_name="VoiceMultiInstance"
+	 label="Allow voice in multiple viewers" font="SansSerifSmall"
+	 tool_tip="Allow voice in simultaneous viewer instances. Restart the additional viewer to apply this setting."
+	 left="214" bottom_delta="0" width="230" height="16" follows="left|top"/>
 	<radio_group name="ear_location" draw_border="false"
-	 left_delta="20" bottom_delta="-62" width="364" height="58" follows="left|top">
+	 left="28" bottom_delta="-62" width="364" height="58" follows="left|top">
 		<radio_item name="0" left="3" bottom="-19" width="315" height="16" follows="left|top">
 			Hear voice chat from camera position.
 		</radio_item>

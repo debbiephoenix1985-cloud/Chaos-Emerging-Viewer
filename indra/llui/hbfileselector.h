@@ -113,6 +113,12 @@ public:
 	static void loadFile(ELoadFilter filter, HBLoadFileCallback callback,
 						 void* userdatap = NULL);
 
+	static void loadUploadFile(ELoadFilter filter, HBLoadFileCallback callback,
+							   void* userdatap = NULL);
+
+	static void loadUploadFiles(ELoadFilter filter, HBLoadFilesCallback callback,
+							    void* userdatap = NULL);
+
 	static void loadFiles(ELoadFilter filter, HBLoadFilesCallback callback,
 						  void* userdatap = NULL);
 

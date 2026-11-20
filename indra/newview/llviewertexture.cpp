@@ -30,6 +30,8 @@
 
 #include "llviewerprecompiledheaders.h"
 
+#include <bit>
+
 #include <utility>
 
 #include "llviewertexture.h"
@@ -581,7 +583,10 @@ void LLViewerTexture::updateUsableGLTexMem()
 	sUsableGLTexMemMB = llclamp(mem, getMinVideoRamSetting(), max_mem);
 	if (sUsableGLTexMemMB != cur_mem)
 	{
-		gSavedSettings.setU32("GLTextureMemory", mem);
+		// Persist the clamped budget, not the original out-of-range input;
+		// otherwise the setting can repeatedly re-trigger and retain an
+		// unsafe requested value when the GPU's VRAM is smaller.
+		gSavedSettings.setU32("GLTextureMemory", sUsableGLTexMemMB);
 		// At this point the setting listener re-entered this method already.
 		return;
 	}
@@ -2263,6 +2268,16 @@ F32 LLViewerFetchedTexture::maxDecodePriority()
 
 void LLViewerFetchedTexture::setDecodePriority(F32 priority)
 {
+	// Dayturn comparator audit: NaNs and infinities invalidate the ordered
+	// image set. Inspect IEEE-754 exponent bits, because /fp:fast may
+	// optimize std::isfinite() under a finite-number assumption.
+	const U32 priority_bits = std::bit_cast<U32>(priority);
+	if ((priority_bits & 0x7f800000U) == 0x7f800000U)
+	{
+		llwarns_once << "Non-finite texture decode priority ignored."
+					 << llendl;
+		priority = 0.f;
+	}
 	mDecodePriority = priority;
 	if (mDecodePriority < F_ALMOST_ZERO)
 	{

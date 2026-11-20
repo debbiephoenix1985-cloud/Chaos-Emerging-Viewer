@@ -39,6 +39,7 @@
 
 #include "llfloaterchat.h"
 #include "llfloaterfriends.h"
+#include "llfloatercontactsets.h"
 #include "llfloatergroups.h"
 #include "llfloaterim.h"
 #include "llfloaternewim.h"
@@ -114,7 +115,15 @@ public:
 												 NULL, false);
 		LLFloater* friends = LLFloaterFriends::getInstance(LLSD());
 		addFloater(friends, true);
-		addFloater(LLFloaterGroups::getInstance(LLSD()), false);
+		friends->setTitleVisible(false);
+		LLFloater* groups = LLFloaterGroups::getInstance(LLSD());
+		addFloater(groups, false);
+		groups->setTitleVisible(false);
+		// Preserve native tab labels; suppress redundant floated-window title
+		// bars that otherwise render under the tab's first dropdown/controls.
+		LLFloater* contact_sets = LLFloaterContactSets::getInstance(LLSD());
+		addFloater(contact_sets, false);
+		contact_sets->setTitleVisible(false);
 		mTabContainer->lockTabs();
 	}
 };

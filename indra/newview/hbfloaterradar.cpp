@@ -36,6 +36,8 @@
 #include "llviewerprecompiledheaders.h"
 
 #include <utility>
+#include <ctime>
+#include <cstdio>
 
 #include "hbfloaterradar.h"
 
@@ -58,6 +60,7 @@
 #include "llchat.h"
 #include "llfloateravatarinfo.h"
 #include "llfloaterchat.h"
+#include "llfloateractivespeakers.h"
 #include "llfloaterinspect.h"
 #include "llfloatermute.h"
 #include "llfloaterreporter.h"
@@ -67,6 +70,7 @@
 #include "lltracker.h"
 #include "hbviewerautomation.h"
 #include "llviewercontrol.h"
+#include "llvoiceclient.h"
 #include "llviewerobjectlist.h"
 #include "llviewerregion.h"
 #include "llviewerwindow.h"
@@ -139,6 +143,7 @@ HBRadarListEntry::HBRadarListEntry(LLVOAvatar* avatarp, const LLUUID& avid,
 	mFriend(LLAvatarTracker::isAgentFriend(avid)),
 	mFrame(gFrameCount),
 	mInSimFrame(U32_MAX),
+	mRegionSeen(false),
 	mInDrawFrame(U32_MAX),
 	mInChatFrame(U32_MAX),
 	mInShoutFrame(U32_MAX)
@@ -191,11 +196,23 @@ void HBRadarListEntry::setPosition(const LLVector3d& position, bool this_sim,
 
 	if (this_sim)
 	{
+		LLViewerRegion* regionp = gAgent.getRegion();
+		const LLUUID region_id = regionp ? regionp->getRegionID() : LLUUID::null;
+		if (!mRegionSeen || mSeenRegionID != region_id)
+		{
+			mSeenRegionID = region_id;
+			mRegionSeen = true;
+			mRegionTimer.start();
+		}
 		if (mInSimFrame == U32_MAX)
 		{
 			reportAvatarStatus(ALERT_TYPE_SIM, true);
 		}
 		mInSimFrame = mFrame;
+	}
+	else
+	{
+		mRegionSeen = false;
 	}
 	if (drawn)
 	{
@@ -240,6 +257,7 @@ bool HBRadarListEntry::getAlive()
 	if (mInSimFrame != U32_MAX && current - mInSimFrame >= 2)
 	{
 		mInSimFrame = U32_MAX;
+		mRegionSeen = false;
 		reportAvatarStatus(ALERT_TYPE_SIM, false);
 	}
 	if (mInDrawFrame != U32_MAX && current - mInDrawFrame >= 2)
@@ -345,12 +363,15 @@ bool HBRadarListEntry::reportAvatarStatus(ERadarAlertType type, bool entering)
 ///////////////////////////////////////////////////////////////////////////////
 
 HBFloaterRadar::HBFloaterRadar(const LLSD&)
-:	mShowActions(false),
+:	LLAvatarPropertiesObserver(LLUUID::null, APT_AVATAR_INFO),
+	mShowActions(false),
 	mTracking(false)
 {
 	LLUICtrlFactory::getInstance()->buildFloater(this, "floater_radar.xml");
 	LLMuteList::addObserver(this);
 	gAvatarTracker.addObserver(this);
+	LLAvatarProperties::addObserver(this);
+	mAgeRequestTimer.start();
 }
 
 //virtual
@@ -358,6 +379,7 @@ HBFloaterRadar::~HBFloaterRadar()
 {
 	LLMuteList::removeObserver(this);
 	gAvatarTracker.removeObserver(this);
+	LLAvatarProperties::removeObserver(this);
 	gIdleCallbacks.deleteFunction(HBFloaterRadar::callbackIdle);
 }
 
@@ -668,6 +690,44 @@ void HBFloaterRadar::changed(U32 mask)
 	}
 }
 
+void HBFloaterRadar::processProperties(S32 type, void* data)
+{
+	if (type != APT_AVATAR_INFO || !data) return;
+	const LLAvatarInfo* info = static_cast<const LLAvatarInfo*>(data);
+	if (!mAgeRequested.count(info->mAvatarId)) return;
+
+	S32 days = -1;
+	unsigned int year = 0, month = 0, day = 0;
+	const std::string& born = info->mBirthDate;
+	const std::string format = gSavedSettings.getString("ShortDateFormat");
+	if (sscanf(born.c_str(), "%u-%u-%u", &year, &month, &day) != 3)
+	{
+		if (format.find("%d/%m/%Y") != std::string::npos)
+		{
+			sscanf(born.c_str(), "%u/%u/%u", &day, &month, &year);
+		}
+		else
+		{
+			sscanf(born.c_str(), "%u/%u/%u", &month, &day, &year);
+		}
+	}
+	if (year >= 2000 && year <= 2100 && month >= 1 && month <= 12 &&
+		day >= 1 && day <= 31)
+	{
+		std::tm birthday = {};
+		birthday.tm_year = year - 1900;
+		birthday.tm_mon = month - 1;
+		birthday.tm_mday = day;
+		const time_t created = _mkgmtime(&birthday);
+		const time_t now = time(NULL);
+		if (created != (time_t)-1 && now >= created)
+		{
+			days = (S32)((now - created) / 86400);
+		}
+	}
+	mAccountAgeDays[info->mAvatarId] = days;
+}
+
 void HBFloaterRadar::updateAvatarList()
 {
 	LLViewerRegion* aregionp = gAgent.getRegion();
@@ -814,6 +874,23 @@ void HBFloaterRadar::updateAvatarList()
 	}
 
 	expireAvatarList();
+	// Ask the standard avatar profile service for at most two ages per second.
+	// Never issue repeated requests for the same avatar during this radar session.
+	if (getVisible() && !isMinimized() &&
+		mAgeRequestTimer.getElapsedTimeF32() >= 0.5f &&
+		mAgeRequested.size() < 200)
+	{
+		for (auto& pair : mAvatars)
+		{
+			if (pair.second.isInSim() && !mAgeRequested.count(pair.first))
+			{
+				mAgeRequested.insert(pair.first);
+				LLAvatarProperties::sendGenericRequest(pair.first, APT_AVATAR_INFO);
+				mAgeRequestTimer.reset();
+				break;
+			}
+		}
+	}
 	refreshAvatarList();
 	refreshTracker();
 }
@@ -843,6 +920,10 @@ void HBFloaterRadar::refreshAvatarList()
 {
 	// Do not update the list when the floater is hidden
 	if (!getVisible() || isMinimized()) return;
+
+	// Use Firestorm radar speaker-list reconciliation before reading voice status.
+	LLLocalSpeakerMgr* speakermgr = LLLocalSpeakerMgr::getInstance();
+	speakermgr->update(true);
 
 	// We rebuild the list fully each time it is refreshed. The assumption is
 	// that it is faster than to refresh each entry and sort again the list.
@@ -962,6 +1043,39 @@ void HBFloaterRadar::refreshAvatarList()
 			name_column["color"] = entry.getColor().getValue();
 		}
 
+				// Firestorm radar status, using Chaos's own WebRTC/Vivox
+		// participant tracking and the avatar's existing typing flag.
+		LLSD& voice_column = element["columns"][LIST_VOICE_STATUS];
+		voice_column["column"] = "voice_status";
+		voice_column["type"] = "icon";
+		voice_column["value"] = "";
+		std::string voice_icon;
+		// Firestorm fsradar.cpp voice state, ported to Chaos gVoiceClient.
+		if (gVoiceClient.voiceEnabled() && gVoiceClient.isVoiceWorking())
+		{
+			LLPointer<LLSpeaker> speaker = speakermgr->findSpeaker(avid);
+			if (speaker.notNull() && speaker->isInVoiceChannel())
+			{
+				EVoicePowerLevel power_level = gVoiceClient.getPowerLevel(avid);
+				switch (power_level)
+				{
+					case VPL_PTT_Off: voice_icon = "Radar_VoicePTT_Off"; break;
+					case VPL_PTT_On: voice_icon = "Radar_VoicePTT_On"; break;
+					case VPL_Level1: voice_icon = "Radar_VoicePTT_Lvl1"; break;
+					case VPL_Level2: voice_icon = "Radar_VoicePTT_Lvl2"; break;
+					case VPL_Level3: voice_icon = "Radar_VoicePTT_Lvl3"; break;
+					default: break;
+				}
+			}
+		}
+
+		// Firestorm fsradar.cpp typing detection and panel_fs_radar.xml icon.
+		LLSD& typing_column = element["columns"][LIST_TYPING_STATUS];
+		typing_column["column"] = "typing_status";
+		typing_column["type"] = "icon";
+		LLVOAvatar* avVo = (LLVOAvatar*)gObjectList.findObject(avid);
+		typing_column["value"] = (avVo && avVo->isTyping()) ? "radarbox_t" : "";
+
 		LLColor4* color = &sNameColor;
 		LLSD& dist_column = element["columns"][LIST_DISTANCE];
 		dist_column["column"] = "distance";
@@ -1044,10 +1158,53 @@ void HBFloaterRadar::refreshAvatarList()
 		}
 		alt_column["value"] = temp;
 
+		LLSD& seen_column = element["columns"][LIST_REGION_SEEN];
+		seen_column["column"] = "region_seen";
+		seen_column["type"] = "text";
+		if (entry.isInSim())
+		{
+			const U32 seconds = (U32)entry.getRegionSeenSeconds();
+			if (seconds >= 86400)
+			{
+				seen_column["value"] = llformat("%ud %uh", seconds / 86400,
+												   (seconds / 3600) % 24);
+			}
+			else if (seconds >= 3600)
+			{
+				seen_column["value"] = llformat("%uh %02um", seconds / 3600,
+													(seconds / 60) % 60);
+			}
+			else
+			{
+				seen_column["value"] = llformat("%um %02us", seconds / 60,
+												 seconds % 60);
+			}
+		}
+		else
+		{
+			seen_column["value"] = "-";
+		}
+
+		LLSD& age_column = element["columns"][LIST_ACCOUNT_AGE];
+		age_column["column"] = "account_age";
+		age_column["type"] = "text";
+		auto age_it = mAccountAgeDays.find(avid);
+		age_column["value"] = age_it == mAccountAgeDays.end() ? "..." :
+			(age_it->second < 0 ? "?" : llformat("%d", age_it->second));
+
 		// Add to list
 		LLScrollListItem* itemp = mAvatarList->addElement(element, ADD_BOTTOM);
 		if (itemp)
 		{
+			if (!voice_icon.empty())
+			{
+				// Firestorm sets the voice icon after the row is constructed.
+				LLScrollListCell* voice_cell = itemp->getColumn(LIST_VOICE_STATUS);
+				if (voice_cell)
+				{
+					voice_cell->setValue(voice_icon);
+				}
+			}
 			itemp->setToolTip(entry.getToolTip());
 		}
 	}

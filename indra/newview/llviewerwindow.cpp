@@ -104,6 +104,7 @@
 #include "llsky.h"							// gSky
 #include "llstartup.h"
 #include "llstatusbar.h"
+#include "llchaosfavoritesbar.h"
 #include "llsurface.h"
 #include "lltexturecache.h"
 #include "lltexturefetch.h"
@@ -992,10 +993,9 @@ LLViewerWindow::LLViewerWindow(const std::string& title, S32 x, S32 y,
 	gNotifications.getChannel("VW_alerts")->connectChanged(&LLViewerWindow::onAlert);
 	gNotifications.getChannel("VW_alertmodal")->connectChanged(&LLViewerWindow::onAlert);
 
-	// Default to application directory.
+	// Snapshot destination and basename are persisted in per-account settings.
 	LLViewerWindow::sSnapshotBaseName = "Snapshot";
 	LLViewerWindow::sMovieBaseName = "SLmovie";
-	resetSnapshotLoc();
 
 	// Make sure it is a multiple of 2 less or equal to 16 (and try avoiding any
 	// bogus compiler optimization). HB
@@ -1584,6 +1584,20 @@ void LLViewerWindow::initWorldUI()
 
 		mRootView->addChild(gStatusBarp);
 
+		// Firestorm-style Favorites folder landmark bar, just below the
+		// menu/status bar. This is independent of the media top/bottom setting.
+		// Match Firestorm: a compact Favorites strip immediately below the menu.
+		LLRect favorites_rect(0, root_rect.getHeight() - menu_bar_height,
+							 root_rect.getWidth(),
+							 root_rect.getHeight() - menu_bar_height - 18);
+		mRootView->addChild(new LLChaosFavoritesBar(favorites_rect));
+		// Keep the Favourites strip behind floating windows. Root addChild()
+		// inserts at the front, which otherwise puts this strip above the
+		// floater layer and hides floater title bars/drag handles underneath it.
+		// The floater view is mouse-transparent outside its children, so the
+		// strip remains clickable where there is no overlapping floater.
+		mRootView->sendChildToBack(gChaosFavoritesBarp);
+
 		// Menu holder must be a child of the root view as well
 		mRootView->addChild(gMenuHolderp);
 		// Menu holder appears on top to get first pass at all mouse events
@@ -1950,6 +1964,10 @@ void LLViewerWindow::draw()
 {
 	if (!mRootView) return;
 
+	// Keep the Favorites bar in sync even while hidden: changes in Cool
+	// Features and mouselook must be able to show it again immediately.
+	if (gChaosFavoritesBarp) gChaosFavoritesBarp->updateState();
+
 	LLUI::setLineWidth(1.f);
 
 	LLUI::setLineWidth(1.f);
@@ -2149,13 +2167,29 @@ bool LLViewerWindow::handleKey(KEY key, MASK mask)
 		return true;
 	}
 
-	// Handle shift-escape key (reset camera view)
+	// Firestorm-style Shift+Esc: restore factory camera offsets; a plain
+	// Escape below only restores the user's normal camera position.
 	if (key == KEY_ESCAPE && mask == MASK_SHIFT)
 	{
 		if (LLView::sDebugKeys)
 		{
-			llinfos << "Key handling for SHIFT ESC: resetting view" << llendl;
+			llinfos << "Shift+Esc: restore default camera angles" << llendl;
 		}
+		const char* camera_defaults[] =
+		{
+			"CameraOffsetDefault", "FocusOffsetDefault",
+			"CameraOffsetFrontView", "FocusOffsetFrontView",
+			"CameraOffsetScale"
+		};
+		for (const char* setting : camera_defaults)
+		{
+			LLControlVariablePtr control = gSavedSettings.getControl(setting);
+			if (control.notNull())
+			{
+				control->resetToDefault(true);
+			}
+		}
+		gSavedSettings.setBool("CameraFrontView", false);
 		handle_reset_view();
 		return true;
 	}
@@ -2332,6 +2366,16 @@ bool LLViewerWindow::handleKey(KEY key, MASK mask)
 				return true;
 			}
 		}
+	}
+
+	// Chaos Emerging: one plain Escape restores the normal avatar view when
+	// the world has keyboard focus. Let text editors, media and dialogs use
+	// Escape themselves first, as in Firestorm.
+	if (key == KEY_ESCAPE && mask == MASK_NONE && !keyboard_focus &&
+		!LLMenuGL::getKeyboardMode())
+	{
+		handle_reset_view();
+		return true;
 	}
 
 	// Do not pass keys on to world when something in UI has focus
@@ -4589,13 +4633,26 @@ bool LLViewerWindow::mousePointOnLandGlobal(S32 x, S32 y,
 	return false;
 }
 
+bool LLViewerWindow::isSnapshotLocSet() const
+{
+	return !gSavedPerAccountSettings.getString("SnapshotBaseDir").empty();
+}
+
+std::string LLViewerWindow::getSnapshotBaseName() const
+{
+	const std::string name = gSavedPerAccountSettings.getString("SnapshotBaseName");
+	return name.empty() ? "Snapshot" : name;
+}
+
 void LLViewerWindow::setSnapshotLoc(std::string filepath)
 {
 	LLViewerWindow::sSnapshotBaseName = LLDir::getBaseFileName(filepath, true);
 	LLViewerWindow::sSnapshotDir = LLDir::getDirName(filepath);
+	gSavedPerAccountSettings.setString("SnapshotBaseName", sSnapshotBaseName);
+	gSavedPerAccountSettings.setString("SnapshotBaseDir", sSnapshotDir);
 }
 
-// Saves an image to the harddrive as "SnapshotX" where X >= 1.
+// Save successive snapshots under an unused numbered filename, as Firestorm does.
 bool LLViewerWindow::saveImageNumbered(LLImageFormatted* image)
 {
 	if (!image || !isSnapshotLocSet())
@@ -4606,8 +4663,9 @@ bool LLViewerWindow::saveImageNumbered(LLImageFormatted* image)
 	// Look for an unused file name
 	const std::string extension = "." + image->getExtension();
 	std::string filepath;
-	const std::string base_path = sSnapshotDir + LL_DIR_DELIM_STR +
-								  sSnapshotBaseName;
+	const std::string base_path =
+		gSavedPerAccountSettings.getString("SnapshotBaseDir") +
+		LL_DIR_DELIM_STR + getSnapshotBaseName();
 	S32 i = 1;
 	do
 	{
@@ -4627,6 +4685,7 @@ bool LLViewerWindow::saveImageNumbered(LLImageFormatted* image)
 void LLViewerWindow::resetSnapshotLoc()
 {
 	sSnapshotDir.clear();
+	gSavedPerAccountSettings.setString("SnapshotBaseDir", "");
 }
 
 void LLViewerWindow::resizeWindow(S32 new_width, S32 new_height)

@@ -199,6 +199,18 @@ public:
 
 	bool isParticipant(const LLUUID& id);
 
+	// Firestorm-style notification of changes in the actual voice roster.
+	// Observers update the UI on its normal draw, not from this callback.
+	boost::signals2::connection addParticipantListObserver(
+		const boost::signals2::signal<void()>::slot_type& callback)
+	{
+		return mParticipantRosterChanged.connect(callback);
+	}
+	void notifyParticipantListChanged()
+	{
+		mParticipantRosterChanged();
+	}
+
 	bool isCallBackPossible(const LLUUID& session_id);
 
 #if 0	// Not used in the Cool VL Viewer
@@ -344,7 +356,10 @@ private:
 						  bool notify_on_first_join,
 						  bool hangup_on_last_leave);
 
-		LL_INLINE bool isSpatial() override 			{ return true; }
+		// Firestorm 7.1.13: private/ad-hoc channels are NOT spatial.
+		// Reporting true makes processChannels() replace this pending
+		// session with estate/parcel voice before WebRTC can join it.
+		LL_INLINE bool isSpatial() override 			{ return false; }
 		LL_INLINE bool isEstate() override				{ return false; }
 
 		LL_INLINE bool isCallbackPossible() override
@@ -438,6 +453,7 @@ private:
 	static void predMuteListChanged(const sessionState::ptr_t& sessionp);
 
 private:
+	boost::signals2::signal<void()> mParticipantRosterChanged;
 	LLPluginClassMedia*		mWebRTCPlugin;
 
 	// Session state for the current audio session

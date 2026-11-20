@@ -294,6 +294,14 @@ notes, this person cannot see them, nor can other people.
 			 text_readonly_color="1, 1, 1, 1" bg_readonly_color="0, 0, 0, 0"
 			 bevel_style="in" border_thickness="1" border_style="line"
 			 left_delta="104" bottom_delta="-1" width="246" height="18" follows="left|top" />
+			<!-- Keep the copy actions inside the actual avatar profile tabs.
+			     The previous floater footer was outside the visible panel area. -->
+			<button name="copy_avatar_uuid" label="Copy UUID" font="SansSerifSmall"
+			 tool_tip="Copy this avatar's UUID to the clipboard"
+			 left="114" bottom="-373" width="106" height="22" follows="left|top" />
+			<button name="copy_avatar_profile_url" label="Copy Profile URL" font="SansSerifSmall"
+			 tool_tip="Copy this avatar's profile link for the current grid"
+			 left="226" bottom="-373" width="156" height="22" follows="left|top" />
 		</panel>
 	</tab_container>
 	<button bottom="-481" font="SansSerif" halign="center" height="20" label="OK"

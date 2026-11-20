@@ -136,6 +136,15 @@ bool on_load_url_external_response(const LLSD& notification,
 //static
 void LLWeb::loadURLExternal(const std::string& url, bool async)
 {
+	// Block remote content from requesting OS handling of local files.
+	std::string scheme = url.substr(0, 5);
+	LLStringUtil::toLower(scheme);
+	if (scheme == "file:")
+	{
+		llwarns << "Blocked external file: URL" << llendl;
+		return;
+	}
+
 	LLSD payload;
 	payload["url"] = url;
 	gNotifications.add("WebLaunchExternalTarget", LLSD(), payload,

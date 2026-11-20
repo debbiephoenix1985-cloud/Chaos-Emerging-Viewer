@@ -57,6 +57,7 @@
 #include "llcachename.h"
 #include "llcombobox.h"
 #include "lllineeditor.h"
+#include "llmenugl.h"
 #include "llscrolllistctrl.h"
 #include "lltabcontainer.h"
 #include "lluictrlfactory.h"
@@ -68,8 +69,11 @@
 #include "llfloaterreporter.h"
 #include "lltracker.h"
 #include "llselectmgr.h"
+#include "llviewermenu.h"
+#include "mkrlinterface.h"
 #include "llviewercontrol.h"
 #include "llviewerobjectlist.h"
+#include "llviewerregion.h"
 #include "llviewerwindow.h"			// For gWindowp
 
 // static variables
@@ -102,6 +106,19 @@ bool HBFloaterAreaSearch::postBuild()
 	mResultsList->setDoubleClickCallback(onDoubleClickResult);
 	mResultsList->setCallbackUserData(this);
 	mResultsList->sortByColumn("name", true);
+
+	// The area-search list uses a real right-click menu, with the clicked
+	// object's UUID saved separately from the normal selection.
+	LLMenuGL* menu = new LLMenuGL("Area Search Object");
+	menu->append(new LLMenuItemCallGL("Touch", onMenuTouch, NULL, this));
+	menu->append(new LLMenuItemCallGL("Take Copy", onMenuTakeCopy, NULL, this));
+	menu->append(new LLMenuItemCallGL("Buy", onMenuBuy, NULL, this));
+	menu->append(new LLMenuItemCallGL("Edit", onMenuEdit, NULL, this));
+	menu->append(new LLMenuItemCallGL("Return", onMenuReturn, NULL, this));
+	menu->append(new LLMenuItemCallGL("Delete", onMenuDelete, NULL, this));
+	menu->append(new LLMenuItemCallGL("Teleport To", onMenuTeleport, NULL, this));
+	menu->setVisible(false);
+	mContextMenuHandle = menu->getHandle();
 
 	mCounterText = getChild<LLTextBox>("counter");
 	if (sTracking)
@@ -154,6 +171,13 @@ bool HBFloaterAreaSearch::postBuild()
 //virtual
 void HBFloaterAreaSearch::draw()
 {
+	// Refresh distance values once per second as the avatar or objects move.
+	// Preserve existing 0.25s scan throttle and selection restoration.
+	if (getVisible() && gFrameTimeSeconds - mLastDistanceUpdate >= 1.f)
+	{
+		mLastDistanceUpdate = gFrameTimeSeconds;
+		sIsDirty = true;
+	}
 	if (sTracking)
 	{
 		F32 dist = 3.f;
@@ -241,6 +265,63 @@ void HBFloaterAreaSearch::draw()
 	}
 
 	LLFloater::draw();
+}
+
+// Right click selects the row *under the pointer*, never a stale selection.
+// The menu keeps the UUID so any subsequent selection changes do not redirect
+// its actions to another object.
+bool HBFloaterAreaSearch::handleRightMouseDown(S32 x, S32 y, MASK mask)
+{
+	LLRect list_rect = mResultsList->getRect();
+	if (!list_rect.pointInRect(x, y))
+	{
+		return LLFloater::handleRightMouseDown(x, y, mask);
+	}
+
+	LLScrollListItem* item = mResultsList->hitItem(x - list_rect.mLeft,
+											  y - list_rect.mBottom);
+	if (!item)
+	{
+		return true;
+	}
+	mResultsList->selectItem(item);
+	setButtonsStatus();
+	mContextObjectID = item->getUUID();
+	LLViewerObject* objectp = getContextObject();
+	if (!objectp)
+	{
+		return true;
+	}
+
+	// Use existing selection permission checks and confirmation workflows.
+	gSelectMgr.deselectAll();
+	gSelectMgr.selectObjectAndFamily(objectp);
+	LLMenuGL* menu = (LLMenuGL*)mContextMenuHandle.get();
+	if (menu)
+	{
+		menu->setItemEnabled("Take Copy", enable_object_take_copy());
+		object_details_map_t::const_iterator details =
+			sObjectDetails.find(mContextObjectID);
+		menu->setItemEnabled("Buy", details != sObjectDetails.end() &&
+								   details->second.sale_info.isForSale());
+		menu->setItemEnabled("Return", enable_object_return());
+		menu->setItemEnabled("Delete", enable_object_delete());
+		menu->buildDrawLabels();
+		menu->updateParent(gMenuHolderp);
+		LLMenuGL::showPopup(this, menu, x, y);
+	}
+	return true;
+}
+
+LLViewerObject* HBFloaterAreaSearch::getContextObject()
+{
+	LLViewerObject* objectp = gObjectList.findObject(mContextObjectID);
+	if (!isObjectOfInterest(objectp) || objectp->isDead() ||
+		objectp->getRegion() != gAgent.getRegion())
+	{
+		return NULL;
+	}
+	return objectp;
 }
 
 void HBFloaterAreaSearch::addInResultsList(const LLUUID& object_id,
@@ -355,6 +436,15 @@ void HBFloaterAreaSearch::addInResultsList(const LLUUID& object_id,
 	column_group["type"] = "text";
 	column_group["value"] = object_group;
 	column_group["font-style"] = style;
+
+	LLViewerObject* objectp = gObjectList.findObject(object_id);
+	LLSD& column_distance = element["columns"][LIST_OBJECT_DISTANCE];
+	column_distance["column"] = "distance";
+	column_distance["type"] = "text";
+	column_distance["value"] = objectp ?
+		llformat("%.1f m", (F32)(objectp->getPositionGlobal() -
+							gAgent.getPositionGlobal()).length()) : "-";
+	column_distance["font-style"] = style;
 
 	mResultsList->addElement(element, ADD_BOTTOM);
 }
@@ -511,6 +601,16 @@ void HBFloaterAreaSearch::processObjectPropertiesFamily(LLMessageSystem* msg)
 
 	msg->getUUIDFast(_PREHASH_ObjectData, _PREHASH_OwnerID, details->owner_id);
 	msg->getUUIDFast(_PREHASH_ObjectData, _PREHASH_GroupID, details->group_id);
+	msg->getUUIDFast(_PREHASH_ObjectData, _PREHASH_LastOwnerID,
+					 details->last_owner_id);
+	msg->getU32Fast(_PREHASH_ObjectData, _PREHASH_BaseMask, details->base_mask);
+	msg->getU32Fast(_PREHASH_ObjectData, _PREHASH_OwnerMask, details->owner_mask);
+	msg->getU32Fast(_PREHASH_ObjectData, _PREHASH_GroupMask, details->group_mask);
+	msg->getU32Fast(_PREHASH_ObjectData, _PREHASH_EveryoneMask,
+					 details->everyone_mask);
+	msg->getU32Fast(_PREHASH_ObjectData, _PREHASH_NextOwnerMask,
+					 details->next_owner_mask);
+	details->sale_info.unpackMessage(msg, _PREHASH_ObjectData);
 	msg->getStringFast(_PREHASH_ObjectData, _PREHASH_Name, details->name);
 	msg->getStringFast(_PREHASH_ObjectData, _PREHASH_Description,
 					   details->desc);
@@ -532,6 +632,120 @@ void HBFloaterAreaSearch::processObjectPropertiesFamily(LLMessageSystem* msg)
 							<< " object " << object_id << LL_ENDL;
 
 	sIsDirty = true;
+}
+
+// Use the same ObjectGrab/ObjectDeGrab protocol as the normal Touch command.
+// A list entry has no world-view pick ray, so send neutral surface coordinates.
+void HBFloaterAreaSearch::onMenuTouch(void* userdata)
+{
+	HBFloaterAreaSearch* self = (HBFloaterAreaSearch*)userdata;
+	LLViewerObject* objectp = self ? self->getContextObject() : NULL;
+	if (!objectp || (gRLenabled && !gRLInterface.canTouch(objectp))) return;
+	LLMessageSystem* msg = gMessageSystemp;
+	if (!msg) return;
+	msg->newMessageFast(_PREHASH_ObjectGrab);
+	msg->nextBlockFast(_PREHASH_AgentData);
+	msg->addUUIDFast(_PREHASH_AgentID, gAgentID);
+	msg->addUUIDFast(_PREHASH_SessionID, gAgentSessionID);
+	msg->nextBlockFast(_PREHASH_ObjectData);
+	msg->addU32Fast(_PREHASH_LocalID, objectp->mLocalID);
+	msg->addVector3Fast(_PREHASH_GrabOffset, LLVector3::zero);
+	msg->nextBlock("SurfaceInfo");
+	msg->addVector3("UVCoord", LLVector3::zero);
+	msg->addVector3("STCoord", LLVector3::zero);
+	msg->addS32Fast(_PREHASH_FaceIndex, -1);
+	msg->addVector3("Position", LLVector3::zero);
+	msg->addVector3("Normal", LLVector3::zero);
+	msg->addVector3("Binormal", LLVector3::zero);
+	msg->sendMessage(objectp->getRegion()->getHost());
+	msg->newMessageFast(_PREHASH_ObjectDeGrab);
+	msg->nextBlockFast(_PREHASH_AgentData);
+	msg->addUUIDFast(_PREHASH_AgentID, gAgentID);
+	msg->addUUIDFast(_PREHASH_SessionID, gAgentSessionID);
+	msg->nextBlockFast(_PREHASH_ObjectData);
+	msg->addU32Fast(_PREHASH_LocalID, objectp->mLocalID);
+	msg->nextBlock("SurfaceInfo");
+	msg->addVector3("UVCoord", LLVector3::zero);
+	msg->addVector3("STCoord", LLVector3::zero);
+	msg->addS32Fast(_PREHASH_FaceIndex, -1);
+	msg->addVector3("Position", LLVector3::zero);
+	msg->addVector3("Normal", LLVector3::zero);
+	msg->addVector3("Binormal", LLVector3::zero);
+	msg->sendMessage(objectp->getRegion()->getHost());
+}
+
+void HBFloaterAreaSearch::onMenuTakeCopy(void* userdata)
+{
+	HBFloaterAreaSearch* self = (HBFloaterAreaSearch*)userdata;
+	LLViewerObject* objectp = self ? self->getContextObject() : NULL;
+	if (!objectp) return;
+	gSelectMgr.selectObjectAndFamily(objectp);
+	if (enable_object_take_copy()) handle_take_copy();
+}
+
+void HBFloaterAreaSearch::onMenuBuy(void* userdata)
+{
+	HBFloaterAreaSearch* self = (HBFloaterAreaSearch*)userdata;
+	LLViewerObject* objectp = self ? self->getContextObject() : NULL;
+	if (!objectp) return;
+	object_details_map_t::const_iterator it =
+		sObjectDetails.find(self->mContextObjectID);
+	if (it == sObjectDetails.end() || !it->second.sale_info.isForSale())
+	{
+		return;
+	}
+	gSelectMgr.deselectAll();
+	gSelectMgr.selectObjectAndFamily(objectp);
+	LLSelectNode* node = gSelectMgr.getSelection()->findNode(objectp);
+	if (!node) return;
+	const HBObjectDetails& details = it->second;
+	// Area Search already requested ObjectPropertiesFamily. Reuse its trusted
+	// sale/permissions fields, just as Firestorm does for off-screen objects.
+	node->mValid = true;
+	node->mPermissions->set(LLUUID::null, details.owner_id,
+							   details.last_owner_id, details.group_id,
+							   details.base_mask, details.owner_mask,
+							   details.everyone_mask, details.group_mask,
+							   details.next_owner_mask);
+	node->mSaleInfo = details.sale_info;
+	node->mName.assign(details.name);
+	node->mDescription.assign(details.desc);
+	// Normal buy floater validates the sale type and confirms the price.
+	handle_buy(NULL);
+}
+
+void HBFloaterAreaSearch::onMenuEdit(void* userdata)
+{
+	HBFloaterAreaSearch* self = (HBFloaterAreaSearch*)userdata;
+	LLViewerObject* objectp = self ? self->getContextObject() : NULL;
+	if (!objectp || (gRLenabled && !gRLInterface.canEdit(objectp))) return;
+	gSelectMgr.selectObjectAndFamily(objectp);
+	handle_object_edit();
+}
+
+void HBFloaterAreaSearch::onMenuReturn(void* userdata)
+{
+	HBFloaterAreaSearch* self = (HBFloaterAreaSearch*)userdata;
+	LLViewerObject* objectp = self ? self->getContextObject() : NULL;
+	if (!objectp) return;
+	gSelectMgr.selectObjectAndFamily(objectp);
+	if (enable_object_return()) handle_object_return();
+}
+
+void HBFloaterAreaSearch::onMenuDelete(void* userdata)
+{
+	HBFloaterAreaSearch* self = (HBFloaterAreaSearch*)userdata;
+	LLViewerObject* objectp = self ? self->getContextObject() : NULL;
+	if (!objectp) return;
+	gSelectMgr.selectObjectAndFamily(objectp);
+	if (enable_object_delete()) handle_object_delete();
+}
+
+void HBFloaterAreaSearch::onMenuTeleport(void* userdata)
+{
+	HBFloaterAreaSearch* self = (HBFloaterAreaSearch*)userdata;
+	LLViewerObject* objectp = self ? self->getContextObject() : NULL;
+	if (objectp) gAgent.teleportViaLocation(objectp->getPositionGlobal());
 }
 
 //static

@@ -620,6 +620,24 @@ LLSLURL::LLSLURL(const std::string& slurl)
 				// must be secondlife://<region>.  Therefore the hostname will
 				// be the region name, and it's a location type
 				mType = LOCATION;
+				// A legacy secondlife://<region>/<x>/<y>/<z> link has NO grid
+				// identity.  In OpenSim, treat this unqualified location as
+				// belonging to the current grid, rather than blindly assigning
+				// it to Agni because of the protocol name.  Do not change links
+				// with explicit grid hosts, /secondlife/ or /app/ paths, or
+				// hop:// and x-grid-info:// URLs (handled in other branches).
+				// This preserves genuine cross-grid rejection and Hypergrid.
+				if (!gIsInSecondLife)
+				{
+					const std::string current_grid = gm->getGridId();
+					if (!current_grid.empty())
+					{
+						mGrid = current_grid;
+						LL_DEBUGS("Teleport") << "Legacy gridless region URI on OpenSim: "
+											 << slurl << " mapped to current grid "
+											 << mGrid << LL_ENDL;
+					}
+				}
 				// 'normalize' it so the region name is in fact the head of the
 				// path_array
 				path_array.insert(0, slurl_uri.hostName());
@@ -632,7 +650,14 @@ LLSLURL::LLSLURL(const std::string& slurl)
 				 scheme == LLSLURL::SLURL_X_GRID_LOCATION_INFO_SCHEME)
 		{
 			// We are dealing with either a standalone style slurl or slurl.com
-			// slurl
+			// slurl.  For genuine hop:// URLs, keep the original authority
+			// (including the gatekeeper port): the grid-name-only form cannot
+			// round-trip correctly through callbacks.
+			if (scheme == LLSLURL::SLURL_HOP_SCHEME)
+			{
+				mIsHop = true;
+				mHopAuthority = slurl_uri.authority();
+			}
 			std::string hostname = slurl_uri.hostName();
 			if (hostname == LLSLURL::SLURL_COM ||
 				hostname == LLSLURL::WWW_SLURL_COM ||
@@ -872,6 +897,13 @@ std::string LLSLURL::getSLURLString() const
 			S32 x = ll_roundp(mPosition.mV[VX]);
 			S32 y = ll_roundp(mPosition.mV[VY]);
 			S32 z = ll_roundp(mPosition.mV[VZ]);
+			// Preserve OpenSim hop:// links across the map lookup callback,
+			// including the original gatekeeper port when present.
+			if (mIsHop && !mHopAuthority.empty())
+			{
+				return "hop://" + mHopAuthority + "/" +
+					   LLURI::escape(mRegion) + llformat("/%d/%d/%d", x, y, z);
+			}
 			return LLGridManager::getInstance()->getSLURLBase(mGrid) +
 				   LLURI::escape(mRegion) + llformat("/%d/%d/%d", x, y, z);
 		}

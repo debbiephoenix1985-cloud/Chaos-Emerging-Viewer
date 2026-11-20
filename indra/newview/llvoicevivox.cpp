@@ -1055,6 +1055,9 @@ void LLVoiceVivox::connectorCreate()
 		   << mVoiceAccountServerURI
 		   << "</AccountManagementServer><Mode>Normal</Mode>"
 		   << "<ConnectorHandle>" << mConnectorHandle << "</ConnectorHandle>"
+		   // Firestorm llvoicevivox.cpp connector port range for multiple instances.
+		   << (gSavedSettings.getBool("VoiceMultiInstance") ?
+			   "<MinimumPort>30000</MinimumPort><MaximumPort>50000</MaximumPort>" : "")
 		   << "<Logging><Folder>" << logpath
 		   << "</Folder><FileNamePrefix>Connector</FileNamePrefix>"
 		   << "<FileNameSuffix>.log</FileNameSuffix><LogLevel>"
@@ -1499,8 +1502,17 @@ void LLVoiceVivox::stateMachine()
 					// to lower the risk of a port collision with other running
 					// viewer sessions.
 					static U32 portoffset = 49 + ll_rand(49); // 0 to 98
-					port += portoffset++;
-					portoffset %= 100; // Cycle the offset over 100 ports
+					if (gSavedSettings.getBool("VoiceMultiInstance"))
+					{
+						// Firestorm llvoicevivox.cpp uses a random port across
+						// 30000-49999 for each simultaneous SLVoice daemon.
+						port = 30000 + ll_rand(20000);
+					}
+					else
+					{
+						port += portoffset++;
+						portoffset %= 100; // Cycle the offset over 100 ports
+					}
 					mProcess->addArgument("-i");
 					mProcess->addArgument(llformat("%s:%d", host.c_str(),
 												   port));

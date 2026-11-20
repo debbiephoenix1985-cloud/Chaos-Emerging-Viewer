@@ -45,6 +45,8 @@
 #include "llfilesystem.h"
 #include "llgl.h"
 #include "llimagebmp.h"
+#include "llimagefilter.h"
+#include "llimagefiltersmanager.h"
 #include "llimagej2c.h"
 #include "llimagejpeg.h"
 #include "llimagepng.h"
@@ -173,6 +175,10 @@ public:
 	}
 
 	void setSnapshotQuality(S32 quality);
+	// Re-encode the already captured (and filtered) pixels when choosing a
+	// format directly from Save, without taking a second snapshot.
+	bool reencodeLocalSnapshot(U32 format);
+	void setFilter(const std::string& filter_name) { mFilterName = filter_name; }
 	void updateSnapshot(bool new_snapshot, bool new_thumbnail = false,
 						F32 delay = 0.f);
 	void checkAutoSnapshot(bool update_thumbnail = false);
@@ -212,6 +218,7 @@ private:
 	LLPointer<LLImageRaw>		mPreviewImage;
 	LLPointer<LLImageRaw>		mPreviewImageEncoded;
 	LLPointer<LLImageFormatted>	mFormattedImage;
+	std::string                 mFilterName; // Active Firestorm snapshot filter
 	LLFrameTimer				mSnapshotDelayTimer;
 	LLFrameTimer				mShineAnimTimer;
 	LLFrameTimer				mFallAnimTimer;
@@ -390,6 +397,43 @@ void LLSnapshotLivePreview::setSnapshotQuality(S32 quality)
 		mSnapshotQuality = quality;
 		gSavedSettings.setS32("SnapshotQuality", quality);
 	}
+}
+
+bool LLSnapshotLivePreview::reencodeLocalSnapshot(U32 format)
+{
+	// Capture/filters have already been applied to mPreviewImage. Encoding
+	// that same image avoids a second camera capture and preserves the filter.
+	if (!mSnapshotUpToDate || mPreviewImage.isNull() ||
+		mPreviewImage->isBufferInvalid() ||
+		getSnapshotType() != SNAPSHOT_LOCAL)
+	{
+		return false;
+	}
+
+	LLPointer<LLImageFormatted> encoded;
+	switch (format)
+	{
+		case LLFloaterSnapshot::SNAPSHOT_FORMAT_PNG:
+			encoded = new LLImagePNG();
+			break;
+		case LLFloaterSnapshot::SNAPSHOT_FORMAT_JPEG:
+			encoded = new LLImageJPEG(mSnapshotQuality);
+			break;
+		case LLFloaterSnapshot::SNAPSHOT_FORMAT_BMP:
+			encoded = new LLImageBMP();
+			break;
+		default:
+			return false;
+	}
+	if (!encoded->encode(mPreviewImage))
+	{
+		llwarns << "Could not encode local snapshot in the selected format" << llendl;
+		return false;
+	}
+	mFormattedImage = encoded;
+	mDataSize = encoded->getDataSize();
+	setSnapshotFormat(format);
+	return true;
 }
 
 bool LLSnapshotLivePreview::checkImageSize(S32& width, S32& height,
@@ -812,6 +856,16 @@ void LLSnapshotLivePreview::generateThumbnailImage(bool force_update)
 
 	if (raw.notNull())
 	{
+		// Match the main image's Firestorm filter in the smaller preview.
+		if (!mFilterName.empty() && raw->getComponents() >= 3)
+		{
+			std::string path = LLImageFiltersManager::getInstance()->getFilterPath(mFilterName);
+			if (!path.empty())
+			{
+				LLImageFilter filter(path);
+				filter.executeFilter(raw);
+			}
+		}
 		mThumbnailImage = LLViewerTextureManager::getLocalTexture(raw.get(),
 																  false);
 		mThumbnailUpToDate = true;
@@ -854,6 +908,11 @@ bool LLSnapshotLivePreview::onIdle()
 		return false;
 	}
 
+	// A failed recapture must not report a stale encoded image as usable.
+	mDataSize = 0;
+	mSnapshotUpToDate = false;
+	mFormattedImage = NULL;
+
 	// Time to produce a snapshot
 
 	if (!mPreviewImage)
@@ -881,9 +940,22 @@ bool LLSnapshotLivePreview::onIdle()
 									render_ui, false, mSnapshotBufferType,
 									getMaxImageSize()))
 	{
+		// Apply the selected Firestorm filter to the real captured pixels
+		// BEFORE JPEG/PNG/BMP/J2C encoding, so Save and Save As are filtered.
+		if (!mFilterName.empty() && mPreviewImage->getComponents() >= 3)
+		{
+			std::string path = LLImageFiltersManager::getInstance()->getFilterPath(mFilterName);
+			if (!path.empty())
+			{
+				LLImageFilter filter(path);
+				filter.executeFilter(mPreviewImage);
+			}
+		}
+
 		mPreviewImageEncoded->resize(mPreviewImage->getWidth(),
 									 mPreviewImage->getHeight(),
 									 mPreviewImage->getComponents());
+		bool encoded_ok = false;
 
 		if (getSnapshotType() == SNAPSHOT_TEXTURE)
 		{
@@ -896,10 +968,11 @@ bool LLSnapshotLivePreview::onIdle()
 
 			scaled->biasedScaleToPowerOfTwo(gMaxImageSizeDefault);
 			mImageScaled[mCurImageIndex] = true;
-			if (formatted->encode(scaled))
+			if (formatted->encode(scaled) &&
+				formatted->decode(mPreviewImageEncoded))
 			{
 				mDataSize = formatted->getDataSize();
-				formatted->decode(mPreviewImageEncoded);
+				encoded_ok = true;
 			}
 		}
 		else
@@ -923,8 +996,13 @@ bool LLSnapshotLivePreview::onIdle()
 
 				case LLFloaterSnapshot::SNAPSHOT_FORMAT_BMP:
 					mFormattedImage = new LLImageBMP();
+					break;
+				default:
+					llwarns << "Unsupported snapshot image format" << llendl;
+					break;
 			}
-			if (mFormattedImage->encode(mPreviewImage))
+			if (mFormattedImage.notNull() &&
+				mFormattedImage->encode(mPreviewImage))
 			{
 				mDataSize = mFormattedImage->getDataSize();
 				// Special case BMP to copy instead of decode otherwise decode
@@ -932,12 +1010,26 @@ bool LLSnapshotLivePreview::onIdle()
 				if (format == LLFloaterSnapshot::SNAPSHOT_FORMAT_BMP)
 				{
 					mPreviewImageEncoded->copy(mPreviewImage);
+					encoded_ok = !mPreviewImageEncoded->isBufferInvalid();
 				}
 				else
 				{
-					mFormattedImage->decode(mPreviewImageEncoded);
+					encoded_ok = mFormattedImage->decode(mPreviewImageEncoded);
 				}
 			}
+		}
+
+		if (!encoded_ok || mPreviewImageEncoded->isBufferInvalid())
+		{
+			// Do not build a GPU preview from uninitialised decoded pixels.
+			llwarns << "Snapshot image encoding/decoding failed" << llendl;
+			mDataSize = 0;
+			mFormattedImage = NULL;
+			gWindowp->decBusyCount();
+			setVisible(LLPipeline::sFreezeTime);
+			mSnapshotDelayTimer.stop();
+			mSnapshotActive = false;
+			return false;
 		}
 
 		LLPointer<LLImageRaw> scaled =
@@ -1147,16 +1239,28 @@ void LLSnapshotLivePreview::doSaveLocal(HBFileSelector::ESaveFilter type,
 		gToolMgr.setCurrentToolset(gCameraToolset);
 	}
 
-	if (!filename.empty())
+	// Firestorm keeps the captured image available if Save As is cancelled.
+	if (filename.empty())
 	{
-		if (!gViewerWindowp->isSnapshotLocSet())
-		{
-			gViewerWindowp->setSnapshotLoc(filename);
-		}
-		gViewerWindowp->saveImageNumbered(self->mFormattedImage);
+		floaterp->updateControls();
+		return;
 	}
 
-	// Relinquish image memory. Save button will be disabled as a side-effect.
+	if (!gViewerWindowp->isSnapshotLocSet())
+	{
+		gViewerWindowp->setSnapshotLoc(filename);
+	}
+	if (!gViewerWindowp->saveImageNumbered(self->mFormattedImage))
+	{
+		llwarns << "Failed to save the snapshot to disk" << llendl;
+		gNotifications.add("SnapshotToDiskFailed");
+		// Prompt for a new destination on retry; preserve the captured image.
+		gViewerWindowp->resetSnapshotLoc();
+		floaterp->updateControls();
+		return;
+	}
+
+	// Relinquish image memory only after the save succeeds.
 	self->mFormattedImage = NULL;
 	self->mDataSize = 0;
 	self->updateSnapshot(false, false);
@@ -1354,6 +1458,22 @@ void LLFloaterSnapshot::show(void*)
 	gSnapshotFloaterViewp->adjustToFitScreen(self);
 }
 
+// Open the existing snapshot preview with disk as the selected destination.
+// This uses the normal Save flyout and its PNG/JPEG/BMP controls rather than
+// bypassing the floater with an immediate file selector and raw capture.
+void LLFloaterSnapshot::showLocal()
+{
+	gSavedSettings.setU32("LastSnapshotType",
+						  LLSnapshotLivePreview::SNAPSHOT_LOCAL);
+	show(NULL);
+	LLFloaterSnapshot* floaterp = findInstance();
+	if (floaterp)
+	{
+		floaterp->updateControls();
+		floaterp->mLivePreview->updateSnapshot(true);
+	}
+}
+
 //static
 void LLFloaterSnapshot::hide(void*)
 {
@@ -1481,6 +1601,21 @@ bool LLFloaterSnapshot::postBuild()
 	mAutoSnapCheck->setCallbackUserData(this);
 
 	mTempCheck = getChild<LLCheckBoxCtrl>("temp_check");
+
+	// Firestorm 7.2.4 snapshot image filters. Read installed presets from
+	// app_settings/filters so the same names and XML operations are used.
+	LLComboBox* filter_combo = getChild<LLComboBox>("snapshot_filter_combo");
+	filter_combo->add("No Filter");
+	const std::vector<std::string> filters =
+		LLImageFiltersManager::getInstance()->getFiltersList();
+	for (const std::string& name : filters)
+	{
+		filter_combo->add(name);
+	}
+	filter_combo->selectFirstItem();
+	filter_combo->setCommitCallback(onCommitSnapshotFilter);
+	filter_combo->setCallbackUserData(this);
+	mLivePreview->setFilter("");
 
 	mPostcardSizeCombo = getChild<LLComboBox>("postcard_size_combo");
 	mPostcardSizeCombo->setCommitCallback(onCommitResolution);
@@ -2050,14 +2185,36 @@ void LLFloaterSnapshot::onClickDiscard(void* data)
 //static
 void LLFloaterSnapshot::onCommitSave(LLUICtrl* ctrlp, void* datap)
 {
-	if (ctrlp && datap)
+	LLFloaterSnapshot* self = (LLFloaterSnapshot*)datap;
+	if (!ctrlp || !self) return;
+
+	const std::string action = ctrlp->getValue().asString();
+	if (action == "save as")
 	{
-		if (ctrlp->getValue().asString() == "save as")
-		{
-			gViewerWindowp->resetSnapshotLoc();
-		}
-		onClickKeep(datap);
+		// Firestorm's Save As keeps the format selected in the snapshot panel.
+		gViewerWindowp->resetSnapshotLoc();
 	}
+	else if (action == "save as png" || action == "save as jpeg" ||
+			 action == "save as bmp")
+	{
+		// Explicit format choices re-encode the current filtered image,
+		// preserving the already captured frame without a second snapshot.
+		U32 format = action == "save as jpeg" ? SNAPSHOT_FORMAT_JPEG :
+					 action == "save as bmp" ? SNAPSHOT_FORMAT_BMP :
+					 SNAPSHOT_FORMAT_PNG;
+		if (!self->mLivePreview->reencodeLocalSnapshot(format))
+		{
+			llwarns << "Snapshot unavailable for requested Save As format" << llendl;
+			self->mLivePreview->updateSnapshot(true);
+			self->updateControls();
+			return;
+		}
+		gSavedSettings.setU32("SnapshotFormat", format);
+		// Explicit formats always ask for the destination and filename.
+		gViewerWindowp->resetSnapshotLoc();
+		self->updateControls();
+	}
+	onClickKeep(datap);
 }
 
 //static
@@ -2115,6 +2272,21 @@ void LLFloaterSnapshot::onClickNewSnapshot(void* data)
 	{
 		self->mLivePreview->updateSnapshot(true);
 	}
+}
+
+//static
+void LLFloaterSnapshot::onCommitSnapshotFilter(LLUICtrl* ctrlp, void* data)
+{
+	LLFloaterSnapshot* self = (LLFloaterSnapshot*)data;
+	if (!self || !ctrlp) return;
+
+	LLComboBox* combo = static_cast<LLComboBox*>(ctrlp);
+	// Item zero is explicitly No Filter; every other choice is backed by
+	// a Firestorm preset XML in app_settings/filters.
+	self->mLivePreview->setFilter(combo->getCurrentIndex() > 0 ?
+								   combo->getSimple() : "");
+	self->mLivePreview->updateSnapshot(true, true);
+	self->updateControls();
 }
 
 //static

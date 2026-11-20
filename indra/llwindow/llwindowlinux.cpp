@@ -2766,7 +2766,8 @@ void LLWindowLinux::spawnWebBrowser(const std::string& escaped_url, bool async)
 	bool found = false;
 	for (S32 i = 0; i < gURLProtocolWhitelistCount; ++i)
 	{
-		if (escaped_url.find(gURLProtocolWhitelist[i]) != std::string::npos)
+		// Only accept a whitelisted protocol at the start of the URL.
+		if (escaped_url.find(gURLProtocolWhitelist[i]) == 0)
 		{
 			found = true;
 			break;

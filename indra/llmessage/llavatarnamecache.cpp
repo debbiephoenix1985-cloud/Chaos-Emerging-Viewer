@@ -606,6 +606,16 @@ void LLAvatarNameCache::cleanupClass()
 	sHttpRequest.reset();
 	sHttpHeaders.reset();
 	sHttpOptions.reset();
+	// Pending lookups may never reply (e.g. after changing grids). Their
+	// signal objects are heap allocated; release unresolved callbacks too.
+	for (signal_map_t::iterator it = sSignalMap.begin();
+		 it != sSignalMap.end(); ++it)
+	{
+		delete it->second;
+	}
+	sSignalMap.clear();
+	sPendingQueue.clear();
+	sAskQueue.clear();
 	sCache.clear();
 }
 

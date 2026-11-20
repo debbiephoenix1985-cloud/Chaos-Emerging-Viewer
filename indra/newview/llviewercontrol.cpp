@@ -696,6 +696,14 @@ static bool handleAvatarDebugSettingsChanged(const LLSD&)
 	return true;
 }
 
+// Re-rank the visible avatars whenever the non-impostor limit changes.
+static bool handleAvatarMaxNonImpostorsChanged(const LLSD&)
+{
+	LLVOAvatar::updateSettings();
+	LLVOAvatar::setAvatarCullingDirty();
+	return true;
+}
+
 static bool handleAvatarLoadingSettingsChanged(const LLSD&)
 {
 	LLVOAvatar::loadingSettingsChanged();
@@ -1237,7 +1245,7 @@ void settings_setup_listeners()
 	add_listener("RenderAvatarCloth", handleSetShaderChanged);
 	add_listener("RenderAvatarLODFactor", handleAvatarDebugSettingsChanged);
 	add_listener("RenderAvatarMaxNonImpostors",
-				 handleAvatarDebugSettingsChanged);
+				 handleAvatarMaxNonImpostorsChanged);
 	add_listener("RenderAvatarMaxPuppets", handleAvatarDebugSettingsChanged);
 	add_listener("RenderAvatarPhysicsLODFactor",
 				 handleAvatarDebugSettingsChanged);

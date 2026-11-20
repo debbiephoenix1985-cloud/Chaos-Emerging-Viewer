@@ -51,6 +51,7 @@
 #include "llfloaterabout.h"
 #include "llfloatermediabrowser.h"
 #include "llfloaterpreference.h"
+#include "llprefsskins.h"
 #if LL_DEBUG
 #include "llfloatertos.h"
 #endif
@@ -283,6 +284,13 @@ bool LLPanelLogin::postBuild()
 	mServerCombo->setCommitCallback(onSelectServer);
 	mServerCombo->setFocusLostCallback(onServerComboLostFocus);
 	mServerCombo->setCallbackUserData(this);
+
+	// Simple Modern (dark) / Legacy (default) selector at login.
+	LLComboBox* style_combo = getChild<LLComboBox>("interface_style_combo");
+	style_combo->setValue(gSavedSettings.getString("SkinCurrent") == "default"
+								 ? "default" : "dark");
+	style_combo->setCommitCallback(onSelectInterfaceStyle);
+	style_combo->setCallbackUserData(this);
 
 	mConnectButton = getChild<LLButton>("connect_btn");
 	mConnectButton->setClickedCallback(onClickConnect, this);
@@ -1036,6 +1044,21 @@ void LLPanelLogin::onStartLocationComboLostFocus(LLFocusableElement* fe, void*)
 }
 
 //static
+void LLPanelLogin::onSelectInterfaceStyle(LLUICtrl* ctrl, void* user_data)
+{
+	if (!ctrl || !user_data) return;
+	const std::string selection = ctrl->getValue().asString();
+	if (selection != "dark" && selection != "default") return;
+	if (selection == gSavedSettings.getString("SkinCurrent")) return;
+
+	// Skin assets are loaded during startup; the new skin applies on restart.
+	// Only the very first deliberate skin change sets the media-bar preset.
+	applyChaosSkinMediaPresetOnce(selection);
+	gSavedSettings.setString("SkinCurrent", selection);
+	gNotifications.add("ChangeSkin");
+}
+
+//static
 void LLPanelLogin::onSelectServer(LLUICtrl*, void* user_data)
 {
 	LLPanelLogin* self = (LLPanelLogin*)user_data;
@@ -1085,6 +1108,19 @@ void LLPanelLogin::onSelectServer(LLUICtrl*, void* user_data)
 		gm->setGridChoice(grid_name);
 	}
 
+	// Firestorm keeps the start location associated with the selected grid
+	// before the login request. Keep the native first/last/password UI.
+	const LLSLURL selected_location = LLStartUp::getStartSLURL();
+	const std::string selected_host = gm->getGridHost();
+	if (selected_location.getType() == LLSLURL::LOCATION &&
+		!selected_location.isHop() && !selected_host.empty() &&
+		selected_host != "secondlife" && selected_host != "aditi" &&
+		gm->getGridHost(selected_location.getGrid()) != selected_host)
+	{
+		LLStartUp::setStartSLURL(LLSLURL(gm->getGridId(),
+									 selected_location.getRegion(),
+									 selected_location.getPosition()));
+	}
 	// Get the newly selected and properly formatted grid name.
 	grid_name = gm->getGridLabel();
 

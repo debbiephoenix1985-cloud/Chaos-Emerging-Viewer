@@ -1067,6 +1067,7 @@ public:
 	void addChat(const LLChat& chat);
 	void clearChat();
 	LL_INLINE void startTyping()	{ mTyping = true; mTypingTimer.reset(); }
+	LL_INLINE bool isTyping() const { return mTyping; } // Retain Build155 radar typing indicator.
 	LL_INLINE void stopTyping()		{ mTyping = false; }
 
 private:

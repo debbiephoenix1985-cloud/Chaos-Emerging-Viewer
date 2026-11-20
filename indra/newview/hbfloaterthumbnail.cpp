@@ -49,6 +49,7 @@
 #include "lluictrlfactory.h"
 
 #include "llagent.h"
+#include "llaisapi.h"
 #include "llappviewer.h"			// For gDisconnected & LLApp::isExiting()
 #include "llfloaterimagepreview.h"
 #include "hbfloaterinvitemspicker.h"
@@ -942,6 +943,13 @@ void HBFloaterThumbnail::setThumbnail()
 	}
 	if (mIsCategory)
 	{
+        // Legacy OpenSim folder updates cannot transmit thumbnail metadata.
+        // Record the association locally before inventory refresh can replace
+        // the category's optimistic in-memory thumbnail.
+        if (!AISAPI::isAvailable())
+        {
+            save_local_folder_thumbnail(mInventoryObjectId, mThumbnailId);
+        }
 		update_inventory_category(mInventoryObjectId, updates, NULL);
 	}
 	else

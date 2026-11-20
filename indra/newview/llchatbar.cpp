@@ -59,6 +59,8 @@
 #include "llviewergesture.h"		// For triggering gestures
 #include "llviewermenu.h"			// For deleting object with DEL key
 #include "llviewerstats.h"
+#include "llvoiceremotectrl.h"
+#include "llvoiceclient.h"
 #include "llworld.h"
 
 constexpr F32 AGENT_TYPING_TIMEOUT = 5.f;	// seconds
@@ -334,6 +336,12 @@ private:
 // LLChatBar class proper
 ///////////////////////////////////////////////////////////////////////////////
 
+// Only the main bottom chat bar hosts the existing voice remote control.
+static void* createChatVoiceRemote(void*)
+{
+	return new LLVoiceRemoteCtrl("voice_remote");
+}
+
 // Constructor for chat bars embedded in floaters, etc
 LLChatBar::LLChatBar(const std::string& name)
 :	LLPanel(name, LLRect(), BORDER_NO),
@@ -369,7 +377,10 @@ LLChatBar::LLChatBar(const std::string& name, const LLRect& rect)
 	sSwappedShortcuts = gSavedSettings.getBool("SwapShoutWhisperShortcuts");
 	mLastSwappedShortcuts = sSwappedShortcuts;
 
-	LLUICtrlFactory::getInstance()->buildPanel(this, "panel_chat_bar.xml");
+	LLCallbackMap::map_t factory_map;
+	factory_map["voice_remote"] = LLCallbackMap(createChatVoiceRemote, this);
+	LLUICtrlFactory::getInstance()->buildPanel(this, "panel_chat_bar.xml",
+											&factory_map);
 
 	setIsChrome(true);
 	setFocusRoot(true);
@@ -484,6 +495,8 @@ void LLChatBar::reshape(S32 width, S32 height, bool called_from_parent)
 //virtual
 bool LLChatBar::handleKeyHere(KEY key, MASK mask)
 {
+    if (DPEmojiPicker::handleLiveSuggestionKey(mInputEditor, key, mask))
+        return true;
 	if (HBFloaterTextInput::hasFloaterFor(mInputEditor))
 	{
 		HBFloaterTextInput::show(mInputEditor);
@@ -619,6 +632,17 @@ void LLChatBar::layout()
 		y = 2;
 	}
 
+	// Reserve the same voice remote used previously on the media bar,
+	// directly to the right of the Gestures combo on the main chat bar.
+	LLVoiceRemoteCtrl* voice_remote =
+		getChild<LLVoiceRemoteCtrl>("voice_remote", true, false);
+	S32 voice_width = 0;
+	if (voice_remote && LLVoiceClient::voiceEnabled())
+	{
+		voice_width = voice_remote->getRect().getWidth();
+		consumed_width += voice_width + pad;
+	}
+
 	// Gesture combo width
 	S32 gesture_width = 0;
 	if (mGestureCombo)
@@ -709,6 +733,16 @@ void LLChatBar::layout()
 	if (mGestureCombo)
 	{
 		mGestureCombo->setRect(r);
+		x += gesture_width + pad;
+	}
+	if (voice_remote)
+	{
+		voice_remote->setVisible(voice_width > 0);
+		if (voice_width > 0)
+		{
+			r.setOriginAndSize(x, y, voice_width, height);
+			voice_remote->setRect(r);
+		}
 	}
 }
 
@@ -722,6 +756,13 @@ void LLChatBar::refresh()
 		static LLCachedControl<bool> chat_visible(gSavedSettings,
 												  "ChatVisible");
 		LLPanel::setVisible(chat_visible);
+		LLVoiceRemoteCtrl* voice_remote =
+			getChild<LLVoiceRemoteCtrl>("voice_remote", true, false);
+		if (voice_remote &&
+			voice_remote->getVisible() != LLVoiceClient::voiceEnabled())
+		{
+			layout();
+		}
 	}
 
 	// *HACK: Leave the name of the gesture in place for a few seconds.
@@ -1185,6 +1226,8 @@ void LLChatBar::onInputEditorKeystroke(LLLineEditor* caller, void* userdata)
 			}
 		}
 	}
+    // Only local-chat input text: show emoji suggestions while typing.
+    DPEmojiPicker::updateLiveSuggestions(caller);
 }
 
 //static

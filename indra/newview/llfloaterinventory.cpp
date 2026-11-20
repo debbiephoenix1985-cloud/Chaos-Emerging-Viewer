@@ -32,7 +32,11 @@
 
 #include "llfloaterinventory.h"
 
+#include "llcallbacklist.h"
 #include "llcheckboxctrl.h"
+#include "llbutton.h"
+#include "llmenugl.h"
+#include "llnotifications.h"
 #include "lldir.h"
 #include "llfasttimer.h"
 #include "lllocale.h"
@@ -72,6 +76,7 @@
 #include "lltooldraganddrop.h"
 #include "llviewercontrol.h"
 #include "llviewerinventory.h"
+#include "llviewermenu.h"
 #include "llviewerobjectlist.h"
 #include "llviewerregion.h"
 #include "llviewertexturelist.h"
@@ -643,6 +648,454 @@ static void expandInventoryFolders(void* userdata)
 	}
 }
 
+// Native panel creation for Firestorm 7.2.5 custom filter tabs (FIRE-35598).
+// This is the panel integration layer; tab management and persistence follow.
+LLInventoryPanel* LLFloaterInventory::createCustomFilterTab(const std::string& label)
+{
+	if (!mFilterTabs || !mEverythingPanel || label.empty() ||
+		mCustomFilterPanels.size() >= 64)
+	{
+		return NULL;
+	}
+
+	// Use a unique internal identifier, including after deleting a middle tab.
+	U32 serial = 1;
+	std::string panel_name;
+	for (;;)
+	{
+		panel_name = "ChaosCustomInventoryFilter" + std::to_string(serial++);
+		bool used = false;
+		for (LLInventoryPanel* existing : mCustomFilterPanels)
+		{
+			if (existing && existing->getName() == panel_name)
+			{
+				used = true;
+				break;
+			}
+		}
+		if (!used) break;
+	}
+	LLInventoryPanel* panelp = new LLInventoryPanel(
+		panel_name, "", mEverythingPanel->getRect(),
+		mEverythingPanel->getModel(), true, false, false);
+	panelp->setFollowsAll();
+	if (!panelp->postBuild())
+	{
+		delete panelp;
+		return NULL;
+	}
+
+	panelp->setSortOrder(gSavedSettings.getU32("InventorySortOrder"));
+	panelp->getFilter()->markDefault();
+	panelp->setSelectCallback(onSelectionChange, panelp);
+	// Insert before both the hidden-tab selector and permanent "+" tab.
+	const bool hidden_selector_attached = mShowHiddenCustomTabPanel &&
+		mFilterTabs->getIndexForPanel(mShowHiddenCustomTabPanel) >= 0;
+	if (mAddCustomTabPanel &&
+		mFilterTabs->getIndexForPanel(mAddCustomTabPanel) >= 0)
+		mFilterTabs->removeTabPanel(mAddCustomTabPanel);
+	if (hidden_selector_attached)
+		mFilterTabs->removeTabPanel(mShowHiddenCustomTabPanel);
+	mFilterTabs->addTabPanel(panelp, label, true, onFilterSelected, this);
+	mCustomFilterPanels.push_back(panelp);
+	mCustomTabLabels[panelp] = label;
+	mActivePanel = panelp;
+	if (hidden_selector_attached)
+	{
+	    mFilterTabs->addTabPanel(mShowHiddenCustomTabPanel, "▼", false,
+	    NULL, this);
+	    mFilterTabs->setTabPrecommitChangeCallback(mShowHiddenCustomTabPanel, onShowHiddenCustomTabPrecommit);
+	    mFilterTabs->setTabButtonTooltip(mShowHiddenCustomTabPanel, "Restore a hidden custom inventory tab");
+	}
+	if (mAddCustomTabPanel)
+	{
+	    mFilterTabs->addTabPanel(mAddCustomTabPanel, "+", false,
+	    NULL, this);
+	    mFilterTabs->setTabPrecommitChangeCallback(mAddCustomTabPanel, onAddCustomTabPrecommit);
+	    mFilterTabs->setTabButtonTooltip(mAddCustomTabPanel, "Add custom inventory filter tab");
+	}
+	return panelp;
+}
+
+void LLFloaterInventory::addCustomFilterTab()
+{
+	const std::string label = "Custom " +
+		std::to_string(mCustomFilterPanels.size() + 1);
+	if (createCustomFilterTab(label))
+	{
+		saveCustomFilterTabs();
+	}
+}
+
+void LLFloaterInventory::cloneCustomFilterTab()
+{
+	LLInventoryPanel* source = mActivePanel;
+	if (!source || mCustomFilterPanels.size() >= 64)
+	{
+		return;
+	}
+	const S32 idx = mFilterTabs->getIndexForPanel(source);
+	const std::string label = idx >= 0 ? mFilterTabs->getPanelTitle(idx) + " copy" : "Custom copy";
+	LLSD state;
+	source->getFilter()->toLLSD(state);
+	LLInventoryPanel* clone = createCustomFilterTab(label);
+	if (clone)
+	{
+		clone->getFilter()->fromLLSD(state);
+		clone->getFilter()->setModified();
+		saveCustomFilterTabs();
+	}
+}
+
+bool LLFloaterInventory::isCustomFilterTab(LLInventoryPanel* panel) const
+{
+	return panel && std::find(mCustomFilterPanels.begin(),
+		mCustomFilterPanels.end(), panel) != mCustomFilterPanels.end();
+}
+
+void LLFloaterInventory::renameCustomFilterTab()
+{
+	LLInventoryPanel* panel = mActivePanel;
+	if (std::find(mCustomFilterPanels.begin(), mCustomFilterPanels.end(), panel) ==
+		mCustomFilterPanels.end()) return;
+	const S32 index = mFilterTabs->getIndexForPanel(panel);
+	if (index < 0) return;
+	LLSD args;
+	args["NAME"] = mFilterTabs->getPanelTitle(index);
+	LLSD payload;
+	payload["panel_name"] = panel->getName();
+	LLHandle<LLView> handle = getHandle();
+	gNotifications.add("ChaosInventoryCustomTabRename", args, payload,
+		[handle](const LLSD& notification, const LLSD& response) -> bool
+		{
+			if (LLNotification::getSelectedOption(notification, response) != 0)
+				return false;
+			LLFloaterInventory* self = dynamic_cast<LLFloaterInventory*>(handle.get());
+			if (!self || !self->mFilterTabs) return false;
+			std::string name = response["message"].asString();
+			LLStringUtil::trim(name);
+			if (name.empty() || name.size() > 128) return false;
+			const std::string panel_name = notification["payload"]["panel_name"].asString();
+			for (LLInventoryPanel* candidate : self->mCustomFilterPanels)
+			{
+				if (candidate && candidate->getName() == panel_name)
+				{
+					const S32 idx = self->mFilterTabs->getIndexForPanel(candidate);
+					if (idx >= 0)
+					{
+						self->mFilterTabs->setPanelTitle(idx, name);
+						self->saveCustomFilterTabs();
+					}
+					break;
+				}
+			}
+			return false;
+		});
+}
+
+void LLFloaterInventory::removeCustomFilterTabByName(const std::string& panel_name)
+{
+	for (LLInventoryPanel* panel : mCustomFilterPanels)
+	{
+		if (panel && panel->getName() == panel_name &&
+			!mHiddenCustomFilterPanels.count(panel))
+		{
+			mFilterTabs->selectTabPanel(panel);
+			mActivePanel = panel;
+			closeCustomFilterTab();
+			return;
+		}
+	}
+}
+
+void LLFloaterInventory::requestCloseCustomFilterTab(LLInventoryPanel* panel)
+{
+	if (!isCustomFilterTab(panel) || !mFilterTabs ||
+		mHiddenCustomFilterPanels.count(panel)) return;
+	const S32 index = mFilterTabs->getIndexForPanel(panel);
+	if (index < 0) return;
+	LLSD args;
+	args["NAME"] = mFilterTabs->getPanelTitle(index);
+	LLSD payload;
+	payload["panel_name"] = panel->getName();
+	LLHandle<LLView> handle = getHandle();
+	gNotifications.add("ChaosInventoryCustomTabClose", args, payload,
+		[handle](const LLSD& notification, const LLSD& response) -> bool
+		{
+			if (LLNotification::getSelectedOption(notification, response) == 0)
+			{
+				LLFloaterInventory* inv =
+					dynamic_cast<LLFloaterInventory*>(handle.get());
+				if (inv) inv->removeCustomFilterTabByName(
+					notification["payload"]["panel_name"].asString());
+			}
+			return false;
+		});
+}
+
+void LLFloaterInventory::closeCustomFilterTab()
+{
+	std::vector<LLInventoryPanel*>::iterator it =
+		std::find(mCustomFilterPanels.begin(), mCustomFilterPanels.end(), mActivePanel);
+	if (it == mCustomFilterPanels.end() ||
+		mHiddenCustomFilterPanels.count(mActivePanel))
+	{
+		return; // Never close built-in tabs or detached hidden tabs.
+	}
+	LLInventoryPanel* closing = *it;
+	mFilterTabs->selectTabPanel(mEverythingPanel);
+	mActivePanel = mEverythingPanel;
+	mFilterTabs->removeTabPanel(closing);
+	mCustomFilterPanels.erase(it);
+	mCustomTabLabels.erase(closing);
+	if (mContextCustomFilterPanel == closing) mContextCustomFilterPanel = nullptr;
+	delete closing; // Legacy tab container detaches without deleting the panel.
+	saveCustomFilterTabs();
+}
+
+void LLFloaterInventory::hideCustomFilterTab(LLInventoryPanel* panel)
+{
+	if (!isCustomFilterTab(panel) || mHiddenCustomFilterPanels.count(panel) ||
+		!mFilterTabs) return;
+	const S32 index = mFilterTabs->getIndexForPanel(panel);
+	if (index < 0) return;
+	mCustomTabLabels[panel] = mFilterTabs->getPanelTitle(index);
+	LLPanel* prior = mFilterTabs->getCurrentPanel();
+	// Remove from the legacy tab strip only while a stable built-in tab is selected.
+	mFilterTabs->selectTabPanel(mEverythingPanel);
+	mActivePanel = mEverythingPanel;
+	mFilterTabs->removeTabPanel(panel); // Detach, retain filter and contents.
+	mHiddenCustomFilterPanels.insert(panel);
+	if (mContextCustomFilterPanel == panel) mContextCustomFilterPanel = nullptr;
+	updateShowHiddenCustomTab();
+	if (prior != panel && prior != mEverythingPanel &&
+		mFilterTabs->getIndexForPanel(prior) >= 0)
+		mFilterTabs->selectTabPanel(prior);
+	saveCustomFilterTabs();
+}
+
+void LLFloaterInventory::showCustomFilterTab(LLInventoryPanel* panel)
+{
+	if (!isCustomFilterTab(panel) || !mHiddenCustomFilterPanels.count(panel))
+		return;
+	if (mAddCustomTabPanel &&
+		mFilterTabs->getIndexForPanel(mAddCustomTabPanel) >= 0)
+		mFilterTabs->removeTabPanel(mAddCustomTabPanel);
+	if (mShowHiddenCustomTabPanel &&
+		mFilterTabs->getIndexForPanel(mShowHiddenCustomTabPanel) >= 0)
+		mFilterTabs->removeTabPanel(mShowHiddenCustomTabPanel);
+	mHiddenCustomFilterPanels.erase(panel);
+	const auto label_it = mCustomTabLabels.find(panel);
+	const std::string label = label_it == mCustomTabLabels.end() ?
+		"Custom" : label_it->second;
+	mFilterTabs->addTabPanel(panel, label, true, onFilterSelected, this);
+	mActivePanel = panel;
+	if (!mHiddenCustomFilterPanels.empty())
+	{
+	    mFilterTabs->addTabPanel(mShowHiddenCustomTabPanel, "▼", false,
+	    NULL, this);
+	    mFilterTabs->setTabPrecommitChangeCallback(mShowHiddenCustomTabPanel, onShowHiddenCustomTabPrecommit);
+	    mFilterTabs->setTabButtonTooltip(mShowHiddenCustomTabPanel, "Restore a hidden custom inventory tab");
+	}
+	if (mAddCustomTabPanel)
+	{
+	    mFilterTabs->addTabPanel(mAddCustomTabPanel, "+", false,
+	    NULL, this);
+	    mFilterTabs->setTabPrecommitChangeCallback(mAddCustomTabPanel, onAddCustomTabPrecommit);
+	    mFilterTabs->setTabButtonTooltip(mAddCustomTabPanel, "Add custom inventory filter tab");
+	}
+	saveCustomFilterTabs();
+}
+
+void LLFloaterInventory::updateShowHiddenCustomTab()
+{
+	if (!mShowHiddenCustomTabPanel || !mFilterTabs) return;
+	const bool attached =
+		mFilterTabs->getIndexForPanel(mShowHiddenCustomTabPanel) >= 0;
+	if (mHiddenCustomFilterPanels.empty())
+	{
+		if (attached) mFilterTabs->removeTabPanel(mShowHiddenCustomTabPanel);
+		return;
+	}
+	if (attached) return;
+	if (mAddCustomTabPanel &&
+		mFilterTabs->getIndexForPanel(mAddCustomTabPanel) >= 0)
+		mFilterTabs->removeTabPanel(mAddCustomTabPanel);
+    {
+        mFilterTabs->addTabPanel(mShowHiddenCustomTabPanel, "▼", false, NULL, this);
+        mFilterTabs->setTabPrecommitChangeCallback(mShowHiddenCustomTabPanel, onShowHiddenCustomTabPrecommit);
+        mFilterTabs->setTabButtonTooltip(mShowHiddenCustomTabPanel, "Restore a hidden custom inventory tab");
+    }
+    if (mAddCustomTabPanel)
+	{
+	    mFilterTabs->addTabPanel(mAddCustomTabPanel, "+", false,
+	    NULL, this);
+	    mFilterTabs->setTabPrecommitChangeCallback(mAddCustomTabPanel, onAddCustomTabPrecommit);
+	    mFilterTabs->setTabButtonTooltip(mAddCustomTabPanel, "Add custom inventory filter tab");
+	}
+}
+
+void LLFloaterInventory::contextRenameCustomTab(void* data)
+{
+	LLFloaterInventory* self = static_cast<LLFloaterInventory*>(data);
+	if (!self || !self->isCustomFilterTab(self->mContextCustomFilterPanel)) return;
+	if (self->mHiddenCustomFilterPanels.count(self->mContextCustomFilterPanel)) return;
+	self->mFilterTabs->selectTabPanel(self->mContextCustomFilterPanel);
+	self->mActivePanel = self->mContextCustomFilterPanel;
+	self->renameCustomFilterTab();
+}
+
+void LLFloaterInventory::contextCloneCustomTab(void* data)
+{
+	LLFloaterInventory* self = static_cast<LLFloaterInventory*>(data);
+	if (!self || !self->isCustomFilterTab(self->mContextCustomFilterPanel)) return;
+	if (self->mHiddenCustomFilterPanels.count(self->mContextCustomFilterPanel)) return;
+	self->mFilterTabs->selectTabPanel(self->mContextCustomFilterPanel);
+	self->mActivePanel = self->mContextCustomFilterPanel;
+	self->cloneCustomFilterTab();
+}
+
+void LLFloaterInventory::contextHideCustomTab(void* data)
+{
+	LLFloaterInventory* self = static_cast<LLFloaterInventory*>(data);
+	if (self && self->isCustomFilterTab(self->mContextCustomFilterPanel))
+		self->hideCustomFilterTab(self->mContextCustomFilterPanel);
+}
+
+void LLFloaterInventory::contextCloseCustomTab(void* data)
+{
+	LLFloaterInventory* self = static_cast<LLFloaterInventory*>(data);
+	if (self && self->isCustomFilterTab(self->mContextCustomFilterPanel))
+		self->requestCloseCustomFilterTab(self->mContextCustomFilterPanel);
+}
+
+void LLFloaterInventory::restoreHiddenCustomTabAction(void* data)
+{
+	HiddenTabAction* action = static_cast<HiddenTabAction*>(data);
+	if (!action) return;
+	LLFloaterInventory* self =
+		dynamic_cast<LLFloaterInventory*>(action->owner.get());
+	if (!self) return;
+	for (LLInventoryPanel* panel : self->mCustomFilterPanels)
+	{
+		if (panel && panel->getName() == action->panel_name &&
+			self->mHiddenCustomFilterPanels.count(panel))
+		{
+			self->showCustomFilterTab(panel);
+			break;
+		}
+	}
+}
+
+void LLFloaterInventory::showHiddenCustomTabMenu()
+{
+	if (!mFilterTabs || mHiddenCustomFilterPanels.empty() ||
+		!gMenuHolderp) return;
+	if (mHiddenCustomTabMenu)
+	{
+		mHiddenCustomTabMenu->die();
+		mHiddenCustomTabMenu = nullptr;
+	}
+	// Previous popup has closed; release its action objects before rebuilding.
+	mHiddenTabActions.clear();
+	LLMenuGL* menu = new LLMenuGL("ChaosHiddenInventoryTabs",
+		"Hidden inventory tabs");
+	mHiddenCustomTabMenu = menu;
+	gMenuHolderp->addChild(menu);
+	menu->setVisible(false);
+	for (LLInventoryPanel* panel : mCustomFilterPanels)
+	{
+		if (!panel || !mHiddenCustomFilterPanels.count(panel)) continue;
+		auto action = std::make_unique<HiddenTabAction>();
+		action->owner = getHandle();
+		action->panel_name = panel->getName();
+		const std::string label = mCustomTabLabels[panel];
+		menu->append(new LLMenuItemCallGL(label, restoreHiddenCustomTabAction,
+			NULL, action.get()));
+		mHiddenTabActions.push_back(std::move(action));
+	}
+	LLButton* selector = mShowHiddenCustomTabPanel ?
+		mFilterTabs->getChild<LLButton>(
+			(mShowHiddenCustomTabPanel->getName() + " tab").c_str(), true, false) : nullptr;
+	const S32 x = selector ? selector->getRect().mLeft : 0;
+	const S32 y = selector ? selector->getRect().mBottom : 0;
+	LLMenuGL::showPopup(mFilterTabs, menu, x, y);
+}
+
+void LLFloaterInventory::saveCustomFilterTabs()
+{
+	// Never overwrite existing account data during a partial/failed load.
+	if (mLoadingCustomFilterTabs || !mCustomFilterTabsLoadOK) return;
+	LLSD saved = LLSD::emptyArray();
+	for (LLInventoryPanel* panel : mCustomFilterPanels)
+	{
+		if (!panel) continue;
+		const S32 index = mFilterTabs->getIndexForPanel(panel);
+		if (index >= 0) mCustomTabLabels[panel] = mFilterTabs->getPanelTitle(index);
+		LLSD entry;
+		entry["name"] = mCustomTabLabels[panel];
+		entry["hidden"] = mHiddenCustomFilterPanels.count(panel) != 0;
+		LLSD filter;
+		panel->getFilter()->toLLSD(filter);
+		entry["filter"] = filter;
+		saved.append(entry);
+	}
+	const std::string filename = gDirUtil.getFullPath(
+		LL_PATH_PER_ACCOUNT, "chaos_custom_inventory_tabs.xml");
+	llofstream output(filename.c_str());
+	if (!output.is_open() || !LLSDSerialize::toPrettyXML(saved, output))
+	{
+		llwarns << "Could not save custom inventory tabs to " << filename << llendl;
+	}
+}
+
+void LLFloaterInventory::loadCustomFilterTabs()
+{
+	const std::string filename = gDirUtil.getFullPath(
+		LL_PATH_PER_ACCOUNT, "chaos_custom_inventory_tabs.xml");
+	llifstream input(filename.c_str());
+	if (!input.is_open()) return;
+	LLSD saved;
+	if (LLSDSerialize::fromXML(saved, input) <= 0 || !saved.isArray())
+	{
+		mCustomFilterTabsLoadOK = false;
+		llwarns << "Invalid custom inventory tab state: " << filename << llendl;
+		return;
+	}
+	mLoadingCustomFilterTabs = true;
+	if (saved.size() > 64) mCustomFilterTabsLoadOK = false;
+	for (LLSD::array_const_iterator it = saved.beginArray();
+		 it != saved.endArray() && mCustomFilterPanels.size() < 64; ++it)
+	{
+		const LLSD& entry = *it;
+		if (!entry.isMap() || !entry.has("name") || !entry.has("filter"))
+		{
+			mCustomFilterTabsLoadOK = false;
+			continue;
+		}
+		const std::string name = entry["name"].asString();
+		if (name.empty() || name.size() > 128 || !entry["filter"].isMap())
+		{
+			mCustomFilterTabsLoadOK = false;
+			continue;
+		}
+		LLInventoryPanel* panel = createCustomFilterTab(name);
+		if (!panel)
+		{
+			mCustomFilterTabsLoadOK = false;
+			continue;
+		}
+		LLSD filter = entry["filter"];
+		panel->getFilter()->fromLLSD(filter);
+		panel->getFilter()->setModified();
+		if (entry.has("hidden") && entry["hidden"].asBoolean())
+			hideCustomFilterTab(panel);
+	}
+	mFilterTabs->selectTabPanel(mEverythingPanel);
+	mActivePanel = mEverythingPanel;
+	mLoadingCustomFilterTabs = false;
+}
+
 bool LLFloaterInventory::postBuild()
 {
 	mSavedFolderState = new LLSaveFolderState();
@@ -713,12 +1166,24 @@ bool LLFloaterInventory::postBuild()
 	mNewSettingsMenuItem = getChild<LLView>("New Settings");
 	mNewMaterialMenuItem = getChild<LLView>("New Material");
 
+	// Permanent Firestorm-style add-tab and hidden-tab controls in Chaos.
+	mShowHiddenCustomTabPanel = new LLPanel("ChaosCustomTabShowHidden",
+		mEverythingPanel->getRect(), true);
+	mAddCustomTabPanel = new LLPanel("ChaosCustomTabAdd",
+		mEverythingPanel->getRect(), true);
+	mFilterTabs->addTabPanel(mAddCustomTabPanel, "+", false,
+		NULL, this);
+		mFilterTabs->setTabPrecommitChangeCallback(mAddCustomTabPanel, onAddCustomTabPrecommit);
+		mFilterTabs->setTabButtonTooltip(mAddCustomTabPanel, "Add custom inventory filter tab");
+	// Restore only user-defined tabs; keep the original four tabs untouched.
+	loadCustomFilterTabs();
 	return true;
 }
 
 // Destroys the object
 LLFloaterInventory::~LLFloaterInventory()
 {
+	saveCustomFilterTabs();
 	// Save the filters state.
 	LLInventoryFilter* filter = mEverythingPanel->getFilter();
 
@@ -774,6 +1239,16 @@ LLFloaterInventory::~LLFloaterInventory()
 	}
 
 	gInventory.removeObserver(this);
+
+	// Detached hidden tabs aren't owned by the tab container: release them.
+	for (LLInventoryPanel* hidden_panel : mHiddenCustomFilterPanels)
+		delete hidden_panel;
+	mHiddenCustomFilterPanels.clear();
+	if (mShowHiddenCustomTabPanel &&
+		mFilterTabs->getIndexForPanel(mShowHiddenCustomTabPanel) < 0)
+		delete mShowHiddenCustomTabPanel;
+	if (mCustomTabContextMenu) mCustomTabContextMenu->die();
+	if (mHiddenCustomTabMenu) mHiddenCustomTabMenu->die();
 
 	delete mSavedFolderState;
 }
@@ -862,6 +1337,48 @@ void LLFloaterInventory::onClose(bool app_quitting)
 
 	// Pass up
 	LLFloater::setVisible(false);
+}
+
+bool LLFloaterInventory::handleRightMouseDown(S32 x, S32 y, MASK mask)
+{
+	if (mFilterTabs && gMenuHolderp)
+	{
+		S32 tab_x = 0, tab_y = 0;
+		if (localPointToOtherView(x, y, &tab_x, &tab_y, mFilterTabs))
+		{
+			for (LLInventoryPanel* panel : mCustomFilterPanels)
+			{
+				if (!panel || mHiddenCustomFilterPanels.count(panel)) continue;
+				LLButton* button = mFilterTabs->getChild<LLButton>(
+					(panel->getName() + " tab").c_str(), true, false);
+				if (!button || !button->getVisible() ||
+					!button->getRect().pointInRect(tab_x, tab_y))
+					continue;
+				mContextCustomFilterPanel = panel;
+				if (mCustomTabContextMenu)
+				{
+					mCustomTabContextMenu->die();
+					mCustomTabContextMenu = nullptr;
+				}
+				LLMenuGL* menu = new LLMenuGL(
+					"ChaosInventoryCustomTabContext", "Custom inventory tab");
+				mCustomTabContextMenu = menu;
+				gMenuHolderp->addChild(menu);
+				menu->setVisible(false);
+				menu->append(new LLMenuItemCallGL("Rename tab",
+					contextRenameCustomTab, NULL, this));
+				menu->append(new LLMenuItemCallGL("Clone tab",
+					contextCloneCustomTab, NULL, this));
+				menu->append(new LLMenuItemCallGL("Hide tab",
+					contextHideCustomTab, NULL, this));
+				menu->append(new LLMenuItemCallGL("Close tab",
+					contextCloseCustomTab, NULL, this));
+				LLMenuGL::showPopup(this, menu, x, y);
+				return true;
+			}
+		}
+	}
+	return LLFloater::handleRightMouseDown(x, y, mask);
 }
 
 bool LLFloaterInventory::handleKeyHere(KEY key, MASK mask)
@@ -1158,6 +1675,32 @@ void LLFloaterInventory::onSearchEdit(const std::string& search_string,
 	panelp->setFilterSubString(uc_search_string);
 }
 
+// The legacy tab control invokes precommit *before* changing the active panel.
+// The "+" and hidden-selector panels must never become the active inventory.
+void LLFloaterInventory::onAddCustomTabPrecommit(void* data, bool)
+{
+	LLFloaterInventory* self = static_cast<LLFloaterInventory*>(data);
+	if (!self) return;
+	// Never remove/reinsert a tab inside LLTabContainer::selectTab(): its
+	// selected tuple pointer is still in use until the click handler returns.
+	// Do the native panel insertion on the next idle tick instead.
+	LLHandle<LLView> handle = self->getHandle();
+	doOnIdleOneTime([handle]()
+	{
+		LLFloaterInventory* inv = dynamic_cast<LLFloaterInventory*>(handle.get());
+		if (inv && inv->mFilterTabs && inv->mEverythingPanel)
+		{
+			inv->addCustomFilterTab();
+		}
+	});
+}
+
+void LLFloaterInventory::onShowHiddenCustomTabPrecommit(void* data, bool)
+{
+	LLFloaterInventory* self = static_cast<LLFloaterInventory*>(data);
+	if (self) self->showHiddenCustomTabMenu();
+}
+
 //static
 void LLFloaterInventory::onFilterSelected(void* datap, bool)
 {
@@ -1167,6 +1710,21 @@ void LLFloaterInventory::onFilterSelected(void* datap, bool)
 		return;
 	}
 
+	// Show a menu of individually hidden custom tabs from the ▼ control.
+	if (self->mFilterTabs->getCurrentPanel() == self->mShowHiddenCustomTabPanel)
+	{
+		self->mFilterTabs->selectTabPanel(self->mEverythingPanel);
+		self->showHiddenCustomTabMenu();
+		return;
+	}
+	// The + tab creates a new native inventory filter tab.
+	if (self->mFilterTabs->getCurrentPanel() == self->mAddCustomTabPanel)
+	{
+		self->addCustomFilterTab();
+		if (self->mFilterTabs->getCurrentPanel() == self->mAddCustomTabPanel)
+			self->mFilterTabs->selectTabPanel(self->mEverythingPanel);
+		return;
+	}
 	// Find my index
 	LLInventoryPanel* panelp =
 		(LLInventoryPanel*)self->mFilterTabs->getCurrentPanel();

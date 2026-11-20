@@ -39,6 +39,7 @@
 #include "llframetimer.h"
 #include "lltimer.h"
 
+#include "llavatarproperties.h"
 #include "llavatartracker.h"
 #include "llmutelist.h"
 
@@ -120,6 +121,13 @@ public:
 
 	LL_INLINE bool isInSim() const					{ return mInSimFrame != U32_MAX; }
 
+	// Time since the viewer first observed this entry in its current region.
+	LL_INLINE F32 getRegionSeenSeconds() const
+	{
+		return mRegionSeen ? mRegionTimer.getElapsedTimeF32() : 0.f;
+	}
+
+
 	// Returns true when the item is dead and should not appear in the list
 	LL_INLINE bool isDead() const
 	{
@@ -185,6 +193,10 @@ private:
 
 	// Timer to keep track of whether avatars are still there
 	LLTimer		mUpdateTimer;
+	LLTimer		mRegionTimer;
+	LLUUID		mSeenRegionID;
+	bool		mRegionSeen;
+
 
 	// Last frame when this avatar was updated
 	U32			mFrame;
@@ -205,7 +217,8 @@ private:
 	bool		mFocused;
 };
 
-class HBFloaterRadar final : public LLMuteListObserver,
+class HBFloaterRadar final : public LLAvatarPropertiesObserver,
+								 public LLMuteListObserver,
 							 public LLFriendObserver,
 							 public LLFloater,
 					 		 public LLFloaterSingleton<HBFloaterRadar>
@@ -224,6 +237,8 @@ protected:
 	void onChange() override;
 	// Friends list observer inteface
 	void changed(U32 mask) override;
+	// Account creation date from the standard OpenSim avatar profile service.
+	void processProperties(S32 type, void* data) override;
 
 public:
 	~HBFloaterRadar() override;
@@ -282,9 +297,13 @@ private:
 	{
 		LIST_MARK,
 		LIST_AVATAR_NAME,
+		LIST_VOICE_STATUS,
+		LIST_TYPING_STATUS,
 		LIST_DISTANCE,
 		LIST_POSITION,
-		LIST_ALTITUDE
+		LIST_ALTITUDE,
+		LIST_REGION_SEEN,
+		LIST_ACCOUNT_AGE
 	};
 
 	// Refreshes the avatars list
@@ -403,6 +422,11 @@ private:
 	std::string				mFilterString;
 
 	avatar_list_t			mAvatars;
+
+	// Profile requests are staggered to keep the radar inexpensive on busy grids.
+	std::map<LLUUID, S32>	mAccountAgeDays;
+	std::set<LLUUID>		mAgeRequested;
+	LLTimer					mAgeRequestTimer;
 
 	uuid_list_t				mMarkedAvatars;
 

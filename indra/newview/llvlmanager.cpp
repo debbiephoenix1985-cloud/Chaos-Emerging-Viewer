@@ -59,6 +59,12 @@ LLVLManager::~LLVLManager()
 
 void LLVLManager::addLayerData(LLVLData* vl_datap, S32 mesg_size)
 {
+	// An incomplete or unexpected packet must not reach patch decompression.
+	if (!vl_datap || mesg_size <= 0)
+	{
+		delete vl_datap; // This method takes ownership of the packet.
+		return;
+	}
 	S8 type = vl_datap->mType;
 	if (type == LAND_LAYER_CODE || type == AURORA_LAND_LAYER_CODE)
 	{
@@ -74,8 +80,12 @@ void LLVLManager::addLayerData(LLVLData* vl_datap, S32 mesg_size)
 	}
 	else if (type != WATER_LAYER_CODE && type != AURORA_WATER_LAYER_CODE)
 	{
+		// Dayturn #5414: unknown layer data is not fatal, but it must not be
+		// queued for decoding because its patch header may be unrecognisable.
 		llwarns_once << "Unknown layer type: " << type << " (" << (S32)type
-					 << ")" << llendl;
+					 << "). Dropping the packet." << llendl;
+		delete vl_datap;
+		return;
 	}
 
 	mPacketData.push_back(vl_datap);

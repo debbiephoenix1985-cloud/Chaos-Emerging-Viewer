@@ -137,82 +137,91 @@ bool LLFileSystem::read(U8* buffer, S32 bytes)
 
 bool LLFileSystem::write(const U8* buffer, S32 bytes)
 {
-	if (!mValid)
+	if (!mValid || bytes < 0 || (bytes > 0 && !buffer))
 	{
+		llwarns << "Invalid request to write cached asset: " << mFilename
+				<< llendl;
 		return false;
 	}
+	if (mMode == READ)
+	{
+		llerrs << "Cannot write in READ mode." << llendl;
+		return false;
+	}
+	if (bytes == 0)
+	{
+		return true;
+	}
+
+	// Dayturn 2026-08-10/12: detect short writes and flush failures instead of
+	// reporting success for truncated asset data. Preserve Cool VL's existing
+	// seek-safe WRITE implementation (which already avoids repeated truncation).
+	const S32 old_size = LLFile::getFileSize(mFilename);
+	const bool existed = old_size > 0;
+	const char* mode = NULL;
 	if (mMode == APPEND)
 	{
-		// Write to file, appending to it if it already exists.
-		LLFILE* file = LLFile::open(mFilename, "a+b");
-		if (file)
-		{
-			fwrite((void*)buffer, 1, bytes, file);
-			if (LLFile::sFlushOnWrite)
-			{
-				fflush(file);
-			}
-			mPosition = ftell(file);
-			LLFile::close(file);
-			mTotalBytesWritten += bytes;
-			mExists = true;
-			return true;
-		}
+		mode = "a+b";
 	}
 	else if (mMode == OVERWRITE)
 	{
-		// Discard any existing contents and write.
-		mTotalBytesWritten -= LLFile::getFileSize(mFilename);
-		LLFILE* file = LLFile::open(mFilename, "wb");
-		if (file)
-		{
-			fwrite((void*)buffer, 1, bytes, file);
-			if (LLFile::sFlushOnWrite)
-			{
-				fflush(file);
-			}
-			mPosition = ftell(file);
-			LLFile::close(file);
-			mTotalBytesWritten += bytes;
-			mExists = true;
-			return true;
-		}
+		mode = "wb";
 	}
 	else if (mMode == WRITE)
 	{
-		// Write at current position, without truncating
-		S32 size = LLFile::getFileSize(mFilename);	// Remember current size
-		mExists = size > 0;
-		const char* mode = mExists ? "r+b" : "wb";
-		LLFILE* file = LLFile::open(mFilename, mode);
-		if (file)
-		{
-			if (mExists && mPosition > 0)
-			{
-				fseek(file, mPosition, SEEK_SET);
-			}
-			fwrite((void*)buffer, 1, bytes, file);
-			if (LLFile::sFlushOnWrite)
-			{
-				fflush(file);
-			}
-			mPosition = ftell(file);
-			LLFile::close(file);
-			if (mPosition > size)
-			{
-				mTotalBytesWritten += mPosition - size;
-			}
-			mExists = true;
-			return true;
-		}
+		mode = existed ? "r+b" : "wb";
 	}
 	else
 	{
-		llerrs << "Cannot write in READ mode." << llendl;
+		llwarns << "Invalid asset cache write mode." << llendl;
+		return false;
 	}
 
-	mExists = false;
-	return false;
+	LLFILE* file = LLFile::open(mFilename, mode);
+	if (!file)
+	{
+		llwarns << "Unable to open asset cache file for writing: "
+				<< mFilename << llendl;
+		return false;
+	}
+	if (mMode == WRITE && existed && mPosition > 0 &&
+		fseek(file, mPosition, SEEK_SET) != 0)
+	{
+		llwarns << "Unable to seek in cached asset: " << mFilename
+				<< llendl;
+		LLFile::close(file);
+		return false;
+	}
+
+	const size_t written = fwrite((void*)buffer, 1, (size_t)bytes, file);
+	const bool flushed = fflush(file) == 0;
+	const long position = ftell(file);
+	LLFile::close(file);
+	if (written != (size_t)bytes || !flushed || position < 0)
+	{
+		llwarns << "Incomplete write to cached asset: " << mFilename
+				<< " (requested " << bytes << ", wrote " << written
+				<< ", flush " << (flushed ? "ok" : "failed") << ")"
+				<< llendl;
+		return false;
+	}
+
+	mPosition = (S32)position;
+	if (mMode == APPEND)
+	{
+		mTotalBytesWritten += bytes;
+	}
+	else if (mMode == OVERWRITE)
+	{
+		mTotalBytesWritten -= old_size;
+		mTotalBytesWritten += bytes;
+	}
+	else if (mPosition > old_size)
+	{
+		mTotalBytesWritten += mPosition - old_size;
+	}
+	mExists = true;
+	return true;
 }
 
 bool LLFileSystem::seek(S32 offset, S32 origin)

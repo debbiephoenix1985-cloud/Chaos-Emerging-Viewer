@@ -53,10 +53,10 @@ struct LLAvatarInfo
 	std::string	mFLAbout;
 	std::string	mProfileUrl;
 	std::string	mCaptionText;
-	U32			mFlags;
-	U8			mCaptionIndex;
-	bool		mAllowPublish;
-	bool		mReceivedViaCap;
+	U32			mFlags = 0;
+	U8			mCaptionIndex = 0;
+	bool		mAllowPublish = false;
+	bool		mReceivedViaCap = false;
 };
 
 struct LLAvatarGroups
@@ -133,7 +133,7 @@ struct LLAvatarNotes
 {
 	LLUUID		mAvatarId;
 	std::string	mNotes;
-	bool		mReceivedViaCap;
+	bool		mReceivedViaCap = false;
 };
 
 enum EAvatarPropertiesReplyFlags

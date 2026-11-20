@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lltoolbar.cpp
  * @author James Cook, Richard Nelson
  * @brief Large friendly buttons at bottom of screen.
@@ -46,11 +46,16 @@ extern void chaosToggleQuickPreferences();
 #include "hbfloaterteleporthistory.h"
 #include "hbfloaterareasearch.h"
 #include "llfloaterinventory.h"
+#include "hbfloaterwearablefavorites.h"
+#include "ao.h" // Existing Firestorm-based AO editor; no AO engine changes.
 #include "llfloaterminimap.h"
 #include "hbfloatersearch.h"
 #include "hbfloaterradar.h"
 #include "llfloatersnapshot.h"
 #include "llfloaterworldmap.h"
+#include "llfloaterregioninfo.h"
+#include "llfloaterstats.h"
+#include "llfloatercamera.h"
 //MK
 #include "mkrlinterface.h"
 //mk
@@ -164,9 +169,33 @@ bool LLToolBar::postBuild()
 	mMapButton->setClickedCallback(onClickMap, this);
 	mMapButton->setControlName("ShowWorldMap", NULL);
 
+	mRegionInfoButton = getChild<LLButton>("region_info_btn");
+	mRegionInfoButton->setClickedCallback(onClickRegionInfo, this);
+	mRegionInfoButton->setControlName("", NULL);
+
+	mStatisticsButton = getChild<LLButton>("statistics_btn");
+	mStatisticsButton->setClickedCallback(onClickStatistics, this);
+	mStatisticsButton->setControlName("", NULL);
+
+	mCameraControlsButton = getChild<LLButton>("camera_controls_btn");
+	mCameraControlsButton->setClickedCallback(onClickCameraControls, this);
+	mCameraControlsButton->setControlName("", NULL);
+
 	mInventoryButton = getChild<LLButton>("inventory_btn");
 	mInventoryButton->setClickedCallback(onClickInventory, this);
 	mInventoryButton->setControlName("ShowInventory", NULL);
+
+	mFavoritesButton = getChild<LLButton>("wearable_favorites_btn");
+	mFavoritesButton->setClickedCallback(onClickFavorites, this);
+	mFavoritesButton->setControlName("", NULL);
+
+	// Firestorm Vintage split AO control: add only the AO toggle and editor.
+	mAOButton = getChild<LLButton>("chaos_ao_toggle_btn");
+	mAOButton->setClickedCallback(onClickAOToggle, this);
+	mAOButton->setControlName("", NULL);
+	mAOEditorArrow = getChild<LLButton>("chaos_ao_editor_arrow_btn");
+	mAOEditorArrow->setClickedCallback(onClickAOEditor, this);
+	mAOEditorArrow->setControlName("", NULL);
 
 	for (child_list_const_iter_t child_iter = getChildList()->begin();
 		 child_iter != getChildList()->end(); ++child_iter)
@@ -306,9 +335,34 @@ void LLToolBar::layoutButtons()
 	mMapButton->setVisible(show);
 	if (!show) --count;
 
+	show = gSavedSettings.getBool("ShowRegionInfoButton");
+	mRegionInfoButton->setVisible(show);
+	if (!show) --count;
+
+	show = gSavedSettings.getBool("ShowStatisticsButton");
+	mStatisticsButton->setVisible(show);
+	if (!show) --count;
+
+	show = gSavedSettings.getBool("ShowCameraControlsButton");
+	mCameraControlsButton->setVisible(show);
+	if (!show) --count;
+
 	show = gSavedSettings.getBool("ShowInventoryButton");
 	mInventoryButton->setVisible(show);
 	if (!show) --count;
+
+	// The existing Favourite Wearables shortcut can be hidden or shown.
+	show = gSavedSettings.getBool("ShowFavWearablesButton");
+	mFavoritesButton->setVisible(show);
+	if (!show) --count;
+
+	// Both halves of the AO split control must always hide/show together.
+	// Exclude BOTH halves from the ordinary toolbar button distribution;
+	// the compact AO control is positioned separately on the far right.
+	const bool show_ao = gSavedSettings.getBool("ShowAOButton");
+	mAOButton->setVisible(show_ao);
+	mAOEditorArrow->setVisible(show_ao);
+	count -= 2;
 
 	if (count < 1)
 	{
@@ -349,7 +403,13 @@ void LLToolBar::layoutButtons()
 
 	// We actually want to extend "PAD" pixels off the right edge of the
 	// screen, such that the rightmost button is aligned.
-	F32 segment_width = (F32)(width + PAD) / (F32)count;
+	// The AO control is compact like Firestorm Vintage: 40px AO + 20px
+	// arrow, rather than stretching to fill a normal toolbar segment.
+	constexpr S32 AO_TOGGLE_WIDTH = 40;
+	constexpr S32 AO_ARROW_WIDTH = 20;
+	constexpr S32 AO_TOTAL_WIDTH = AO_TOGGLE_WIDTH + AO_ARROW_WIDTH;
+	const S32 buttons_width = width - (show_ao ? AO_TOTAL_WIDTH + 2 * PAD : 0);
+	F32 segment_width = (F32)(buttons_width + PAD) / (F32)count;
 	S32 btn_width = S32(segment_width - PAD);
 
 	// Evenly space all views
@@ -360,6 +420,8 @@ void LLToolBar::layoutButtons()
 	{
 		LLView* btn_view = *child_iter;
 		LLButton* buttonp = dynamic_cast<LLButton*>(btn_view);
+		// Neither AO half may be stretched by the normal toolbar layout.
+		if (buttonp == mAOButton || buttonp == mAOEditorArrow) continue;
 		if (buttonp && btn_view->getVisible())
 		{
 			if (height < 0)
@@ -373,6 +435,24 @@ void LLToolBar::layoutButtons()
 			btn_view->setRect(r);
 			--i;
 		}
+	}
+	// The two AO halves are joined edge to edge and fixed at 60 x 20.
+	// Their visibility is already controlled together above.
+	if (show_ao)
+	{
+		constexpr S32 AO_BOTTOM = 2;
+		constexpr S32 AO_HEIGHT = 20;
+		// Unlike ordinary toolbar slots, the AO split control must stay
+		// entirely inside the visible toolbar, not its +4px layout fudge.
+		// The toolbar panel rectangle may be narrower than the screen.
+		// Existing buttons use the viewer window width for their coordinates.
+		const S32 ao_right = width - FUDGE_WIDTH_OF_SCREEN;
+		const S32 ao_left = ao_right - AO_TOTAL_WIDTH;
+		mAOButton->setRect(LLRect(ao_left, AO_BOTTOM + AO_HEIGHT,
+									  ao_left + AO_TOGGLE_WIDTH, AO_BOTTOM));
+		mAOEditorArrow->setRect(LLRect(ao_left + AO_TOGGLE_WIDTH,
+										 AO_BOTTOM + AO_HEIGHT,
+										 ao_right, AO_BOTTOM));
 	}
 }
 
@@ -405,6 +485,28 @@ void LLToolBar::refresh()
 	}
 	if (!visible) return;
 
+	// Only the new AO control responds to its Show/Hide preference.
+	static S32 last_show_ao = -1;
+	const S32 show_ao = gSavedSettings.getBool("ShowAOButton") ? 1 : 0;
+	static S32 last_show_region_info = -1;
+	static S32 last_show_statistics = -1;
+	static S32 last_show_camera = -1;
+	const S32 show_region_info = gSavedSettings.getBool("ShowRegionInfoButton") ? 1 : 0;
+	const S32 show_statistics = gSavedSettings.getBool("ShowStatisticsButton") ? 1 : 0;
+	const S32 show_camera = gSavedSettings.getBool("ShowCameraControlsButton") ? 1 : 0;
+	if (last_show_ao != show_ao ||
+		last_show_region_info != show_region_info ||
+		last_show_statistics != show_statistics ||
+		last_show_camera != show_camera)
+	{
+		last_show_ao = show_ao;
+		last_show_region_info = show_region_info;
+		last_show_statistics = show_statistics;
+		last_show_camera = show_camera;
+		layoutButtons();
+	}
+	mAOButton->setToggleState(gSavedPerAccountSettings.getBool("UseAO"));
+
 	bool sitting = false;
 	if (isAgentAvatarValid())
 	{
@@ -422,6 +524,11 @@ void LLToolBar::refresh()
 		mMapButton->setEnabled(!gRLInterface.mContainsShowworldmap &&
 							   !gRLInterface.mContainsShowloc);
 		mInventoryButton->setEnabled(!gRLInterface.mContainsShowinv);
+		mFavoritesButton->setEnabled(!gRLInterface.mContainsShowinv);
+	}
+	else
+	{
+		mFavoritesButton->setEnabled(true);
 	}
 //mk
 
@@ -484,6 +591,27 @@ void LLToolBar::onClickMap(void*)
 }
 
 // static
+void LLToolBar::onClickRegionInfo(void*)
+{
+	// Mirror the existing World > Region Details location-privacy check.
+	if (!gRLenabled || !gRLInterface.mContainsShowloc)
+	{
+		LLFloaterRegionInfo::showInstance();
+	}
+}
+
+// static
+void LLToolBar::onClickStatistics(void*)
+{
+	LLFloaterStats::toggleInstance();
+}
+
+void LLToolBar::onClickCameraControls(void*)
+{
+	LLFloaterCamera::toggleInstance();
+}
+
+// static
 void LLToolBar::onClickFriends(void*)
 {
 	// The former Friends slot opens the existing native Teleport History floater.
@@ -501,4 +629,23 @@ void LLToolBar::onClickAreaSearch(void*)
 void LLToolBar::onClickInventory(void*)
 {
 	handle_inventory(NULL);
+}
+
+// static
+void LLToolBar::onClickFavorites(void*)
+{
+	HBFloaterWearableFavorites::toggleInstance();
+}
+
+// AO-only controls, connected to the existing Firestorm AO settings/editor.
+// No other toolbar controls or AO engine implementation are modified.
+void LLToolBar::onClickAOToggle(void*)
+{
+	gSavedPerAccountSettings.setBool("UseAO",
+		!gSavedPerAccountSettings.getBool("UseAO"));
+}
+
+void LLToolBar::onClickAOEditor(void*)
+{
+	FloaterAO::showInstance();
 }

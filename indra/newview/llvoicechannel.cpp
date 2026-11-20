@@ -173,6 +173,13 @@ void LLVoiceChannel::setChannelInfo(const LLSD& channel_info)
 	}
 }
 
+void LLVoiceChannel::resetChannelInfo()
+{
+	// Firestorm clears credentials after a previous call has ended or failed.
+	mChannelInfo = LLSD();
+	mState = STATE_NO_CHANNEL_INFO;
+}
+
 void LLVoiceChannel::onChange(EStatusType type, const LLSD& channel_info, bool)
 {
 	if (mChannelInfo.isUndefined() ||
@@ -451,9 +458,11 @@ void LLVoiceChannelGroup::activate()
 		return;
 	}
 
-	// We have the channel info, just need to use it now.
+	// Firestorm's ad-hoc voice session handles P2P signalling and
+	// microphone state together when the call starts.
 	gVoiceClient.setNonSpatialChannel(mChannelInfo, mIsP2P && mOutgoingCall,
 									  mIsP2P);
+	gVoiceClient.setUserPTTState(mIsP2P);
 }
 
 //static

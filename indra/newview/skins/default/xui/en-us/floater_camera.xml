@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<floater name="camera controls" title="" rect_control="FloaterCameraRect3a" mouse_opaque="true"
- can_close="true" can_drag_on_left="false" can_minimize="false" can_resize="false" can_tear_off="true" 
- width="200" min_width="200" height="64" min_height="64" follows="top|right">
-	<!-- Icons are custom buttons in the code -->
-	<string name="rotate_tooltip">Rotate camera around focus</string>
-	<string name="zoom_tooltip">Zoom camera towards focus</string>
-	<string name="move_tooltip">Move camera up and down, left and right</string>
-	<spinner name="draw_distance" label="" label_width="1" control_name="RenderFarClip"
-	 decimal_digits="0" max_val="512" min_val="32" increment="32"
-	 tool_tip="Draw distance"
-	 right="-4" bottom="-40" width="45" height="16" follows="bottom|right" />
-	<check_box name="front_view" label="Front" control_name="CameraFrontView"
-	 tool_tip="Switch the camera to front view"
-	 left_delta="-2" bottom_delta="-20" height="16" width="45" follows="bottom|right" />
+<floater name="camera controls" title="Camera Controls" rect_control="ChaosCameraWindowRect"
+ can_close="true" can_drag_on_left="false" can_minimize="false" can_resize="true"
+ can_tear_off="false" mouse_opaque="true" width="170" min_width="170"
+ height="157" min_height="157" follows="top|right">
+ <string name="rotate_tooltip">Orbit camera around focus</string>
+ <string name="zoom_tooltip">Zoom camera towards focus</string>
+ <string name="move_tooltip">Pan camera up, down, left or right</string>
+ <button name="view_front" left="3" bottom="-40" width="20" height="19" label="" scale_image="true"
+  image_unselected="Chaos_Cam_Preset_Front_Off.png" image_selected="Chaos_Cam_Preset_Front_On.png" tool_tip="Front view" />
+ <button name="view_side" left="26" bottom="-40" width="20" height="19" label="" scale_image="true"
+  image_unselected="Chaos_Cam_Preset_Side_Off.png" image_selected="Chaos_Cam_Preset_Side_On.png" tool_tip="Side view" />
+ <button name="view_rear" left="49" bottom="-40" width="20" height="19" label="" scale_image="true"
+  image_unselected="Chaos_Cam_Preset_Back_Off.png" image_selected="Chaos_Cam_Preset_Back_On.png" tool_tip="Rear view" />
+ <button name="view_tpp" left="72" bottom="-40" width="20" height="19" label="" scale_image="true"
+  image_unselected="Chaos_Cam_Preset_TPP_Off.png" image_selected="Chaos_Cam_Preset_TPP_On.png" tool_tip="Third-person view" />
+ <button name="view_object" left="95" bottom="-40" width="20" height="19" label="" scale_image="true"
+  image_unselected="Chaos_Object_View_Off.png" image_selected="Chaos_Object_View_On.png" tool_tip="Object view (focus selected object)" />
+ <button name="view_mouselook" left="118" bottom="-40" width="20" height="19" label="" scale_image="true"
+  image_unselected="Chaos_Mouselook_View_Off.png" image_selected="Chaos_Mouselook_View_On.png" tool_tip="Mouselook" />
+ <button name="reset_camera" left="141" bottom="-40" width="20" height="19" label="" scale_image="true"
+  image_unselected="Chaos_Refresh_Off.png" image_selected="Chaos_Refresh_Press.png" tool_tip="Reset camera (Esc)" />
+ <button name="camera_position_btn" label="Position..." left="4" bottom="-124" width="130" height="20"
+  tool_tip="Open camera position settings" follows="bottom|left|right" />
+ <button name="save_preset_btn" label="+" left="142" bottom="-124" width="19" height="20"
+  tool_tip="Save current camera view to My View preset" follows="bottom|right" />
+ <combo_box name="preset_combo" label="Use preset" allow_text_entry="false" left="4" bottom="-148"
+  height="20" width="130" follows="bottom|left|right">
+  <combo_item name="none">Use preset</combo_item>
+  <combo_item name="rear">Rear View</combo_item>
+  <combo_item name="front">Front View</combo_item>
+  <combo_item name="side">Side View</combo_item>
+  <combo_item name="myview">My View</combo_item>
+ </combo_box>
+ <button name="gear_btn" label="" left="142" bottom="-148" width="19" height="20"
+  image_overlay="Icon_Gear.png" scale_image="true" tool_tip="Camera settings" follows="bottom|right" />
 </floater>

@@ -121,6 +121,7 @@ private:
 	static void onClickForgotPassword(void*);
 	static void onPassKey(LLLineEditor* caller, void* user_data);
 	static void onSelectServer(LLUICtrl*, void* user_data);
+	static void onSelectInterfaceStyle(LLUICtrl*, void* user_data);
 	static void onServerComboLostFocus(LLFocusableElement*, void*);
 	static void onStartLocationComboCommit(LLUICtrl* ctrl, void*);
 	static void onLastNameEditLostFocus(LLUICtrl* ctrl, void* user_data);

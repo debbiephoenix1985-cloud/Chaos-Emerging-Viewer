@@ -124,6 +124,7 @@ void LLMorphView::setVisible(bool visible)
 			gFloaterCustomizep->switchToDefaultSubpart();
 
 			initialize();
+			LLFloaterCustomize::applyRequestedWearableEdit();
 
 			// First run dialog
 			LLFirstUse::useAppearance();

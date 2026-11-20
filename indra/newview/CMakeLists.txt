@@ -53,6 +53,7 @@ set(viewer_SOURCE_FILES
   llaisapi.cpp
   llappcorehttp.cpp
   llappearancemgr.cpp
+  llappearancelistener.cpp
   llappviewer.cpp
   llaudiosourcevo.cpp
   llavataractions.cpp
@@ -93,6 +94,7 @@ set(viewer_SOURCE_FILES
   llfloateractivespeakers.cpp
   llfloateranimpreview.cpp
   hbfloaterareasearch.cpp
+  hbfloaterwearablefavorites.cpp
   llfloaterauction.cpp
   llfloateravatarinfo.cpp
   llfloateravatarpicker.cpp
@@ -104,6 +106,7 @@ set(viewer_SOURCE_FILES
   llfloaterbuy.cpp
   llfloaterbuycurrency.cpp
   llfloaterbuyland.cpp
+  llfloateradvancedbuild.cpp
   llfloatercamera.cpp
   llfloaterchat.cpp
   llfloaterchatterbox.cpp
@@ -120,6 +123,7 @@ set(viewer_SOURCE_FILES
   llfloaterexperienceprofile.cpp
   llfloaterexperiences.cpp
   llfloaterfriends.cpp
+  llfloatercontactsets.cpp
   llfloatergesture.cpp
   llfloatergodtools.cpp
   llfloatergroupbulkban.cpp
@@ -171,6 +175,8 @@ set(viewer_SOURCE_FILES
   hbfloatersearch.cpp
   llfloatersellland.cpp
   llfloatersnapshot.cpp
+  llimagefilter.cpp
+  llimagefiltersmanager.cpp
   hbfloatersoundslist.cpp
   llfloaterstats.cpp
   llfloatertelehub.cpp
@@ -319,6 +325,7 @@ set(viewer_SOURCE_FILES
   llspatialpartition.cpp
   llstartup.cpp
   llstatusbar.cpp
+  llchaosfavoritesbar.cpp
   llsurface.cpp
   llsurfacepatch.cpp
   lltexturecache.cpp
@@ -434,6 +441,7 @@ set(viewer_HEADER_FILES
   llaisapi.h
   llappcorehttp.h
   llappearancemgr.h
+  llappearancelistener.h
   llappviewer.h
   llaudiosourcevo.h
   llavataractions.h
@@ -475,6 +483,7 @@ set(viewer_HEADER_FILES
   llfloateractivespeakers.h
   llfloateranimpreview.h
   hbfloaterareasearch.h
+  hbfloaterwearablefavorites.h
   llfloaterauction.h
   llfloateravatarinfo.h
   llfloateravatarpicker.h
@@ -486,6 +495,7 @@ set(viewer_HEADER_FILES
   llfloaterbuycontents.h
   llfloaterbuycurrency.h
   llfloaterbuyland.h
+  llfloateradvancedbuild.h
   llfloatercamera.h
   llfloaterchat.h
   llfloaterchatterbox.h
@@ -502,6 +512,7 @@ set(viewer_HEADER_FILES
   llfloaterexperienceprofile.h
   llfloaterexperiences.h
   llfloaterfriends.h
+  llfloatercontactsets.h
   llfloatergesture.h
   llfloatergodtools.h
   llfloatergroupbulkban.h
@@ -701,6 +712,7 @@ set(viewer_HEADER_FILES
   llspatialpartition.h
   llstartup.h
   llstatusbar.h
+  llchaosfavoritesbar.h
   llsurface.h
   llsurfacepatch.h
   lltexturecache.h

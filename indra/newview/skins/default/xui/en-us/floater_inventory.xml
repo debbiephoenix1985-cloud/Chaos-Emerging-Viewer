@@ -35,6 +35,19 @@
 				<on_click filter="" function="Inventory.NewWindow" userdata="" />
 			</menu_item_call>
 			<menu_item_separator name="separator1" />
+			<!-- Firestorm 7.2.5 inventory tabs: native actions in existing Folder menu. -->
+			<menu_item_call name="Custom Tab Add" label="New custom filter tab">
+				<on_click function="Inventory.CustomTabAdd" userdata="" />
+			</menu_item_call>
+			<menu_item_call name="Custom Tab Clone" label="Clone current filter tab">
+				<on_click function="Inventory.CustomTabClone" userdata="" />
+			</menu_item_call>
+			<menu_item_call name="Custom Tab Rename" label="Rename current custom filter tab">
+				<on_click function="Inventory.CustomTabRename" userdata="" />
+			</menu_item_call>
+			<menu_item_call name="Custom Tab Close" label="Close current custom filter tab">
+				<on_click function="Inventory.CustomTabClose" userdata="" />
+			</menu_item_call>
 			<menu_item_call name="Show Filters" label="Show filters">
 				<on_click filter="" function="Inventory.ShowFilters" userdata="" />
 			</menu_item_call>
@@ -48,7 +61,12 @@
 			 control_name="HideEmptySystemFolders">
 				<on_click filter="" function="Inventory.HideEmptySystemFolders" userdata="" />
 			</menu_item_check>
-			<menu_item_check name="Hide Marketplace Folder" label="Hide Marketplace folder"
+	        <!-- Firestorm 7.2.5: add one check to Chaos's original Folder menu. -->
+        <menu_item_check name="Hide Library Folder" label="Hide Library folder"
+         control_name="HideLibraryFolder">
+            <on_click function="Inventory.HideLibraryFolder" userdata="" />
+        </menu_item_check>
+		<menu_item_check name="Hide Marketplace Folder" label="Hide Marketplace folder"
 			 control_name="HideMarketplaceFolder">
 				<on_click filter="" function="Inventory.HideMarketplaceFolder" userdata="" />
 			</menu_item_check>
