@@ -185,6 +185,10 @@ bool LLToolBar::postBuild()
 	mInventoryButton->setClickedCallback(onClickInventory, this);
 	mInventoryButton->setControlName("ShowInventory", NULL);
 
+	mAppearanceButton = getChild<LLButton>("appearance_btn");
+	mAppearanceButton->setClickedCallback(onClickAppearance, this);
+	mAppearanceButton->setControlName("", NULL);
+
 	mFavoritesButton = getChild<LLButton>("wearable_favorites_btn");
 	mFavoritesButton->setClickedCallback(onClickFavorites, this);
 	mFavoritesButton->setControlName("", NULL);
@@ -352,6 +356,10 @@ void LLToolBar::layoutButtons()
 	if (!show) --count;
 
 	// The existing Favourite Wearables shortcut can be hidden or shown.
+	show = gSavedSettings.getBool("ShowAppearanceButton");
+	mAppearanceButton->setVisible(show);
+	if (!show) --count;
+
 	show = gSavedSettings.getBool("ShowFavWearablesButton");
 	mFavoritesButton->setVisible(show);
 	if (!show) --count;
@@ -524,11 +532,13 @@ void LLToolBar::refresh()
 		mMapButton->setEnabled(!gRLInterface.mContainsShowworldmap &&
 							   !gRLInterface.mContainsShowloc);
 		mInventoryButton->setEnabled(!gRLInterface.mContainsShowinv);
+		mAppearanceButton->setEnabled(!gRLInterface.mContainsShowinv);
 		mFavoritesButton->setEnabled(!gRLInterface.mContainsShowinv);
 	}
 	else
 	{
 		mFavoritesButton->setEnabled(true);
+		mAppearanceButton->setEnabled(true);
 	}
 //mk
 
@@ -632,6 +642,11 @@ void LLToolBar::onClickInventory(void*)
 }
 
 // static
+void LLToolBar::onClickAppearance(void*)
+{
+	chaosOpenAppearance();
+}
+
 void LLToolBar::onClickFavorites(void*)
 {
 	HBFloaterWearableFavorites::toggleInstance();

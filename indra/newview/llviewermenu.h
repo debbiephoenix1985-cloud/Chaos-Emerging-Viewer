@@ -47,6 +47,8 @@ class LLVOAvatar;
 // Called in llviewerwindow.cpp
 void pre_init_menus();
 void init_menus();
+// Open the integrated Firestorm-style Appearance window from the toolbar.
+void chaosOpenAppearance();
 void cleanup_menus();
 
 // Called in llviewercontrol.cpp

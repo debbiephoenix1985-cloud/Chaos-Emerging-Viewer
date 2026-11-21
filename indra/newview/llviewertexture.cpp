@@ -554,7 +554,7 @@ S32 LLViewerTexture::getMaxVideoRamSetting()
 	}
 	// Further clamp the free VRAM margin between 16 and 1024MB. HB
 	sFreeVRAMMargin = llclamp(sFreeVRAMMargin, 16, 1024);
-	if (margin != sFreeVRAMMargin)
+	if (margin != 0 && margin != sFreeVRAMMargin)
 	{
 		gSavedSettings.setU32("VRAMFreeMargin", sFreeVRAMMargin);
 	}

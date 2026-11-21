@@ -354,6 +354,7 @@ private:
 	bool mShowMapButton;
 	bool mShowInventoryButton;
 	bool mShowFavWearablesButton;
+	bool mShowAppearanceButton;
 	bool mHideMasterRemote;
 	bool mUseOldChatHistory;
 	bool mAutoOpenTextInput;
@@ -491,6 +492,8 @@ HBPrefsCoolImpl::HBPrefsCoolImpl()
 						   onCommitCheckBoxShowButton, this);
 	childSetCommitCallback("show_inventory_button_check",
 						   onCommitCheckBoxShowButton, this);
+	childSetCommitCallback("show_appearance_button_check",
+						   onCommitCheckBoxShowButton, this);
 	childSetCommitCallback("show_fav_wearables_button_check",
 						   onCommitCheckBoxShowButton, this);
 	childSetCommitCallback("use_old_chat_history_check",
@@ -586,9 +589,9 @@ HBPrefsCoolImpl::HBPrefsCoolImpl()
 	control->getSignal()->connect(std::bind(&HBPrefsCoolImpl::setDirty, this));
 	childSetAction("reset_model_folder", onClickResetSetting, control);
 
-	control = gSavedPerAccountSettings.getControl("NewOutfitFolder");
-	control->getSignal()->connect(std::bind(&HBPrefsCoolImpl::setDirty, this));
-	childSetAction("reset_new_outfits_folder", onClickResetSetting, control);
+	// My Outfits is the grid's system folder: not a user-selectable override.
+	// Keep the legacy preference value on disk for older viewer builds.
+	childSetVisible("reset_new_outfits_folder", false);
 
 	refresh();
 }
@@ -718,7 +721,7 @@ void HBPrefsCoolImpl::draw()
 		childSetEnabled("reset_texture_folder", usable);
 		childSetEnabled("reset_material_folder", usable);
 		childSetEnabled("reset_model_folder", usable);
-		childSetEnabled("reset_new_outfits_folder", usable);
+		childSetEnabled("reset_new_outfits_folder", false);
 
 		mIsDirty = false;
 	}
@@ -765,6 +768,7 @@ void HBPrefsCoolImpl::refreshValues()
 	mShowMapButton						= gSavedSettings.getBool("ShowMapButton");
 	mShowInventoryButton				= gSavedSettings.getBool("ShowInventoryButton");
 	mShowFavWearablesButton = gSavedSettings.getBool("ShowFavWearablesButton");
+	mShowAppearanceButton = gSavedSettings.getBool("ShowAppearanceButton");
 	mHideMasterRemote					= gSavedSettings.getBool("HideMasterRemote");
 	mChaosRightClickMenuStyle = gSavedSettings.getString("ChaosRightClickMenuStyle");
 	mMediaRemoteBarLocation = gSavedSettings.getString("MediaRemoteBarLocation");
@@ -999,6 +1003,7 @@ void HBPrefsCoolImpl::cancel()
 	gSavedSettings.setBool("ShowMapButton",						mShowMapButton);
 	gSavedSettings.setBool("ShowInventoryButton",				mShowInventoryButton);
 	gSavedSettings.setBool("ShowFavWearablesButton", mShowFavWearablesButton);
+	gSavedSettings.setBool("ShowAppearanceButton", mShowAppearanceButton);
 	if (gToolBarp) gToolBarp->layoutButtons();
 	gSavedSettings.setBool("HideMasterRemote",					mHideMasterRemote);
 	gSavedSettings.setString("ChaosRightClickMenuStyle", mChaosRightClickMenuStyle);

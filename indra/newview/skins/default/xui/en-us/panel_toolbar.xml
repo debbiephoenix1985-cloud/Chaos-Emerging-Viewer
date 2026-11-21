@@ -15,6 +15,7 @@
 	<button bottom="0" font="SansSerif" height="24" label="Stats" left="0" name="statistics_btn" tool_tip="Statistics: open or close the viewer statistics window." width="50" />
 	<button bottom="0" font="SansSerif" height="24" label="Camera" left="0" name="camera_controls_btn" tool_tip="Open Camera Controls" width="50" />
 	<button bottom="0" font="SansSerif" height="24" label="Inventory" left="0" name="inventory_btn" tool_tip="Your items. (Ctrl-I)" width="50" />
+	<button bottom="0" font="SansSerif" height="24" label="Appearance" left="0" name="appearance_btn" tool_tip="Open Appearance and My Outfits" width="50" />
 	<button bottom="0" font="SansSerif" height="24" label="Fav Wearables" left="0" name="wearable_favorites_btn" tool_tip="Favourite Wearables: quick attach and detach of HUDs and clothing" width="50" />
 	<!-- AO only: Firestorm Vintage split button; right of Favourite Wearables. -->
 	<button bottom="2" font="SansSerif" height="20" label="AO" label_selected="AO" halign="center" left="0" name="chaos_ao_toggle_btn" scale_image="true" tool_tip="Enable/disable animation overrider" is_toggle="true" image_unselected="ChaosAO_Left_Off" image_selected="ChaosAO_Left_Selected" image_disabled="ChaosAO_Left_Disabled" width="40" />

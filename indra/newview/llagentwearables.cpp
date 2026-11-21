@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file llagentwearables.cpp
  * @brief LLAgentWearables class implementation
  *
@@ -44,6 +44,7 @@
 #include "llgesturemgr.h"
 #include "llgridmanager.h"					// For gIsInSecondLife
 #include "llinventorybridge.h"
+#include "llviewerinventory.h"
 //MK
 #include "mkrlinterface.h"
 //mk
@@ -1109,199 +1110,163 @@ struct HBNewOutfitData
 };
 
 void LLAgentWearables::makeNewOutfit(const std::string& new_folder_name,
-									 const uuid_vec_t& wearables_to_include,
-									 const uuid_vec_t& attachments_to_include,
-									 bool rename_clothing)
+                                     const uuid_vec_t& wearables_to_include,
+                                     const uuid_vec_t& attachments_to_include,
+                                     bool rename_clothing)
 {
-	if (!isAgentAvatarValid())
-	{
-		return;
-	}
+    if (!isAgentAvatarValid())
+    {
+        llwarns << "Cannot save outfit: avatar is not ready." << llendl;
+        return;
+    }
 
-	// Store the required data for the callback in a temporary structure (this
-	// is slow, but this is the cost for using asynchronous callbacks). HB
-	HBNewOutfitData* datap = new HBNewOutfitData(wearables_to_include,
-												 attachments_to_include,
-												 rename_clothing);
+    // Firestorm 7.2.5: LLAppearanceMgr::makeNewOutfitLinks() resolves the
+    // dedicated system FT_MY_OUTFITS folder before creating an FT_OUTFIT
+    // category. Do not fall back to Clothing or create a second My Outfits.
+    const LLUUID parent_id =
+        gInventory.findCategoryUUIDForType(LLFolderType::FT_MY_OUTFITS, false);
+    if (parent_id.isNull())
+    {
+        llwarns << "Outfit save: system My Outfits folder not found." << llendl;
+        gNotifications.add("CantCreateRequestedInvFolder");
+        return;
+    }
 
-	// We will create a sub-folder in the user-preferred folder or the Clothing
-	// folder by default (FT_MY_OUTFITS becomes FT_CLOTHING on purpose in
-	// findChoosenCategoryUUIDForType() when no user preferred folder is set).
-	const LLUUID clothing_folder_id =
-		gInventory.findChoosenCategoryUUIDForType(LLFolderType::FT_MY_OUTFITS);
+    // Preserve Chaos' selectable wearables/attachments; the actual folder
+    // contents are written using Firestorm's link-slam workflow below.
+    HBNewOutfitData* datap = new HBNewOutfitData(wearables_to_include,
+                                                 attachments_to_include,
+                                                 rename_clothing);
+    llinfos << "Firestorm outfit save: creating '" << new_folder_name
+            << "' under My Outfits " << parent_id
+            << ", wearables=" << wearables_to_include.size()
+            << ", attachments=" << attachments_to_include.size() << llendl;
 
-	// Create the category and, on completion, call back our method to link,
-	// copy or move the items into it. HB
-	inventory_func_t func = std::bind(&LLAgentWearables::makeNewOutfitCopy,
-									  this, _1, datap);
-	gInventory.createNewCategory(clothing_folder_id, LLFolderType::FT_NONE,
-								 new_folder_name, func);
+    // Firestorm starts by creating an FT_OUTFIT. Some OpenSim inventory
+    // implementations reject this typed category or cannot complete its
+    // CreateInventoryCategory capability request. Retry as a normal
+    // subfolder ONLY in that failure case. It remains inside My Outfits,
+    // with the same link-only contents and no server-side folder retyping.
+    inventory_func_t finish = [this, datap](const LLUUID& id)
+    {
+        llinfos << "Outfit category creation result: " << id << llendl;
+        makeNewOutfitCopy(id, datap);
+    };
 
+    inventory_func_t generic_result =
+        [this, parent_id, new_folder_name, datap, finish](const LLUUID& id)
+        {
+            if (id.notNull())
+            {
+                finish(id);
+                return;
+            }
+            if (gIsInSecondLife)
+            {
+                finish(LLUUID::null);
+                return;
+            }
+
+            // Last-resort OpenSim UDP inventory protocol: retains legacy
+            // viewer compatibility if the category capability failed.
+            llwarns << "OpenSim generic category capability failed; "
+                    << "retrying UDP CreateInventoryFolder under My Outfits."
+                    << llendl;
+            LLUUID udp_id = gInventory.createCategoryUDP(
+                parent_id, LLFolderType::FT_NONE, new_folder_name);
+            finish(udp_id);
+        };
+
+    inventory_func_t typed_result =
+        [this, parent_id, new_folder_name, generic_result, finish]
+        (const LLUUID& id)
+        {
+            if (id.notNull())
+            {
+                finish(id);
+                return;
+            }
+            if (gIsInSecondLife)
+            {
+                finish(LLUUID::null);
+                return;
+            }
+            llwarns << "OpenSim FT_OUTFIT category creation failed. "
+                    << "Retrying FT_NONE inside existing My Outfits." << llendl;
+            gInventory.createNewCategory(
+                parent_id, LLFolderType::FT_NONE,
+                new_folder_name, generic_result);
+        };
+
+    gInventory.createNewCategory(
+        parent_id, LLFolderType::FT_OUTFIT,
+        new_folder_name, typed_result);
 }
 
 void LLAgentWearables::makeNewOutfitCopy(const LLUUID& cat_id,
-										 HBNewOutfitData* datap)
+                                         HBNewOutfitData* datap)
 {
-	if (!datap) return;	// Paranoia
+    if (!datap) return;
+    if (cat_id.isNull())
+    {
+        llwarns << "Outfit save failed: all category creation methods failed."
+                << llendl;
+        gNotifications.add("CantCreateRequestedInvFolder");
+        delete datap;
+        return;
+    }
 
-	if (cat_id.isNull())
-	{
-		gNotifications.add("CantCreateRequestedInvFolder");
-		delete datap;
-		return;
-	}
+    // Ported from Firestorm 7.2.5 LLAppearanceMgr::slamCategoryLinks:
+    // build the link payload and use slam_inventory_folder, including the
+    // legacy item-by-item transport on OpenSim grids without AIS.
+    // No inventory original is copied, moved or renamed.
+    LLSD contents = LLSD::emptyArray();
+    for (const LLUUID& item_id : datap->mWearables)
+    {
+        LLViewerInventoryItem* item = gInventory.getItem(item_id);
+        if (!item) continue;
+        LLViewerWearable* worn = getWearableFromItemID(item_id);
+        LLWearableType::EType type;
+        S32 index = worn ? getWearableTypeAndIndex(worn, type) : -1;
+        if (index < 0) continue;
 
-	bool found_first_item = false;
-	bool no_link = !gSavedSettings.getBool("UseInventoryLinks");
-	bool do_link = gSavedSettings.getBool("UseInventoryLinksAlways");
-	bool cloth_link = gSavedSettings.getBool("UseInventoryLinksForClothes");
+        LLSD link;
+        link["name"] = item->getName();
+        link["desc"] = build_order_string(type, index);
+        link["linked_id"] = item->getLinkedUUID();
+        link["type"] = LLAssetType::AT_LINK;
+        contents.append(link);
+    }
+    for (const LLUUID& item_id : datap->mAttachments)
+    {
+        LLViewerInventoryItem* item = gInventory.getItem(item_id);
+        if (!item) continue;
+        LLSD link;
+        link["name"] = item->getName();
+        link["desc"] = item->getActualDescription();
+        link["linked_id"] = item->getLinkedUUID();
+        link["type"] = LLAssetType::AT_LINK;
+        contents.append(link);
+    }
 
-	///////////////////
-	// Wearables
-
-	if (datap->mWearables.size())
-	{
-		LLWearableList* wl = LLWearableList::getInstance();
-		// Then, iterate though each of the wearables and save copies of them
-		// in the folder.
-		LLPointer<LLRefCount> cbdone = NULL;
-		LLWearableType::EType type;
-		std::string new_name, name_base;
-		if (datap->mRenameClothing)
-		{
-			LLViewerInventoryCategory* catp = gInventory.getCategory(cat_id);
-			if (catp)	// Paranoia
-			{
-				name_base = catp->getName() + " ";
-			}
-		}
-		for (S32 i = 0, count = datap->mWearables.size(); i < count; ++i)
-		{
-			const LLUUID& item_id = datap->mWearables[i];
-			LLViewerWearable* old_wearablep = getWearableFromItemID(item_id);
-			S32 index = getWearableTypeAndIndex(old_wearablep, type);
-			if (index < 0) continue;	// Not found/not worn
-
-			bool use_link = do_link ||
-							(cloth_link && type >= LLWearableType::WT_SHIRT);
-			LLViewerInventoryItem* itemp = gInventory.getItem(item_id);
-			if (!itemp)
-			{
-				llwarns << "Could not find inventory item for wearable type: "
-						<< LLWearableType::getTypeLabel(type)
-						<< " - layer index: " << index << llendl;
-				continue;
-			}
-
-			if (name_base.empty())
-			{
-				new_name = itemp->getName();
-			}
-			else
-			{
-				new_name = name_base + old_wearablep->getTypeLabel();
-				if (index > 0)
-				{
-					if ((S32)new_name.length() + 10 <= DB_INV_ITEM_NAME_STR_LEN)
-					{
-						new_name += llformat(" (layer %d)", index);
-					}
-					else
-					{
-						new_name += llformat("#%d", index);
-					}
-				}
-				LLStringUtil::truncate(new_name, DB_INV_ITEM_NAME_STR_LEN);
-			}
-
-			bool can_copy = isWearableCopyable(type, index);
-			if (!use_link && (no_link || can_copy))
-			{
-				if (can_copy)
-				{
-					LLViewerWearable* new_wearablep = wl->createCopy(old_wearablep);
-					if (datap->mRenameClothing)
-					{
-						new_wearablep->setName(new_name);
-					}
-
-					S32 todo = LLAddWearableToInventoryCallback::CALL_NONE;
-					if (!found_first_item)
-					{
-						found_first_item = true;
-						// set the focus to the first item
-						todo |= LLAddWearableToInventoryCallback::CALL_MAKENEWOUTFITDONE;
-						// Send the agent wearables update when done
-						cbdone = new LLSendAgentWearablesUpdateCallback;
-					}
-					LLPointer<LLInventoryCallback> cb =
-						new LLAddWearableToInventoryCallback(cbdone, type,
-															 index,
-															 new_wearablep,
-															 todo);
-					copy_inventory_item(itemp->getPermissions().getOwner(),
-										itemp->getLinkedUUID(), cat_id,
-										new_name, cb);
-				}
-				else
-				{
-					move_inventory_item(itemp->getLinkedUUID(), cat_id,
-										new_name);
-				}
-			}
-			else
-			{
-				link_inventory_item(itemp->getLinkedUUID(), cat_id,
-									// For auto-ordering on outfit wearing:
-									build_order_string(type, index),
-									LLAssetType::AT_LINK);
-			}
-		}
-		gInventory.notifyObservers();
-	}
-
-	///////////////////
-	// Attachments
-
-	if (datap->mAttachments.size())
-	{
-		for (S32 i = 0, count = datap->mAttachments.size(); i < count; ++i)
-		{
-			const LLUUID& item_id = datap->mAttachments[i];
-			LLViewerInventoryItem* itemp = gInventory.getItem(item_id);
-			if (!itemp) continue;
-
-			const LLUUID& inv_item_id = itemp->getLinkedUUID();
-			if (!do_link &&
-				(no_link || itemp->getPermissions().allowCopyBy(gAgentID)))
-			{
-				const std::string item_name = itemp->getName();
-				const LLUUID& old_cat_id = itemp->getParentUUID();
-				if (itemp->getPermissions().allowCopyBy(gAgentID))
-				{
-					LLPointer<LLInventoryCallback> cb =
-						new LLMoveAfterCopyDoneCallback(inv_item_id, cat_id,
-														item_name);
-					copy_inventory_item(itemp->getPermissions().getOwner(),
-										inv_item_id, old_cat_id, item_name,
-										cb);
-				}
-				else
-				{
-					move_inventory_item(inv_item_id, cat_id, item_name);
-				}
-			}
-			else
-			{
-				link_inventory_item(inv_item_id, cat_id,
-									itemp->getDescription(),
-									LLAssetType::AT_LINK);
-			}
-		}
-		gInventory.notifyObservers();
-	}
-
-	delete datap;
+    llinfos << "Firestorm outfit link slam: " << contents.size()
+            << " links into " << cat_id << llendl;
+    if (contents.size() > 0)
+    {
+        LLPointer<LLInventoryCallback> cb =
+            new LLBoostFuncInventoryCallback([cat_id](const LLUUID&)
+            {
+                gInventory.fetchDescendentsOf(cat_id);
+                gInventory.notifyObservers();
+            });
+        slam_inventory_folder(cat_id, contents, cb);
+    }
+    else
+    {
+        llwarns << "Outfit has no resolvable worn items: " << cat_id << llendl;
+    }
+    gInventory.notifyObservers();
+    delete datap;
 }
 
 void LLAgentWearables::makeNewOutfitDone(LLWearableType::EType type, U32 index)

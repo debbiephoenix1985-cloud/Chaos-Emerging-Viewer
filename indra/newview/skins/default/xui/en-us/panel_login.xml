@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <panel name="panel_login" left="0" bottom="0" width="800" height="600" follows="left|top|right|bottom" background_visible="true" background_opaque="false" bg_alpha_color="0.055 0.13 0.145 0.95">
 	<web_browser name="login_html" border_visible="false" left="0" right="0" top="0" bottom="116" follows="top|left|bottom|right" />
 	<text name="saved_account_text" font="SansSerif" left="668" bottom="90" width="205" height="16" follows="left|bottom">Saved accounts:</text><combo_box name="saved_account_combo" font="SansSerif" allow_text_entry="false" max_chars="120" tool_tip="Select a remembered avatar and grid. Existing login fields and grid splash page are restored." left="668" bottom="62" width="345" height="20" follows="left|bottom" />

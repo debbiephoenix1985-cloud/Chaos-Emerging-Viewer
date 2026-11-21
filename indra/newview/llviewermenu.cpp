@@ -9779,6 +9779,11 @@ class LLChaosAppearance final :
     }
 };
 
+void chaosOpenAppearance()
+{
+	LLChaosAppearance::showInstance();
+}
+
 class LLShowFloater final : public view_listener_t
 {
 	bool handleEvent(LLPointer<LLEvent>, const LLSD& userdata) override

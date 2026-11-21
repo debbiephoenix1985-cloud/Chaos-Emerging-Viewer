@@ -23,6 +23,7 @@
 			<check_box name="show_region_info_button_check" control_name="ShowRegionInfoButton" label="Region Details" tool_tip="Show/hide the Region Details toolbar button" font="SansSerifSmall" height="16" follows="left|top" left="260" bottom="-82" width="119" />
 			<check_box name="show_statistics_button_check" control_name="ShowStatisticsButton" label="Statistics" tool_tip="Show/hide the Statistics toolbar button" font="SansSerifSmall" height="16" follows="left|top" left="381" bottom="-82" width="100" />
 			<check_box name="show_favorites_bar_check" control_name="ShowFavoritesBar" label="Favourites bar" tool_tip="Show or hide the account Favorites landmark teleport bar" font="SansSerifSmall" height="16" follows="left|top" left="15" bottom="-102" width="180" />
+			<check_box name="show_appearance_button_check" control_name="ShowAppearanceButton" label="Appearance" tool_tip="Show or hide Appearance / My Outfits on the bottom bar" font="SansSerifSmall" height="16" follows="left|top" left="378" bottom="-102" width="113" />
 			<check_box name="show_camera_controls_button_check" control_name="ShowCameraControlsButton" label="Camera Controls" tool_tip="Show or hide the Camera Controls button on the bottom toolbar" font="SansSerifSmall" height="16" follows="left|top" left="208" bottom="-102" width="169" />
 			<text name="world_right_click_style_label" font="SansSerifSmall" left="15" bottom="-124" width="150" height="18" follows="left|top">World right-click menu:</text>
 			<radio_group name="chaos_right_click_menu_style" draw_border="false" left="169" bottom="-124" width="304" height="18" follows="left|top" tool_tip="Auto uses Firestorm-style context menus for Modern and classic pie menus for Legacy. Manual choices persist when changing skins.">
@@ -173,10 +174,10 @@
 			<button name="reset_model_folder" label="Reset to default" font="SansSerifSmall" tool_tip="Reset the upload folder for mesh models to the default one ('Objects' folder, at root inventory level)." left_delta="354" bottom_delta="-4" width="102" height="19" follows="left|top" />
 			<line_editor name="upload_folder_model" font="SansSerifSmall" max_length="512" word_wrap="false" enabled="false" tool_tip="This is the inventory folder where mesh models are uploaded. You can choose another folder for this purpose from the inventory context menu for folders." left="20" bottom_delta="-20" width="456" height="18" follows="left|top" />
 			<text name="new_outfits_folder_text" font="SansSerifSmall" left="20" bottom_delta="-22" width="400" height="12" follows="left|top">
-				Inventory folder to use for newly created outfits:
+				System folder for newly created outfits:
 			</text>
-			<button name="reset_new_outfits_folder" label="Reset to default" font="SansSerifSmall" tool_tip="Reset the folder where new outfits are stored to the default one ('Clothing' folder, at root inventory level)." left_delta="354" bottom_delta="-4" width="102" height="19" follows="left|top" />
-			<line_editor name="new_outfits_folder" font="SansSerifSmall" max_length="512" word_wrap="false" enabled="false" tool_tip="This is the inventory folder where new outfits (created with the 'Make new outfit' floater) are stored. You can choose another folder for this purpose from the inventory context menu for folders." left="20" bottom_delta="-20" width="456" height="18" follows="left|top" />
+			<button name="reset_new_outfits_folder" label="Reset to default" font="SansSerifSmall" tool_tip="My Outfits is a system folder; its destination cannot be changed." visible="false" left_delta="354" bottom_delta="-4" width="102" height="19" follows="left|top" />
+			<line_editor name="new_outfits_folder" font="SansSerifSmall" max_length="512" word_wrap="false" enabled="false" tool_tip="New outfits are saved as inventory links inside your existing My Outfits system folder." left="20" bottom_delta="-20" width="456" height="18" follows="left|top" />
 		</panel>
 		<panel name="Animations" label="Animations" border="true" left="1" bottom="-440" width="500" height="440" follows="left|top|right|bottom">
 			<text name="animation_upload" font="SansSerifSmall" left="10" bottom_delta="-28" width="150" height="16" follows="left|top">

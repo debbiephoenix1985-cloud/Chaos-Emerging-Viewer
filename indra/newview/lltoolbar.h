@@ -80,6 +80,7 @@ public:
 	static void onClickStatistics(void* data);
 	static void onClickCameraControls(void* data);
 	static void onClickInventory(void* data);
+	static void onClickAppearance(void* data);
 	static void onClickFavorites(void* data);
 	// AO-only: on/off toggle and separate editor arrow.
 	static void onClickAOToggle(void* data);
@@ -103,6 +104,7 @@ private:
 	LLButton*				mStatisticsButton;
 	LLButton*				mCameraControlsButton;
 	LLButton*				mInventoryButton;
+	LLButton*				mAppearanceButton;
 	LLButton*				mFavoritesButton;
 	LLButton*				mAOButton;
 	LLButton*				mAOEditorArrow;

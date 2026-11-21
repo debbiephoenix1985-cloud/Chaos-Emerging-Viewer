@@ -23,17 +23,17 @@ This tool allows to make a new folder and save copies of the items you are now w
 	</text>
 	<check_box name="checkbox_rename" label="Rename wearables to folder name" font="SansSerifSmall"
 	 tool_tip="When this option is checked, any modify-ok clothing/wearable item gets renamed to the same name as the name of the new outfit folder name when copied/moved into this folder (this does not apply to attachments neither to links)."
-	 left="92" bottom_delta="0" width="195" height="16" follows="left|top" />
+	 left="92" bottom_delta="0" width="195" height="16" follows="left|top" visible="false" />
 	<check_box name="checkbox_nocopy_links" control_name="UseInventoryLinks"
 	 label="Make links for no-copy items" font="SansSerifSmall"
 	 tool_tip="When this option is checked, any no-copy item (wearable or attachment) gets a link created in the new outfit folder instead of being moved from its original location into the new folder."
-	 left="313" bottom_delta="0" width="300" height="16" follows="left|top" />
+	 left="313" bottom_delta="0" width="300" height="16" follows="left|top" visible="false" />
 	<check_box name="checkbox_clothes_links" control_name="UseInventoryLinksForClothes"
 	 label="Make links for all clothes" font="SansSerifSmall"
 	 tool_tip="When this option is checked, all clothing items get a link created in the new outfit folder instead of being copied or moved from their original location into the new folder. The layer of the clothing item can then be stored in the link description, thus allowing the viewer to automatically stack items of the same type in the proper order when wearing the outfit."
-	 left="92" bottom_delta="-18" width="300" height="16" follows="left|top" />
+	 left="92" bottom_delta="-18" width="300" height="16" follows="left|top" visible="false" />
 	<check_box name="checkbox_all_links" control_name="UseInventoryLinksAlways"
-	 label="Make links for all items" font="SansSerifSmall"
+	 label="Save as links (no inventory copies)" font="SansSerifSmall"
 	 tool_tip="When this option is checked, all items (wearables and attachments) get a link created in the new outfit folder instead of being copied or moved from their original location into the new folder."
 	 left="313" bottom_delta="0" width="300" height="16" follows="left|top" />
 	<text name="outfit_items" font="SansSerif" halign="left"

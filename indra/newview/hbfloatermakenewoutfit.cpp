@@ -105,10 +105,17 @@ bool HBFloaterMakeNewOutfit::postBuild()
 	mUseAllLinksCheck->setCommitCallback(onCommitCheckBoxLinkAll);
 	mUseAllLinksCheck->setCallbackUserData(this);
 
-	bool use_links_always = gSavedSettings.getBool("UseInventoryLinksAlways");
-	mUseNoCopyLinksCheck->setEnabled(!use_links_always);
-	mUseClothesLinksCheck->setEnabled(!use_links_always);
-	mRenameCheck->setEnabled(!use_links_always);
+	// Outfit creation is always link-only (Firestorm 7.2.5 model).
+	// Hide outdated copy/move options; existing controls still exist for XUI.
+	gSavedSettings.setBool("UseInventoryLinksAlways", true);
+	mUseNoCopyLinksCheck->setVisible(false);
+	mUseClothesLinksCheck->setVisible(false);
+	mRenameCheck->setVisible(false);
+	mUseNoCopyLinksCheck->setEnabled(false);
+	mUseClothesLinksCheck->setEnabled(false);
+	mRenameCheck->setEnabled(false);
+	mUseAllLinksCheck->setValue(true);
+	mUseAllLinksCheck->setEnabled(false);
 
 	return true;
 }
