@@ -290,7 +290,7 @@ bool FloaterAO::getRowInfo(LLScrollListItem* item, RowInfo& info) const
 LLScrollListItem* FloaterAO::addRow(LLScrollListCtrl* list, const std::string& icon, const std::string& name, const RowInfo& info, const std::string& tooltip, bool indented, bool bold)
 {
     LLSD row;
-    row["value"] = encodeRowValue(info);
+    row["id"] = encodeRowValue(info);
 
     row["columns"][0]["column"] = "icon";
     row["columns"][0]["type"] = "icon";
@@ -1790,7 +1790,7 @@ void FloaterAO::onAnimationChanged(const LLUUID& animation)
 }
 
 // virtual
-BOOL FloaterAO::handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop, EDragAndDropType type, void* data,
+bool FloaterAO::handleDragAndDrop(S32 x, S32 y, MASK mask, bool drop, EDragAndDropType type, void* data,
                                     EAcceptance* accept, std::string& tooltipMsg)
 {
     // no drag & drop on small interface
