@@ -594,6 +594,11 @@ LLFloater* LLPanel::getParentFloater() const
 	return floaterp;
 }
 
+bool LLPanel::hasString(const std::string& name) const
+{
+    return mUIStrings.find(name) != mUIStrings.end();
+}
+
 std::string LLPanel::getString(const std::string& name,
 							   const LLStringUtil::format_map_t& args) const
 {

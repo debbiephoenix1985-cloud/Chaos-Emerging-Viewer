@@ -46,6 +46,16 @@ endif (WINDOWS)
 set(viewer_SOURCE_FILES
   llagent.cpp
   ao.cpp
+  fsfloaterposer.cpp
+  llloadingindicator.cpp
+  fsjointpose.cpp
+  fsposingmotion.cpp
+  fsposeranimator.cpp
+  llcommonutils.cpp
+  fsposestate.cpp
+  fsvirtualtrackpad.cpp
+  fsmaniprotatejoint.cpp
+  fsmaniptranslatejoint.cpp
   aoengine.cpp
   aoset.cpp
   llagentpilot.cpp
@@ -434,6 +444,16 @@ set(viewer_HEADER_FILES
 
   llagent.h
   ao.h
+  fsfloaterposer.h
+  llloadingindicator.h
+  fsjointpose.h
+  fsposingmotion.h
+  fsposeranimator.h
+  llcommonutils.h
+  fsposestate.h
+  fsvirtualtrackpad.h
+  fsmaniprotatejoint.h
+  fsmaniptranslatejoint.h
   aoengine.h
   aoset.h
   llagentpilot.h

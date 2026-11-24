@@ -1,0 +1,698 @@
+<?xml version='1.0' encoding='utf-8'?>
+<floater positioning="None" save_rect="true" height="498" min_height="498" min_width="455" can_resize="true" layout="topleft" name="floater_poser" title="Avatar and Animesh Poser" help_topic="poser" width="455">
+	<string name="icon_category" translate="false">Inv_BodyShape</string>
+	<string name="icon_bone" translate="false" />
+	<string name="icon_object" translate="false">Inv_Object</string>
+	<string name="icon_rotation_bvh_locked_edited" translate="false">Script_Running</string>
+	<string name="icon_rotation_bvh_locked_unedited" translate="false">Script_NotRunning</string>
+	<string name="icon_rotation_bvh_unlocked" translate="false">Script_Error</string>
+	<string name="icon_rotation_is_world_locked" translate="false">Locked_Icon</string>
+	<string name="icon_rotation_does_not_export" translate="false">Conv_toolbar_close</string>
+	<string name="icon_rotation_is_own_work" translate="false">Check_Mark</string>
+	<string name="icon_save_button" translate="false">Icon_Dock_Foreground</string>
+	<string name="icon_save_failed_button" translate="false">Parcel_Exp_Color</string>
+	<string name="icon_save_query" translate="false">Info</string>
+	<string name="joint_transform_mPelvis" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mTorso" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mSpine1" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mSpine2" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mChest" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mSpine3" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mSpine4" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mNeck" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mHead" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mSkull" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mCollarLeft" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mCollarRight" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mShoulderLeft" translate="false">SWAP_ROLL_AND_PITCH NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mShoulderRight" translate="false">SWAP_ROLL_AND_PITCH</string>
+	<string name="joint_transform_mElbowLeft" translate="false">SWAP_ROLL_AND_PITCH NEGATE_PITCH</string>
+	<string name="joint_transform_mElbowRight" translate="false">SWAP_ROLL_AND_PITCH</string>
+	<string name="joint_transform_mWristLeft" translate="false">SWAP_ROLL_AND_PITCH NEGATE_PITCH</string>
+	<string name="joint_transform_mWristRight" translate="false">SWAP_ROLL_AND_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mFaceJaw" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mEyeRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mEyeLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mHipLeft" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mKneeLeft" translate="false">NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mAnkleLeft" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mFootLeft" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mToeLeft" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mHipRight" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mKneeRight" translate="false">NEGATE_PITCH NEGATE_ROLL</string>
+	<string name="joint_transform_mAnkleRight" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mFootRight" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mToeRight" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceTeethLower" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceTeethUpper" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceLipCornerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceLipCornerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceLipUpperLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceLipUpperCenter" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceLipUpperRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceLipLowerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceLipLowerCenter" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceLipLowerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyeLidUpperLeft" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyeLidUpperRight" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyecornerInnerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyecornerInnerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyeLidLowerLeft" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyeLidLowerRight" translate="false">NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyebrowOuterLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyebrowOuterRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyebrowCenterLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyebrowCenterRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyebrowInnerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEyebrowInnerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceCheekUpperLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceCheekLowerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceCheekUpperRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceCheekLowerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mHandThumb1Left" translate="false">SWAP_ROLL_AND_PITCH</string>
+	<string name="joint_transform_mHandThumb1Right" translate="false">SWAP_ROLL_AND_PITCH NEGATE_PITCH</string>
+	<string name="joint_transform_mHandThumb2Left" translate="false">SWAP_ROLL_AND_PITCH</string>
+	<string name="joint_transform_mHandThumb2Right" translate="false">SWAP_ROLL_AND_PITCH NEGATE_PITCH</string>
+	<string name="joint_transform_mHandThumb3Left" translate="false">SWAP_ROLL_AND_PITCH</string>
+	<string name="joint_transform_mHandThumb3Right" translate="false">SWAP_ROLL_AND_PITCH NEGATE_PITCH</string>
+	<string name="joint_transform_mHandIndex1Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandIndex1Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandIndex2Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandIndex2Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandIndex3Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandIndex3Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandMiddle1Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandMiddle1Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandMiddle2Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandMiddle2Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandMiddle3Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandMiddle3Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandRing1Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandRing1Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandRing2Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandRing2Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandRing3Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandRing3Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandPinky1Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandPinky1Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandPinky2Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandPinky2Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_mHandPinky3Left" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_mHandPinky3Right" translate="false">SWAP_X2Z_Y2X_Z2Y NEGATE_PITCH</string>
+	<string name="joint_transform_LEFT_PEC" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_RIGHT_PEC" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_HEAD" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_NECK" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_BELLY" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_CHEST" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_PELVIS" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_UPPER_BACK" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_L_CLAVICLE" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_R_CLAVICLE" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_LEFT_HANDLE" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_RIGHT_HANDLE" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_L_UPPER_ARM" translate="false">SWAP_X2Y_Y2Z_Z2X NEGATE_PITCH NEGATE_YAW</string>
+	<string name="joint_transform_R_UPPER_ARM" translate="false">SWAP_X2Y_Y2Z_Z2X</string>
+	<string name="joint_transform_L_LOWER_ARM" translate="false">SWAP_ROLL_AND_PITCH</string>
+	<string name="joint_transform_R_LOWER_ARM" translate="false">SWAP_ROLL_AND_PITCH</string>
+	<string name="joint_transform_L_HAND" translate="false">SWAP_ROLL_AND_PITCH</string>
+	<string name="joint_transform_R_HAND" translate="false">SWAP_X2Z_Y2X_Z2Y</string>
+	<string name="joint_transform_L_UPPER_LEG" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_R_UPPER_LEG" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_L_LOWER_LEG" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_R_LOWER_LEG" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_L_FOOT" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_R_FOOT" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mTail1" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mTail2" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mTail3" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mTail4" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mTail5" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mTail6" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceTongueBase" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceTongueTip" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEar1Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEar2Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEar1Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceEar2Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceNoseBase" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceNoseBridge" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceNoseLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceNoseCenter" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceNoseRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceForeheadLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceForeheadCenter" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_transform_mFaceForeheadRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mPelvis" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mTorso" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mChest" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mNeck" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHead" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mCollarLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mShoulderLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mElbowLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mWristLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mCollarRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mShoulderRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mElbowRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mWristRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mHipLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mKneeLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mAnkleLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mFootLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mToeLeft" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mHipRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mKneeRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mAnkleRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mFootRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mToeRight" translate="false">NEGATE_ROLL NEGATE_PITCH</string>
+	<string name="joint_frame_mHandThumb1Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandThumb1Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandThumb2Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandThumb2Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandThumb3Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandThumb3Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandIndex1Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandIndex1Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandIndex2Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandIndex2Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandIndex3Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandIndex3Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandMiddle1Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandMiddle1Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandMiddle2Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandMiddle2Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandMiddle3Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandMiddle3Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandRing1Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandRing1Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandRing2Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandRing2Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandRing3Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandRing3Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandPinky1Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandPinky1Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandPinky2Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandPinky2Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandPinky3Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mHandPinky3Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mEyeRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mEyeLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceTeethLower" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceTeethUpper" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceLipCornerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceLipCornerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceLipUpperLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceLipUpperCenter" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceLipUpperRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceLipLowerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceLipLowerCenter" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceLipLowerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyeLidUpperLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyeLidUpperRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyecornerInnerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyecornerInnerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyeLidLowerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyeLidLowerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyebrowOuterLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyebrowOuterRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyebrowCenterLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyebrowCenterRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyebrowInnerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEyebrowInnerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceCheekUpperLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceCheekLowerLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceCheekUpperRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceCheekLowerRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceTongueBase" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceTongueTip" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEar1Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEar2Left" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEar1Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceEar2Right" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceNoseBase" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceNoseBridge" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceNoseLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceNoseCenter" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceNoseRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceForeheadLeft" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceForeheadCenter" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceForeheadRight" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_frame_mFaceJaw" translate="false">SWAP_YAW_AND_ROLL NEGATE_ALL</string>
+	<string name="joint_delta_rotate_mHipLeft">true</string>
+	<string name="joint_delta_rotate_mHipRight">true</string>
+	<string name="joint_delta_rotate_mKneeLeft">true</string>
+	<string name="joint_delta_rotate_mKneeRight">true</string>
+	<string name="joint_delta_rotate_mElbowLeft">true</string>
+	<string name="joint_delta_rotate_mElbowRight">true</string>
+	<string name="joint_delta_rotate_mWristLeft">true</string>
+	<string name="joint_delta_rotate_mWristRight">true</string>
+	<string name="header_mHead">Body</string>
+	<string name="header_mFaceForeheadLeft">Forehead/Brows</string>
+	<string name="header_mEyeLeft">Eyes/Eye Lids</string>
+	<string name="header_mFaceCheekUpperLeft">Cheeks/Lips</string>
+	<string name="header_mHandThumb1Left">Left Hand</string>
+	<string name="header_mCollarLeft">Left Arm</string>
+	<string name="header_mHandThumb1Right">Right Hand</string>
+	<string name="header_mCollarRight">Right Arm</string>
+	<string name="header_mHipLeft">Legs</string>
+	<string name="header_mTail1">Tail</string>
+	<string name="header_mHindLimbsRoot">Hind Limbs</string>
+	<string name="header_mWingsRoot">Wings</string>
+	<string name="header_mFaceEar1Left">Ears/Nose</string>
+	<string name="header_mSkull">Body</string>
+	<string name="header_HEAD">Body</string>
+	<string name="header_L_UPPER_ARM">Arms</string>
+	<string name="header_L_UPPER_LEG">Legs</string>
+	<string name="title_mPelvis">Whole Avatar</string>
+	<string name="title_mTorso">Torso</string>
+	<string name="title_mSpine1">Spine 1</string>
+	<string name="title_mSpine2">Spine 2</string>
+	<string name="title_mSpine3">Spine 3</string>
+	<string name="title_mSpine4">Spine 4</string>
+	<string name="title_mChest">Chest</string>
+	<string name="title_mNeck">Neck</string>
+	<string name="title_mHead">Head</string>
+	<string name="title_mSkull">Skull</string>
+	<string name="title_mEyeRight">Right Eye</string>
+	<string name="title_mEyeLeft">Left Eye</string>
+	<string name="title_mFaceForeheadLeft">Forehead Left Side</string>
+	<string name="title_mFaceForeheadRight">Forehead Right Side</string>
+	<string name="title_mFaceEyebrowOuterLeft">Eyebrow Outer Left</string>
+	<string name="title_mFaceEyebrowCenterLeft">Eyebrow Middle Left</string>
+	<string name="title_mFaceEyebrowInnerLeft">Eyebrow Inner Left</string>
+	<string name="title_mFaceEyebrowOuterRight">Eyebrow Outer Right</string>
+	<string name="title_mFaceEyebrowCenterRight">Eyebrow Middle Right</string>
+	<string name="title_mFaceEyebrowInnerRight">Eyebrow Inner Right</string>
+	<string name="title_mFaceEyeLidUpperLeft">EyeLid Upper Left</string>
+	<string name="title_mFaceEyecornerInnerLeft">Eye Inner Corner Left</string>
+	<string name="title_mFaceEyeLidLowerLeft">EyeLid Lower Left</string>
+	<string name="title_mFaceEyeLidUpperRight">EyeLid Upper Right</string>
+	<string name="title_mFaceEyecornerInnerRight">Eye Inner Corner Right</string>
+	<string name="title_mFaceEyeLidLowerRight">EyeLid Lower Right</string>
+	<string name="title_mFaceEar1Left">Ear Upper Left</string>
+	<string name="title_mFaceEar2Left">Ear Lower Left</string>
+	<string name="title_mFaceEar1Right">Ear Upper Right</string>
+	<string name="title_mFaceEar2Right">Ear Lower Right</string>
+	<string name="title_mFaceNoseBase">Nose Base</string>
+	<string name="title_mFaceNoseBridge">Nose Bridge</string>
+	<string name="title_mFaceNoseLeft">Nose Left</string>
+	<string name="title_mFaceNoseCenter">Nose Middle</string>
+	<string name="title_mFaceNoseRight">Nose Right</string>
+	<string name="title_mFaceCheekLowerLeft">Cheek Lower Left</string>
+	<string name="title_mFaceCheekUpperLeft">Cheek Upper Left</string>
+	<string name="title_mFaceCheekLowerRight">Cheek Lower Right</string>
+	<string name="title_mFaceCheekUpperRight">Cheek Upper Right</string>
+	<string name="title_mFaceJaw">Jaw</string>
+	<string name="title_mFaceTeethLower">Teeth Lower</string>
+	<string name="title_mFaceLipLowerLeft">Lip Lower Left</string>
+	<string name="title_mFaceLipLowerRight">Lip Lower Right</string>
+	<string name="title_mFaceLipLowerCenter">Lip Lower Middle</string>
+	<string name="title_mFaceTongueBase">Tongue Base</string>
+	<string name="title_mFaceTongueTip">Tongue Tip</string>
+	<string name="title_mFaceJawShaper">Jaw Shaper</string>
+	<string name="title_mFaceForeheadCenter">Forehead Middle</string>
+	<string name="title_mFaceTeethUpper">Teeth Upper</string>
+	<string name="title_mFaceLipUpperLeft">Lip Upper Left</string>
+	<string name="title_mFaceLipUpperRight">Lip Upper Right</string>
+	<string name="title_mFaceLipCornerLeft">Lip Corner Left</string>
+	<string name="title_mFaceLipCornerRight">Lip Corner Right</string>
+	<string name="title_mFaceLipUpperCenter">Lip Upper Middle</string>
+	<string name="title_mCollarLeft">Collar</string>
+	<string name="title_mShoulderLeft">Whole Arm</string>
+	<string name="title_mElbowLeft">Forearm</string>
+	<string name="title_mWristLeft">Wrist</string>
+	<string name="title_mHandMiddle1Left">Middle Finger Base</string>
+	<string name="title_mHandMiddle2Left">Middle Finger Mid</string>
+	<string name="title_mHandMiddle3Left">Middle Finger Tip</string>
+	<string name="title_mHandIndex1Left">Index Finger Base</string>
+	<string name="title_mHandIndex2Left">Index Finger Mid</string>
+	<string name="title_mHandIndex3Left">Index Finger Tip</string>
+	<string name="title_mHandRing1Left">Ring Finger Base</string>
+	<string name="title_mHandRing2Left">Ring Finger Mid</string>
+	<string name="title_mHandRing3Left">Ring Finger Tip</string>
+	<string name="title_mHandPinky1Left">Pinky Finger Base</string>
+	<string name="title_mHandPinky2Left">Pinky Finger Mid</string>
+	<string name="title_mHandPinky3Left">Pinky Finger Tip</string>
+	<string name="title_mHandThumb1Left">Thumb Base</string>
+	<string name="title_mHandThumb2Left">Thumb Mid</string>
+	<string name="title_mHandThumb3Left">Thumb Tip</string>
+	<string name="title_mCollarRight">Collar</string>
+	<string name="title_mShoulderRight">Whole Arm</string>
+	<string name="title_mElbowRight">Forearm</string>
+	<string name="title_mWristRight">Wrist</string>
+	<string name="title_mHandMiddle1Right">Middle Finger Base</string>
+	<string name="title_mHandMiddle2Right">Middle Finger Mid</string>
+	<string name="title_mHandMiddle3Right">Middle Finger Tip</string>
+	<string name="title_mHandIndex1Right">Index Finger Base</string>
+	<string name="title_mHandIndex2Right">Index Finger Mid</string>
+	<string name="title_mHandIndex3Right">Index Finger Tip</string>
+	<string name="title_mHandRing1Right">Ring Finger Base</string>
+	<string name="title_mHandRing2Right">Ring Finger Mid</string>
+	<string name="title_mHandRing3Right">Ring Finger Tip</string>
+	<string name="title_mHandPinky1Right">Pinky Finger Base</string>
+	<string name="title_mHandPinky2Right">Pinky Finger Mid</string>
+	<string name="title_mHandPinky3Right">Pinky Finger Tip</string>
+	<string name="title_mHandThumb1Right">Thumb Base</string>
+	<string name="title_mHandThumb2Right">Thumb Mid</string>
+	<string name="title_mHandThumb3Right">Thumb Tip</string>
+	<string name="title_mWingsRoot">Root</string>
+	<string name="title_mWing1Left">Left 1</string>
+	<string name="title_mWing2Left">Left 2</string>
+	<string name="title_mWing3Left">Left 3</string>
+	<string name="title_mWing4Left">Left 4</string>
+	<string name="title_mWing4FanLeft">Left Fan</string>
+	<string name="title_mWing1Right">Right 1</string>
+	<string name="title_mWing2Right">Right 2</string>
+	<string name="title_mWing3Right">Right 3</string>
+	<string name="title_mWing4Right">Right 4</string>
+	<string name="title_mWing4FanRight">Right Fan</string>
+	<string name="title_mHipRight">Right Whole Leg</string>
+	<string name="title_mKneeRight">Right Knee</string>
+	<string name="title_mAnkleRight">Right Ankle</string>
+	<string name="title_mFootRight">Right Foot</string>
+	<string name="title_mToeRight">Right Toe</string>
+	<string name="title_mHipLeft">Left Whole Leg</string>
+	<string name="title_mKneeLeft">Left Knee</string>
+	<string name="title_mAnkleLeft">Left Ankle</string>
+	<string name="title_mFootLeft">Left Foot</string>
+	<string name="title_mToeLeft">Left Toe</string>
+	<string name="title_mTail1">Tail Base</string>
+	<string name="title_mTail2">Tail 2</string>
+	<string name="title_mTail3">Tail 3</string>
+	<string name="title_mTail4">Tail 4</string>
+	<string name="title_mTail5">Tail 5</string>
+	<string name="title_mTail6">Tail Tip</string>
+	<string name="title_mGroin">Groin</string>
+	<string name="title_mHindLimbsRoot">Root</string>
+	<string name="title_mHindLimb1Left">Left Base</string>
+	<string name="title_mHindLimb2Left">Left 2</string>
+	<string name="title_mHindLimb3Left">Left 3</string>
+	<string name="title_mHindLimb4Left">Left 4</string>
+	<string name="title_mHindLimb1Right">Right Base</string>
+	<string name="title_mHindLimb2Right">Right 2</string>
+	<string name="title_mHindLimb3Right">Right 3</string>
+	<string name="title_mHindLimb4Right">Right 4</string>
+	<string name="title_HEAD">Head</string>
+	<string name="title_NECK">Neck</string>
+	<string name="title_CHEST">Chest</string>
+	<string name="title_BUTT">Bottom</string>
+	<string name="title_BELLY">Belly</string>
+	<string name="title_LEFT_PEC">Left Pec</string>
+	<string name="title_RIGHT_PEC">Right Pec</string>
+	<string name="title_L_CLAVICLE">Left Clavicle</string>
+	<string name="title_R_CLAVICLE">Right Clavicle</string>
+	<string name="title_L_UPPER_ARM">Left Upper Arm</string>
+	<string name="title_R_UPPER_ARM">Right Upper Arm</string>
+	<string name="title_L_LOWER_ARM">Left Lower Arm</string>
+	<string name="title_R_LOWER_ARM">Right Lower Arm</string>
+	<string name="title_L_HAND">Left Hand</string>
+	<string name="title_R_HAND">Right Hand</string>
+	<string name="title_UPPER_BACK">Upper Back</string>
+	<string name="title_LEFT_HANDLE">Left Waist</string>
+	<string name="title_RIGHT_HANDLE">Right Waist</string>
+	<string name="title_PELVIS">Pelvis</string>
+	<string name="title_L_UPPER_LEG">Left Upper Leg</string>
+	<string name="title_R_UPPER_LEG">Right Upper Leg</string>
+	<string name="title_L_LOWER_LEG">Left Lower Leg</string>
+	<string name="title_R_LOWER_LEG">Right Lower Leg</string>
+	<string name="title_L_FOOT">Left Foot</string>
+	<string name="title_R_FOOT">Right Foot</string>
+	<string name="bvh_joint_transform_mHead" translate="false">SWAP_X2Y_Y2Z_Z2X</string>
+	<string name="LoadPoseLabel">Load Pose</string>
+	<string name="SavePoseLabel">Save Pose</string>
+	<string name="LoadDiffLabel">Load Diff</string>
+	<string name="SaveDiffLabel">Save Diff</string>
+	<string name="OverWriteLabel">Overwrite?</string>
+	<string name="FiledateFormat">
+		[year,datetime,local]/[mthnum,datetime,local]/[day,datetime,local] [hour,datetime,local]:[min,datetime,local]:[second,datetime,local]
+	</string>
+	<string name="FiledateFormatAMPM">
+		[year,datetime,local]/[mthnum,datetime,local]/[day,datetime,local] [hour12,datetime,local]:[min,datetime,local]:[second,datetime,local] [ampm,datetime,local]
+	</string>
+	<panel follows="top|left|right" height="330" left="0" border_size="-4" close_time_constant="0.02" open_time_constant="0.02" mouse_opaque="false" name="poser_stack" orientation="vertical" width="455" bottom="148">
+		<panel follows="top|left" auto_resize="false" name="regular_controls_layout" height="300" width="455" left="0" bottom="30">
+			<panel follows="left" height="300" background_visible="false" mouse_opaque="false" name="joints_parent_panel" left="7" width="235" bottom="0">
+				<tab_container follows="all" halign="center" height="295" left="0" name="joints_tabs" tab_height="20" tab_width="72" tab_group="1" tab_position="left" width="235" bottom="5">
+					<panel follows="all" background_visible="false" height="295" title="Move" name="positionRotation_panel" width="235" label="Move" left="0" bottom="0">
+						<panel follows="all" height="295" background_visible="false" mouse_opaque="false" left="0" name="move_tab_panel" width="235" bottom="0">
+							<text follows="left|top" name="av_position_updown_label" height="10" width="153" left="0" bottom="280">
+								Up/Down:
+							</text>
+							<slider decimal_digits="2" show_text="false" follows="left|top" height="16" increment="0.01" initial_value="0" min_val="-1.5" max_val="1.5" name="av_position_updown" width="97" tool_tip="Move the selected avatar up or down" can_edit_text="true" left="5" bottom="259">
+								</slider>
+							<spinner height="16" decimal_digits="2" follows="left|top" increment="0.01" name="av_position_updown_spinner" min_val="-1.5" max_val="1.5" width="52" left="103" bottom="262" font="SansSerifSmall">
+								</spinner>
+							<text follows="left|top" name="av_position_leftright_label" height="10" left="0" width="153" bottom="247">
+								Left/Right:
+							</text>
+							<slider decimal_digits="2" follows="left|top" show_text="false" height="16" increment="0.01" initial_value="0" min_val="-1.5" max_val="1.5" name="av_position_leftright" width="97" tool_tip="Move the selected avatar left or right" can_edit_text="true" left="5" bottom="226">
+								</slider>
+							<spinner height="16" decimal_digits="2" follows="left|top" increment="0.01" name="av_position_leftright_spinner" min_val="-1.5" max_val="1.5" width="52" left="103" bottom="229" font="SansSerifSmall">
+								</spinner>
+							<text follows="left|top" name="av_position_inout_label" height="10" left="0" width="153" bottom="214">
+								In/Out:
+							</text>
+							<slider decimal_digits="2" follows="left|top" show_text="false" height="16" increment="0.01" initial_value="0" min_val="-1.5" max_val="1.5" name="av_position_inout" width="97" tool_tip="Move the selected avatar in or out" can_edit_text="true" left="5" bottom="193">
+								</slider>
+							<spinner height="16" decimal_digits="2" follows="left|top" increment="0.01" name="av_position_inout_spinner" min_val="-1.5" max_val="1.5" width="52" left="103" bottom="196" font="SansSerifSmall">
+								</spinner>
+							<check_box control_name="FSPoserPelvisUnlockedForBvhSave" name="unlock_pelvis_for_bvh_save_checkbox" visible="false" height="16" label="Unlock Pelvis in BVH" follows="left|top" left="5" tool_tip="When you save this pose to BVH, the Pelvis will not be 'locked'. This means other animations in-world can 'move' the whole avatar. Use this if your pose is meant to play 'on top of' another pose." width="134" bottom="165" />
+							<scroll_list visible="false" column_padding="2" height="295" follows="left|top|bottom" can_sort="false" left="2" width="151" multi_select="true" name="entireAv_joint_scroll" bottom="0" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+								<column label="" name="icon" relwidth="0.1" />
+								<column label="Body Part" name="joint" relwidth="0.9" />
+							</scroll_list>
+						</panel>
+					</panel>
+					<panel follows="all" background_visible="false" height="295" left="0" title="Body" name="body_joints_panel" width="481" label="Body" bottom="0">
+						<scroll_list column_padding="2" height="295" follows="left|top|bottom" can_sort="false" left="2" width="152" multi_select="true" name="body_joints_scroll" bottom="0" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+							<column label="" name="icon" relwidth="0.1" />
+							<column label="Body Part" name="joint" relwidth="0.9" />
+						</scroll_list>
+					</panel>
+					<panel follows="all" background_visible="false" height="295" left="0" title="Face" name="face_joints_panel" width="481" label="Face" bottom="0">
+						<scroll_list column_padding="2" height="295" follows="left|top|bottom" can_sort="false" left="2" width="152" multi_select="true" name="face_joints_scroll" bottom="0" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+							<column label="" name="icon" relwidth="0.1" />
+							<column label="Body Part" name="joint" relwidth="0.9" />
+						</scroll_list>
+					</panel>
+					<tab_container follows="all" halign="center" height="285" left="0" title="Hands" name="hands_tabs" tab_height="20" tab_width="50" tab_group="1" tab_position="top" width="235" label="Hands" bottom="10">
+						<panel follows="all" background_visible="false" height="285" left="0" title="Adjust" name="hands_joints_panel" width="481" label="Adjust" bottom="0">
+							<scroll_list column_padding="2" height="285" follows="left|top|bottom" can_sort="false" left="2" width="152" multi_select="true" name="hand_joints_scroll" bottom="0" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+								<column label="" name="icon" relwidth="0.1" />
+								<column label="Body Part" name="joint" relwidth="0.9" />
+							</scroll_list>
+						</panel>
+						<panel follows="all" background_visible="false" height="285" left="0" title="Presets" name="hands_presets_panel" width="481" label="Presets" bottom="0">
+							<scroll_list column_padding="2" height="209" follows="left|top|bottom" can_sort="false" left="2" width="152" multi_select="false" name="hand_presets_scroll" bottom="43" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+								<column label="Preset Name" name="load_file_name_column" width="170" />
+								<column label="Date" name="load_file_date_column" sort="load_file_date_sort_column" width="-1" />
+								<column label="Date" name="load_file_date_sort_column" width="-1" />
+							</scroll_list>
+							<button follows="top|left" height="21" label="Set Left" image_unselected="Toolbar_Middle_Off" name="button_loadHandPoseLeft" tool_tip="Click to set your left hand to the selected preset" left="3" width="75" bottom="10" font="SansSerifSmall" scale_image="true">
+								</button>
+							<button follows="left|top" height="21" image_unselected="Toolbar_Middle_Off" label="Set Right" name="button_loadHandPoseRight" tool_tip="Click to set your right hand to the selected preset" width="75" left="80" bottom="10" font="SansSerifSmall" scale_image="true">
+								</button>
+						</panel>
+					</tab_container>
+					<panel follows="all" background_visible="false" height="295" left="0" title="Misc" name="misc_joints_panel" width="481" label="Misc" bottom="0">
+						<scroll_list column_padding="2" height="295" follows="left|top|bottom" can_sort="false" left="2" width="152" multi_select="true" name="misc_joints_scroll" bottom="0" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+							<column label="" name="icon" relwidth="0.1" />
+							<column label="Body Part" name="joint" relwidth="0.9" />
+						</scroll_list>
+					</panel>
+					<panel follows="all" background_visible="false" height="295" left="0" title="Physics" name="collision_volumes_panel" width="481" label="Physics" bottom="0">
+						<scroll_list column_padding="2" height="295" follows="left|top|bottom" can_sort="false" left="2" width="152" multi_select="true" name="collision_volumes_scroll" bottom="0" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+							<column label="" name="icon" relwidth="0.1" />
+							<column label="Physics" name="joint" relwidth="0.9" />
+						</scroll_list>
+					</panel>
+					<panel follows="all" height="295" background_visible="false" visible="true" title="Model" mouse_opaque="false" name="avatarSelection_panel" left="0" width="156" label="Model" bottom="0">
+						<scroll_list column_padding="0" height="243" can_sort="false" follows="left|top|bottom" left="3" tool_tip="Select the Avatar or Animesh you want to animate." width="150" multi_select="false" name="avatarSelection_scroll" bottom="45" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+							<column label="" name="icon" relwidth="0.0" />
+							<column label="Select Someone to Pose..." name="name" relwidth="1.0" />
+							<column label="UUID" name="uuid" relwidth="0.0" />
+							<column label="SaveFileName" name="saveFileName" relwidth="0.0" />
+						</scroll_list>
+						<button height="21" follows="top|left" label="" image_overlay="Refresh_Off" image_unselected="Toolbar_Middle_Off" name="refresh_avatars" tool_tip="Refresh the list of avatars and animeshes" width="20" left="3" bottom="30" scale_image="true">
+							</button>
+						<button height="21" follows="top|left" enabled="false" label="Start Posing" label_selected="Stop Posing" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" tool_tip="Start posing the selected avatar or animesh, if you are allowed to." name="start_stop_posing_button" width="128" left="25" bottom="30" toggle="true" font="SansSerifSmall" scale_image="true">
+							</button>
+						<button height="21" follows="top|left" left="3" label="Set to T-Pose" image_unselected="Toolbar_Middle_Off" name="set_t_pose_button" tool_tip="Click to set the selected avatar to a 'T-Pose'" width="150" bottom="8" font="SansSerifSmall" scale_image="true">
+							</button>
+					</panel>
+					<panel follows="all" background_visible="false" height="295" left="0" title="Settings" name="settings_panel" width="481" label="Settings" bottom="0">
+						<text follows="left|top" name="trackpad_sensitivity_label" height="10" width="151" left="3" bottom="283">
+							Trackpad Sensitivity:
+						</text>
+						<slider decimal_digits="2" control_name="FSPoserTrackpadSensitivity" can_edit_text="true" follows="left|top" height="14" increment="0.01" initial_value="0" max_val="2" min_val="0.01" show_text="false" name="trackpad_sensitivity_slider" tool_tip="Adjusts the sensitivity of the trackball" width="100" left="3" bottom="266">
+							</slider>
+						<spinner height="16" decimal_digits="2" follows="left|top" control_name="FSPoserTrackpadSensitivity" increment="0.01" name="trackpad_sensitivity_spinner" min_val="0.01" max_val="2" width="50" left="105" bottom="269" font="SansSerifSmall">
+							</spinner>
+						<check_box control_name="FSPoserStopPosingWhenClosed" name="stop_posing_on_close_checkbox" height="16" label="Stop posing when closed" follows="left|top" left="5" tool_tip="Not stopping your pose can be helpful if you do a lot of work, and don't want to accidentally lose it." width="150" bottom="243" font="SansSerifSmall" />
+						<check_box control_name="FSPoserSaveExternalFileAlso" name="also_save_bvh_checkbox" height="16" label="Write BVH when saving" follows="left|top" left="5" tool_tip="When you save your pose, also write a BVH file. BVH can be uploaded via the 'Build &gt; Upload &gt; Animation' to pose yourself or others in-world. This needs joints to reset their 'base' to zero, because BVH requires original work." width="150" bottom="222" font="SansSerifSmall" />
+						<check_box control_name="FSPoserOnSaveConfirmOverwrite" name="confirm_overwrite_on_save_checkbox" height="16" label="Confirm Overwrite" follows="left|top" left="5" tool_tip="When you save a pose, if the file already exists, you need to click the save button again to confirm you are sure you want to overwrite." width="150" bottom="201" font="SansSerifSmall" />
+						<check_box control_name="FSManipRotateJointUseNaturalDirection" name="natural_direction_checkbox" height="16" label="Use natural alignment" follows="left|top" left="5" tool_tip="The skeleton has unnatural joint rotations by default. This complicates posing. When checked, the joints will rotate in a more natural way." width="150" bottom="180" font="SansSerifSmall" />
+						<check_box control_name="FSManipShowJointMarkers" name="show_joint_markers_checkbox" height="16" label="Show joint markers" follows="left|top" left="5" tool_tip="Show small indicators to aid joint selection when posing." width="150" bottom="159" font="SansSerifSmall" />
+						<check_box control_name="RenderDepthOfFieldInEditMode" name="dof_edit_mode_checkbox" height="16" label="Enable DoF in Edit Mode" follows="left|top" left="5" tool_tip="When using the Manipulator, Depth of Field normally disables automatically. This keeps Depth of Field on when editing poses or prims." width="150" bottom="138" font="SansSerifSmall" />
+					</panel>
+				</tab_container>
+				<button follows="bottom|left" image_overlay="Poser_Visual_On" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" name="toggleVisualManipulators" tool_tip="Toggle the visual manipulators on and off" height="50" width="50" left="5" bottom="10" label="" toggle="true" scale_image="true">
+					</button>
+			</panel>
+			<panel follows="left|top|bottom" background_visible="false" mouse_opaque="false" name="joint_manipulation_panel" enabled="true" width="210" height="300" left="245" bottom="0">
+				<tab_container follows="all" halign="center" height="254" name="modifier_tabs" tab_height="20" tab_width="90" tab_group="1" tab_position="top" width="210" left="0" bottom="46">
+					<panel follows="left|right|top|bottom" height="263" background_visible="false" mouse_opaque="false" label="Rotate" name="trackball_panel" enabled="false" width="210" left="0" bottom="0">
+						<fs_virtual_trackpad name="limb_rotation" follows="left|bottom" height="136" width="136" left="36" tool_tip="Change the rotation of the currently selected body part(s). Hold Ctrl to move slow. Roll the wheel to adjust the 3rd axis. Use Shift or Alt to swap which rotations change" pinch_mode="false" infinite_scroll_mode="true" bottom="100" />
+						<text follows="left|bottom" name="limb_pitch_label" height="11" left="5" width="198" bottom="84">
+							Up/Down:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.1" initial_value="0" show_text="false" left="3" min_val="-180" max_val="180" name="limb_pitch_slider" width="143" bottom="66">
+							</slider>
+						<spinner height="17" decimal_digits="2" follows="left|bottom" increment="0.1" name="limb_pitch_spinner" min_val="-180" max_val="180" width="59" left="148" bottom="66" font="SansSerifSmall">
+							</spinner>
+						<text follows="left|bottom" name="limb_yaw_label" height="11" left="5" width="198" bottom="53">
+							Left/Right:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.1" initial_value="0" show_text="false" left="3" min_val="-180" max_val="180" name="limb_yaw_slider" width="143" bottom="35">
+							</slider>
+						<spinner height="17" decimal_digits="2" follows="left|bottom" increment="0.1" name="limb_yaw_spinner" min_val="-180" max_val="180" width="59" left="148" bottom="35" font="SansSerifSmall">
+							</spinner>
+						<text follows="left|bottom" name="limb_roll_label" height="11" left="5" width="198" bottom="22">
+							Roll:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.1" initial_value="0" show_text="false" left="3" min_val="-180" max_val="180" name="limb_roll_slider" width="143" bottom="4">
+							</slider>
+						<spinner height="17" decimal_digits="2" follows="left|bottom" increment="0.1" name="limb_roll_spinner" min_val="-180" max_val="180" width="59" left="148" bottom="4" font="SansSerifSmall">
+							</spinner>
+					</panel>
+					<panel follows="all" background_visible="false" height="263" left="0" title="Move / Scale" name="position_panel" width="210" label="Move / Scale" bottom="0">
+						<text follows="left|bottom" name="pos_x_label" height="11" left="5" width="198" bottom="215">
+							Position X:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.001" initial_value="0" show_text="false" left="3" max_val="1.5" min_val="-1.5" name="Advanced_Position_X" width="145" bottom="197">
+							</slider>
+						<spinner height="17" decimal_digits="3" follows="left|bottom" increment="0.001" name="adv_posx_spinner" min_val="-1.5" max_val="1.5" width="55" left="148" bottom="197">
+							</spinner>
+						<text follows="left|bottom" name="pos_y_label" height="11" left="5" width="198" bottom="183">
+							Position Y:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.001" initial_value="0" show_text="false" left="3" max_val="1.5" min_val="-1.5" name="Advanced_Position_Y" width="145" bottom="165">
+							</slider>
+						<spinner height="17" decimal_digits="3" follows="left|bottom" increment="0.001" name="adv_posy_spinner" min_val="-1.5" max_val="1.5" width="55" left="148" bottom="165">
+							</spinner>
+						<text follows="left|bottom" name="pos_z_label" height="11" left="5" width="198" bottom="151">
+							Position Z:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.001" initial_value="0" show_text="false" left="3" max_val="1.5" min_val="-1.5" name="Advanced_Position_Z" width="145" bottom="133">
+							</slider>
+						<spinner height="17" decimal_digits="3" follows="left|bottom" increment="0.001" name="adv_posz_spinner" min_val="-1.5" max_val="1.5" width="55" left="148" bottom="133">
+							</spinner>
+						<text follows="left|bottom" name="scale_x_label" height="11" left="5" width="198" bottom="111">
+							Scale X:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.001" initial_value="0" show_text="false" left="3" max_val="1.5" min_val="-1.5" name="Advanced_Scale_X" width="145" bottom="93">
+							</slider>
+						<spinner height="17" decimal_digits="3" follows="left|bottom" increment="0.001" name="adv_scalex_spinner" min_val="-1.5" max_val="1.5" width="55" left="148" bottom="93">
+							</spinner>
+						<text follows="left|bottom" name="scale_y_label" height="11" left="5" width="198" bottom="79">
+							Scale Y:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.001" initial_value="0" show_text="false" left="3" max_val="1.5" min_val="-1.5" name="Advanced_Scale_Y" width="145" bottom="61">
+							</slider>
+						<spinner height="17" decimal_digits="3" follows="left|bottom" increment="0.001" name="adv_scaley_spinner" min_val="-1.5" max_val="1.5" width="55" left="148" bottom="61">
+							</spinner>
+						<text follows="left|bottom" name="scale_z_label" height="11" left="5" width="198" bottom="47">
+							Scale Z:
+						</text>
+						<slider label="" label_width="0" follows="left|bottom" height="14" increment="0.001" initial_value="0" show_text="false" left="3" max_val="1.5" min_val="-1.5" name="Advanced_Scale_Z" width="145" bottom="29">
+							</slider>
+						<spinner height="17" decimal_digits="3" follows="left|bottom" increment="0.001" name="adv_scalez_spinner" min_val="-1.5" max_val="1.5" width="55" left="148" bottom="29">
+							</spinner>
+					</panel>
+				</tab_container>
+				<panel follows="left|bottom" height="43" background_visible="false" mouse_opaque="false" left="0" name="trackball_button_panel" width="210" bottom="0">
+					<button height="21" follows="left|bottom" image_overlay="Script_Undo" image_unselected="Toolbar_Middle_Off" name="undo_change" tool_tip="Undo the last change" width="19" left="2" bottom="21" label="" scale_image="true">
+						</button>
+					<button height="21" follows="left|bottom" image_overlay="Script_Redo" image_unselected="Toolbar_Middle_Off" name="button_redo_change" tool_tip="Re-do the last change" enabled="false" width="19" left="22" bottom="21" label="" scale_image="true">
+						</button>
+					<button height="21" follows="left|bottom" image_overlay="Inv_TrashOpen" image_unselected="Toolbar_Middle_Off" name="poser_joint_reset" tool_tip="Click to reset the selected body part(s) to when you first started posing" width="18" left="42" bottom="21" label="" scale_image="true">
+						</button>
+					<button height="21" follows="left|bottom" image_overlay="Inv_Mesh" image_unselected="Toolbar_Middle_Off" name="delta_mode_toggle" tool_tip="If changing multiple joints, each changes by the same amount instead of getting the same change. Also used for breaking Gimbal Lock." width="19" left="61" bottom="21" label="" toggle="true" scale_image="true">
+					</button>
+					<button follows="left|bottom" height="21" image_overlay="Locked_Icon" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" name="toggle_LockWorldRotation" tool_tip="Lock rotation in the world for the selected limb(s). Limbs that are world-locked keep the same rotation in-world when their parent-limbs move. Eg: lock your eyes and turn your head, your eyes keep looking (mostly) in the same direction." width="18" left="81" bottom="21" label="" scale_image="true">
+					</button>
+					<button follows="left|bottom" height="21" label="Mirror" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" name="button_toggleMirrorRotation" tool_tip="Mirror changes to the opposite joint." width="53" left="100" bottom="21" toggle="true" font="SansSerifSmall" scale_image="true">
+						</button>
+					<button follows="left|bottom" height="21" label="Copy" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" name="button_toggleSympatheticRotation" tool_tip="Copy changes to the opposite joint." width="53" left="154" bottom="21" toggle="true" font="SansSerifSmall" scale_image="true">
+						</button>
+					<button follows="left|bottom" height="18" label="W" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" name="poser_world_frame_toggle" left="2" tool_tip="Make rotational changes relative to World" width="20" bottom="3" toggle="true" scale_image="true">
+						</button>
+					<button follows="left|bottom" height="18" label="A" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" name="poser_avatar_frame_toggle" tool_tip="Make rotational changes relative to Avatar" width="17" left="22" bottom="3" toggle="true" scale_image="true">
+						</button>
+					<button follows="left|bottom" height="18" label="S" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" name="poser_screen_frame_toggle" tool_tip="Make rotational changes relative to Screen" width="17" left="40" bottom="3" toggle="true" scale_image="true">
+						</button>
+					<button follows="left|bottom" height="18" label="Copy L &gt; R" name="button_symmetrize_left_to_right" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" tool_tip="Click to copy change from left side to right side." width="74" left="58" bottom="3" font="SansSerifSmall" scale_image="true">
+						</button>
+					<button follows="left|bottom" height="18" label="Copy R &gt; L" name="button_symmetrize_right_to_left" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" tool_tip="Click to copy change from right side to left side." width="75" left="133" bottom="3" font="SansSerifSmall" scale_image="true">
+						</button>
+				</panel>
+			</panel>
+			<panel follows="top|left|bottom" height="300" background_visible="false" mouse_opaque="false" visible="false" name="poses_loadSave" width="275" left="455" bottom="0">
+				<scroll_list column_padding="0" height="280" follows="left|top|right" tool_tip="Load a pose for who you are animating." width="275" multi_select="false" draw_heading="true" name="poses_scroll" sort_column="load_file_name_column" left="0" bottom="20" bg_writeable_color="0.84 0.86 0.88 1" bg_read_only_color="0.84 0.86 0.88 1" bg_stripe_color="0.23 0.23 0.23 1" bg_selected_color="0.19 0.35 0.56 1" fg_unselected_color="0.06 0.06 0.06 1" fg_selected_color="1 1 1 1" fg_disable_color="0.35 0.35 0.35 1" highlighted_color="0.42 0.36 0.49 1" draw_stripes="false">
+					<column label="Name" name="load_file_name_column" width="150" />
+					<column label="Date" name="load_file_date_column" sort="load_file_date_sort_column" width="125" />
+					<column label="Date" name="load_file_date_sort_column" width="-1" />
+				</scroll_list>
+				<line_editor follows="top|left" height="21" commit_on_focus_lost="false" label="Enter Pose Name To Save..." name="pose_save_name" width="275" left="0" bottom="1" />
+			</panel>
+		</panel>
+		<panel follows="top|left|right" height="26" auto_resize="false" name="button_controls_layout" width="455" left="0" bottom="4">
+			<panel follows="left|top|bottom" height="26" background_visible="false" mouse_opaque="false" left="7" name="button_controls_panel" width="800" bottom="0">
+				<panel follows="left|top|bottom" height="22" background_visible="false" mouse_opaque="false" name="advbutton_spacer_panel" width="56" left="0" bottom="5" />
+				<button height="21" follows="left|bottom" enabled="false" image_overlay="Inv_Physics" image_unselected="Toolbar_Middle_Off" name="FlipPose_avatar" tool_tip="Flip the whole pose left/right" width="21" left="57" bottom="2" label="" scale_image="true">
+					</button>
+				<button height="21" follows="left|bottom" enabled="false" image_overlay="Edit_Flip_X" image_unselected="Toolbar_Middle_Off" name="FlipJoint_avatar" tool_tip="Mirror the selected body part(s) left/right" width="21" left="79" bottom="2" label="" scale_image="true">
+					</button>
+				<button follows="left|bottom" height="21" enabled="false" label="Recap" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" name="button_RecaptureParts" tool_tip="If the selected body part(s) is/are OFF, this Recaptures what those body parts are doing right now." width="54" left="101" bottom="2" font="SansSerifSmall" scale_image="true">
+					</button>
+				<button follows="left|bottom" height="21" enabled="false" label="Part(s) On/Off" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" name="toggle_PosingSelectedBones" tool_tip="Turn the Poser on or off for the selected body part(s). When off, that body part animates like normal (with your AO or a pose-ball/etc.)" width="111" left="159" bottom="2" font="SansSerifSmall" scale_image="true">
+					</button>
+				<panel follows="left|top|bottom" height="22" background_visible="false" mouse_opaque="false" name="button_spacer_panel" width="44" left="273" bottom="5" />
+				<button follows="left|bottom" height="21" label="Own Poses" image_overlay="Hierarchy_View_On" image_overlay_alignment="left" image_bottom_pad="1" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" button_flash_enable="true" flash_color="0.7 0.7 1 1" button_flash_count="64" button_flash_rate="0.5" name="toggleLoadSavePanel" tool_tip="Load, save and manage the poses you make" width="122" left="318" bottom="2" toggle="true" font="SansSerifSmall" scale_image="true">
+					</button>
+				<button height="21" follows="left|bottom" visible="false" tool_tip="Manage your pose directory" image_overlay="Inv_FolderOpen" image_overlay_alignment="center" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" name="open_poseDir_button" width="33" left="445" bottom="2" label="" scale_image="true">
+					</button>
+				<loading_indicator visible="false" follows="left|bottom" height="20" name="progress_indicator" width="20" left="479" bottom="2" />
+				<button height="21" follows="left|bottom" label="Load Pose" enabled="false" visible="false" tool_tip="Load the currently selected pose." image_overlay="Icon_Undock_Foreground" image_overlay_alignment="left" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" menu_filename="menu_fs_poser_poses_btn.xml" menu_position="topright" name="load_poses_button" width="105" left="504" bottom="2" scale_image="true" />
+				<button height="21" follows="left|bottom" label="Save Diff" enabled="false" visible="false" tool_tip="A Diff is just your changes to an existing Pose. Start from a T-Pose to save a new work." image_overlay="Icon_Dock_Foreground" image_overlay_alignment="left" image_hover_unselected="Toolbar_Middle_Over" image_selected="Toolbar_Middle_Selected" image_unselected="Toolbar_Middle_Off" name="save_poses_button" width="105" left="610" bottom="2" scale_image="true">
+					</button>
+			</panel>
+		</panel>
+		<panel follows="top|left|right" height="4" auto_resize="false" name="advanced_controls_layout" width="455" left="0" bottom="0">
+			<panel follows="top|left|right" height="4" left="0" enabled="false" background_visible="false" mouse_opaque="false" visible="false" name="advanced_parent_panel" width="555" bottom="0">
+			</panel>
+		</panel>
+	</panel>
+	<panel name="poser_record_panel" left="5" bottom="4" width="445" height="34" follows="left|bottom">
+		<button name="poser_static_export" label="Export Static Pose" left="3" bottom="5" width="130" height="24" font="SansSerifSmall" image_unselected="Toolbar_Middle_Off" image_selected="Toolbar_Middle_Selected" scale_image="true" follows="left|bottom" tool_tip="Save the current posed skeleton as a static BVH animation. No recording or T-pose required." />
+		<button name="poser_record_start" label="Record" left="137" bottom="5" width="69" height="24" font="SansSerifSmall" image_unselected="Toolbar_Middle_Off" image_selected="Toolbar_Middle_Selected" scale_image="true" follows="left|bottom" />
+		<button name="poser_record_stop" label="Stop" left="209" bottom="5" width="58" height="24" font="SansSerifSmall" image_unselected="Toolbar_Middle_Off" image_selected="Toolbar_Middle_Selected" scale_image="true" follows="left|bottom" />
+		<button name="poser_record_export" label="Export BVH" left="270" bottom="5" width="97" height="24" font="SansSerifSmall" image_unselected="Toolbar_Middle_Off" image_selected="Toolbar_Middle_Selected" scale_image="true" follows="left|bottom" />
+		<text name="poser_record_status" left="371" bottom="8" width="72" height="19" font="SansSerifSmall" follows="left|bottom">Ready</text>
+	</panel>
+    <panel name="poser_inventory_panel" left="5" bottom="42" width="445" height="104" follows="left|bottom" background_visible="false">
+        <button name="poser_inventory_load" label="Load Inventory Animation" left="3" bottom="78" width="169" height="23" font="SansSerifSmall" follows="left|bottom" tool_tip="Select an animation in inventory and click here, or drag it directly into Poser." />
+        <button name="poser_inventory_play" label="Play" left="176" bottom="78" width="62" height="23" font="SansSerifSmall" follows="left|bottom" enabled="false" />
+        <button name="poser_inventory_clear" label="Clear" left="242" bottom="78" width="62" height="23" font="SansSerifSmall" follows="left|bottom" enabled="false" tool_tip="Discard local edits and begin a new pose." />
+        <button name="poser_inventory_export" label="Export ANIM" left="308" bottom="78" width="132" height="23" font="SansSerifSmall" follows="left|bottom" enabled="false" tool_tip="Save an edited native animation with original keyframes, timing, priorities and constraints. Only the inventory creator can export." />
+        <slider name="poser_inventory_timeline" left="3" bottom="53" width="305" height="20" min_val="0.0" max_val="1.0" initial_val="0.0" increment="0.001" show_text="false" follows="left|bottom" enabled="false" tool_tip="Scrub through the loaded animation. Click Set Key to commit joint changes before moving to another time." />
+        <text name="poser_inventory_time" left="315" bottom="55" width="125" height="16" follows="left|bottom">0.00 / 0.00 s</text>
+        <button name="poser_inventory_prev" label="Prev Key" left="3" bottom="27" width="77" height="23" font="SansSerifSmall" follows="left|bottom" enabled="false" />
+        <button name="poser_inventory_next" label="Next Key" left="84" bottom="27" width="77" height="23" font="SansSerifSmall" follows="left|bottom" enabled="false" />
+        <button name="poser_inventory_setkey" label="Set Key" left="165" bottom="27" width="77" height="23" font="SansSerifSmall" follows="left|bottom" enabled="false" tool_tip="Commit the selected, enabled joints at the current timeline time." />
+        <button name="poser_inventory_offset" label="Adjust Clip" left="246" bottom="27" width="102" height="23" font="SansSerifSmall" follows="left|bottom" enabled="false" tool_tip="Apply the selected joint adjustments to their entire animation curves." />
+        <button name="poser_inventory_extend" label="Extend +1s" left="352" bottom="27" width="88" height="23" font="SansSerifSmall" follows="left|bottom" enabled="false" tool_tip="Add one second holding the last pose, then use Set Key to edit the new end." />
+        <text name="poser_inventory_status" left="3" bottom="3" width="437" height="20" follows="left|bottom" font="SansSerifSmall">Drag an inventory animation here, or select one and click Load.</text>
+    </panel>
+</floater>

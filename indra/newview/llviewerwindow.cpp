@@ -3626,7 +3626,11 @@ bool LLViewerWindow::handlePerFrameHover()
 		LLMouseHandler* captor = gFocusMgr.getMouseCapture();
 		// With the null, inspect, or drag and drop tool, do not muck with
 		// visibility.
-		if (gFloaterToolsp->isMinimized() ||
+		// Firestorm 7.2.5: the Poser has a separate floater, not a Build/Edit tab.
+		// Respect the current toolset before touching LLFloaterTools visibility.
+		LLToolset* active_toolset = gToolMgr.getCurrentToolset();
+		if (active_toolset && active_toolset->isShowFloaterTools() &&
+			(gFloaterToolsp->isMinimized() ||
 			(tool != toolpie &&	// Not default tool
 			 // Not coming out of mouselook
 			 tool != &gToolCompGun &&
@@ -3636,7 +3640,7 @@ bool LLViewerWindow::handlePerFrameHover()
 			 gToolMgr.getCurrentToolset() != gFaceEditToolset &&
 			 gToolMgr.getCurrentToolset() != gMouselookToolset &&
 			 // Not dragging
-			 (!captor || captor->isView())))
+			 (!captor || captor->isView()))))
 		{
 			// Force floater tools to be visible (unless minimized)
 			if (!LLFloaterTools::isVisible())

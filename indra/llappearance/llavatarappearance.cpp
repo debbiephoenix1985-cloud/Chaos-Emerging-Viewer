@@ -1724,7 +1724,7 @@ LLVector3 LLAvatarAppearance::getVolumePos(S32 joint_index,
 
 LLJoint* LLAvatarAppearance::findCollisionVolume(S32 volume_id)
 {
-	if (volume_id < 0 || volume_id > (S32)mCollisionVolumes.size())
+	if (volume_id < 0 || volume_id >= (S32)mCollisionVolumes.size())
 	{
 		return NULL;
 	}

@@ -1,4 +1,5 @@
-<?xml version="1.0"?><notifications>
+<?xml version='1.0' encoding='utf-8'?>
+<notifications>
 
   <global name="skipnexttime">
 
@@ -1208,17 +1209,13 @@ Your search terms were too short so no search was performed.
 Invalid math expression.
 </notification>
 
-  <!-- Generic Teleport failure modes - strings will be inserted from
-       teleport_strings.xml if available. -->
+  
 <notification icon="alertmodal.tga" name="CouldNotTeleportReason" type="alert">
 Could not teleport.
 [REASON]
 </notification>
 
-  <!-- Teleport failure modes not delivered via the generic mechanism
-       above (for example, delivered as an AlertMessage on
-       region-crossing :( ) - these paths should really be merged
-       in the future. -->
+  
 <notification icon="alertmodal.tga" name="invalid_tport" type="alertmodal">
 Teleport attempts are limited to 6 per minute. If you are having trouble, wait one minute and try teleporting again. If the problem persists, log out and log in again.
 </notification>
@@ -3250,7 +3247,7 @@ Please try a shorter name.
     The display names you entered do not match. Please re-enter.
 </notification>
 
-  <!-- *NOTE: This should never happen -->
+  
 <notification icon="alertmodal.tga" name="AgentDisplayNameUpdateThresholdExceeded" type="alertmodal">
 Sorry, you have to wait longer before you can change your display name.
 
@@ -4766,8 +4763,7 @@ Command: [COMMAND]
 Error:   [ERROR]
 </notification>
 
-<!-- Below are notifications coming directly from the SL servers and that are
-     not spawn by the viewer itself -->
+
 
 <notification icon="alertmodal.tga" name="AddPrimitiveFailure" type="notify">
 Insufficient funds to create primitve.
@@ -5761,13 +5757,13 @@ Avatar frozen.
 </notification>
 
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="alertmodal.tga" name="NewAOCantContainNonASCII" type="alertmodal">
 Could not create new AO set "[AO_SET_NAME]".
 The name may only contain ASCII characters, excluding ":" and "|".
     <usetemplate name="okbutton" yestext="OK" /></notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="alertmodal.tga" name="NewAOSet" type="alertmodal">
 Specify a name for the new AO set:
 (The name may contain any ASCII character, except for ":" or "|")
@@ -5775,155 +5771,125 @@ Specify a name for the new AO set:
 New AO Set
       </input><button default="true" index="0" name="OK" text="OK" /><button index="1" name="Cancel" text="Cancel" /></form></notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="alertmodal.tga" name="RemoveAOSet" type="alertmodal">
 Remove AO set "[AO_SET_NAME]" from the list?
     <usetemplate name="okcancelbuttons" notext="Cancel" yestext="Remove" /></notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="alertmodal.tga" name="RenameAOMustBeASCII" type="alertmodal">
 Could not rename AO set "[AO_SET_NAME]".
 The name may only contain ASCII characters, excluding ":" and "|".
     <usetemplate name="okbutton" yestext="OK" /></notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOForeignItemsFound" type="alertmodal">
 The animation overrider found at least one item that did not belong in the configuration. Please check your "Lost and Found" folder for items that were moved out of the animation overrider configuration.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportAbortCreateSet" type="notifytip">
 Could not create import folder for animation set [NAME]. Giving up.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportAnimationNotFound" type="notifytip">
 Couldn't find animation [NAME]. Please make sure it's present in the same folder as the import notecard.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportDownloadFailed" type="notifytip">
 Could not download notecard.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportInvalid" type="notifytip">
 Notecard didn't contain any usable data. Aborting import.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportLinkFailed" type="notifytip">
 Creating animation link for animation "[NAME]" failed!
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportNoFolder" type="notifytip">
 Couldn't find folder to read the animations.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportNoStatePrefix" type="notifytip">
 Notecard line [LINE] has no valid [ state prefix.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportNoText" type="notifytip">
 Notecard is empty or unreadable.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportNoValidDelimiter" type="notifytip">
 Notecard line [LINE] has no valid ] delimiter.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportPermissionDenied" type="notifytip">
 Insufficient permissions to read notecard.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportRetryCreateSet" type="notifytip">
 Could not create import folder for animation set [NAME]. Retrying ...
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportSetAlreadyExists" type="notifytip">
 An animation set with this name already exists.
   </notification>
 
-  <!-- Imported from Firestorm 6.4.21 AO -->
+  
   <notification icon="notifytip.tga" name="AOImportStateNameNotFound" type="notifytip">
 State name [NAME] not found.
   </notification>
 
-  <!-- Ported from Firestorm 7.2.5 AO -->
-<notification
-   icon="alertmodal.tga"
-   name="RenameAOGroup"
-   type="alertmodal">
+  
+<notification icon="alertmodal.tga" name="RenameAOGroup" type="alertmodal">
 Specify a new name for this animation group:
 (The name may contain any ASCII character, except for ":" or "|")
     <form name="form">
       <input name="message" type="text" default="true">
 [AO_GROUP_NAME]
       </input>
-      <button
-       default="true"
-       index="0"
-       name="OK"
-       text="OK"/>
-      <button
-       index="1"
-       name="Cancel"
-       text="Cancel"/>
+      <button default="true" index="0" name="OK" text="OK" />
+      <button index="1" name="Cancel" text="Cancel" />
     </form>
   </notification>
 
-  <!-- Ported from Firestorm 7.2.5 AO -->
-<notification
-   icon="alertmodal.tga"
-   name="RenameAOEntryMustBeASCII"
-   type="alertmodal">
+  
+<notification icon="alertmodal.tga" name="RenameAOEntryMustBeASCII" type="alertmodal">
 Could not rename to "[AO_SET_NAME]".
 The name may only contain ASCII characters, excluding ":" and "|".
-    <usetemplate
-     name="okbutton"
-     yestext="OK"/>
+    <usetemplate name="okbutton" yestext="OK" />
   </notification>
 
-<!-- Firestorm 7.2.5 AO -->
-<notification
-   icon="alertmodal.tga"
-   name="AOFolderDropNoAnimations"
-   type="alertmodal">
+
+<notification icon="alertmodal.tga" name="AOFolderDropNoAnimations" type="alertmodal">
 The folder "[NAME]" does not contain any animations to add.
-    <usetemplate
-     name="okbutton"
-     yestext="OK"/>
+    <usetemplate name="okbutton" yestext="OK" />
   </notification>
 
-<!-- Firestorm 7.2.5 AO -->
-<notification
-   icon="notifytip.tga"
-   name="AOImportComplete"
-   type="notifytip">
+
+<notification icon="notifytip.tga" name="AOImportComplete" type="notifytip">
 Animation Overrider notecard import complete!
   </notification>
 
-<!-- Firestorm 7.2.5 AO -->
-<notification
-   icon="alertmodal.tga"
-   name="NewAONameCantExist"
-   type="alertmodal">
+
+<notification icon="alertmodal.tga" name="NewAONameCantExist" type="alertmodal">
 An animation set with this name already exists.
-    <usetemplate
-     name="okbutton"
-     yestext="OK"/>
+    <usetemplate name="okbutton" yestext="OK" />
   </notification>
-<!-- Firestorm 7.2.5: Favourite Wearables custom folder views.
-     Only new notifications appended; original Chaos notifications unchanged. -->
-<notification icon="alertmodal.tga" label="New favourite wearables folder"
- name="ChaosWearableFavoritesNewFolder" type="alertmodal">
+
+<notification icon="alertmodal.tga" label="New favourite wearables folder" name="ChaosWearableFavoritesNewFolder" type="alertmodal">
 Name the new Favourite Wearables folder:
     <form name="form">
       <input name="message" type="text">New folder</input>
@@ -5931,8 +5897,7 @@ Name the new Favourite Wearables folder:
       <button index="1" name="Cancel" text="Cancel" />
     </form>
 </notification>
-<notification icon="alertmodal.tga" label="Rename favourite wearables folder"
- name="ChaosWearableFavoritesRenameFolder" type="alertmodal">
+<notification icon="alertmodal.tga" label="Rename favourite wearables folder" name="ChaosWearableFavoritesRenameFolder" type="alertmodal">
 Enter the new folder name:
     <form name="form">
       <input name="message" type="text">[FOLDER_NAME]</input>
@@ -5940,8 +5905,7 @@ Enter the new folder name:
       <button index="1" name="Cancel" text="Cancel" />
     </form>
 </notification>
-<notification icon="alertmodal.tga" label="Delete favourite wearables folder"
- name="ChaosWearableFavoritesDeleteFolder" type="alertmodal">
+<notification icon="alertmodal.tga" label="Delete favourite wearables folder" name="ChaosWearableFavoritesDeleteFolder" type="alertmodal">
 Delete this Favourite Wearables folder? Links in the folder will be removed,
 but original inventory items and favourites in other folders stay intact.
     <form name="form">
@@ -5949,8 +5913,7 @@ but original inventory items and favourites in other folders stay intact.
       <button index="1" name="Cancel" text="Cancel" />
     </form>
 </notification>
-<notification icon="alertmodal.tga" label="Rename custom inventory tab"
- name="ChaosInventoryCustomTabRename" type="alertmodal">
+<notification icon="alertmodal.tga" label="Rename custom inventory tab" name="ChaosInventoryCustomTabRename" type="alertmodal">
 Rename custom inventory tab [NAME]:
     <form name="form">
       <input name="message" type="text">[NAME]</input>
@@ -5959,8 +5922,7 @@ Rename custom inventory tab [NAME]:
     </form>
 </notification>
 
-<notification icon="alertmodal.tga" label="Close custom inventory tab"
- name="ChaosInventoryCustomTabClose" type="alertmodal">
+<notification icon="alertmodal.tga" label="Close custom inventory tab" name="ChaosInventoryCustomTabClose" type="alertmodal">
 Close custom inventory tab [NAME]? Its saved filter settings will be removed.
     <form name="form">
       <button index="0" name="OK" text="Close tab" />
@@ -5970,7 +5932,7 @@ Close custom inventory tab [NAME]? Its saved filter settings will be removed.
 <notification icon="alertmodal.tga" name="ChaosContactSetNew" type="alertmodal">
 Enter a name for the new contact set:
   <form name="form">
-    <input name="message" type="text"></input>
+    <input name="message" type="text" />
     <button default="true" index="0" name="OK" text="Create" />
     <button index="1" name="Cancel" text="Cancel" />
   </form>
@@ -5978,7 +5940,7 @@ Enter a name for the new contact set:
 <notification icon="alertmodal.tga" name="ChaosContactSetRename" type="alertmodal">
 Rename contact set [SET] to:
   <form name="form">
-    <input name="message" type="text"></input>
+    <input name="message" type="text" />
     <button default="true" index="0" name="OK" text="Rename" />
     <button index="1" name="Cancel" text="Cancel" />
   </form>
@@ -5993,9 +5955,19 @@ Delete contact set [SET]? The avatars will not be removed from your friends list
 <notification icon="alertmodal.tga" name="ChaosContactSetAlias" type="alertmodal">
 Enter a local alias for [NAME]:
   <form name="form">
-    <input name="message" type="text"></input>
+    <input name="message" type="text" />
     <button default="true" index="0" name="OK" text="Set alias" />
     <button index="1" name="Cancel" text="Cancel" />
   </form>
 </notification>
-</notifications>
+
+  
+  <notification icon="alertmodal.tga" label="Confirm Pose Overwrite" name="ConfirmPoserOverwrite" type="alertmodal">
+    <unique />
+    Overwrite existing pose “[POSE_NAME]”?
+    <tag>confirm</tag>
+    <usetemplate name="okcancelbuttons" notext="Cancel" yestext="Okay" />
+  </notification>
+
+  
+<notification icon="alertmodal.tga" label="Poser export denied" name="ChaosPoserSaveDeniedCreator" type="alertmodal">Cannot save or export this pose: its creator cannot be verified from an external file. Start a new posing session to export your own work.<usetemplate name="okbutton" yestext="OK" /></notification></notifications>

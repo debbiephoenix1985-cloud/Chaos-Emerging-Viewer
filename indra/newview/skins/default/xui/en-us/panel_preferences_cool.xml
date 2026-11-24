@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <panel name="cool" label="Cool features" border="true" top="20" width="517" height="544" follows="left|top|right|bottom">
 	<tab_container name="Cool Prefs" label="Cool prefs" tab_position="top" left="0" bottom="-544" width="500" height="538">
 		<panel name="User Interface" label="User interface" border="true" mouse_opaque="true" left="1" bottom="-540" width="500" height="538" follows="left|top|right|bottom">
@@ -22,9 +22,10 @@
 			<check_box name="show_ao_button_check" control_name="ShowAOButton" label="AO" tool_tip="Show/hide the AO toggle and editor arrow on the toolbar" font="SansSerifSmall" height="16" follows="left|top" left="165" bottom="-82" width="90" />
 			<check_box name="show_region_info_button_check" control_name="ShowRegionInfoButton" label="Region Details" tool_tip="Show/hide the Region Details toolbar button" font="SansSerifSmall" height="16" follows="left|top" left="260" bottom="-82" width="119" />
 			<check_box name="show_statistics_button_check" control_name="ShowStatisticsButton" label="Statistics" tool_tip="Show/hide the Statistics toolbar button" font="SansSerifSmall" height="16" follows="left|top" left="381" bottom="-82" width="100" />
-			<check_box name="show_favorites_bar_check" control_name="ShowFavoritesBar" label="Favourites bar" tool_tip="Show or hide the account Favorites landmark teleport bar" font="SansSerifSmall" height="16" follows="left|top" left="15" bottom="-102" width="180" />
+			<check_box name="show_favorites_bar_check" control_name="ShowFavoritesBar" label="Favourites bar" tool_tip="Show or hide the account Favorites landmark teleport bar" font="SansSerifSmall" height="16" follows="left|top" left="15" bottom="-102" width="130" />
 			<check_box name="show_appearance_button_check" control_name="ShowAppearanceButton" label="Appearance" tool_tip="Show or hide Appearance / My Outfits on the bottom bar" font="SansSerifSmall" height="16" follows="left|top" left="378" bottom="-102" width="113" />
-			<check_box name="show_camera_controls_button_check" control_name="ShowCameraControlsButton" label="Camera Controls" tool_tip="Show or hide the Camera Controls button on the bottom toolbar" font="SansSerifSmall" height="16" follows="left|top" left="208" bottom="-102" width="169" />
+			<check_box name="show_poser_button_check" control_name="ShowPoserButton" label="Poser" tool_tip="Show/hide Firestorm Poser on the bottom toolbar" font="SansSerifSmall" height="16" follows="left|top" left="145" bottom="-102" width="60" />
+            <check_box name="show_camera_controls_button_check" control_name="ShowCameraControlsButton" label="Camera Controls" tool_tip="Show or hide the Camera Controls button on the bottom toolbar" font="SansSerifSmall" height="16" follows="left|top" left="208" bottom="-102" width="169" />
 			<text name="world_right_click_style_label" font="SansSerifSmall" left="15" bottom="-124" width="150" height="18" follows="left|top">World right-click menu:</text>
 			<radio_group name="chaos_right_click_menu_style" draw_border="false" left="169" bottom="-124" width="304" height="18" follows="left|top" tool_tip="Auto uses Firestorm-style context menus for Modern and classic pie menus for Legacy. Manual choices persist when changing skins.">
 				<radio_item name="auto" left="0" bottom="-16" width="100" height="16" follows="left|top">Auto (skin)</radio_item>

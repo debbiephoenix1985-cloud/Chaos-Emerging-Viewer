@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<floater name="Chaos Poser" title="Poser / Animation Creator"
+ can_close="true" can_drag_on_left="false" can_minimize="true"
+ can_resize="false" mouse_opaque="true" width="410" height="255"
+ follows="top|left">
+ <button name="poser_start" label="Start posing" left="12" bottom="-43"
+   width="125" height="22" tool_tip="Begin a completely fresh self-authored pose" />
+ <button name="poser_reset" label="Reset pose" left="145" bottom="-43"
+   width="108" height="22" tool_tip="Clear rotations and keyframes" />
+ <text name="poser_joint_label" left="12" bottom="-75" width="90"
+   height="18" font="SansSerifSmall">Avatar joint</text>
+ <combo_box name="poser_joint" left="105" bottom="-75" width="289"
+   height="21" allow_text_entry="false" />
+ <text name="poser_xyz_label" left="12" bottom="-107" width="90"
+   height="18" font="SansSerifSmall">Rotation degrees</text>
+ <spinner name="poser_x" label="X" label_width="12" left="104" bottom="-107"
+   width="90" height="20" initial_val="0" min_val="-180" max_val="180"
+   increment="1" decimal_digits="1" />
+ <spinner name="poser_y" label="Y" label_width="12" left="201" bottom="-107"
+   width="90" height="20" initial_val="0" min_val="-180" max_val="180"
+   increment="1" decimal_digits="1" />
+ <spinner name="poser_z" label="Z" label_width="12" left="298" bottom="-107"
+   width="90" height="20" initial_val="0" min_val="-180" max_val="180"
+   increment="1" decimal_digits="1" />
+ <button name="poser_add_frame" label="+ Add keyframe"
+   left="12" bottom="-140" width="132" height="21"
+   tool_tip="Record an authored pose at the next animation frame" />
+ <text name="poser_name_label" left="12" bottom="-172"
+   width="98" height="18" font="SansSerifSmall">Animation name</text>
+ <line_editor name="poser_name" left="115" bottom="-172" width="174"
+   height="20" text="MyPose" />
+ <button name="poser_save" label="Save BVH" left="298" bottom="-172"
+   width="98" height="21" tool_tip="Save verified self-created keyframes, never imported animations" />
+ <text name="poser_status" left="12" bottom="-207" width="386"
+   height="35" font="SansSerifSmall" word_wrap="true">
+   Start a new pose. Only your own new edits can be exported.
+ </text>
+ <text name="poser_hint" left="12" bottom="-240" width="390"
+   height="18" font="SansSerifSmall">
+   Exported .bvh files can be uploaded to OpenSim through the viewer.
+ </text>
+</floater>

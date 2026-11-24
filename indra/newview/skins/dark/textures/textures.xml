@@ -47,4 +47,5 @@
  <texture name="ChaosDarkFS_inventory_btn" file_name="toolbar_icons/inventory.png" preload="true" />
  <texture name="ChaosDarkFS_wearable_favorites_btn" file_name="toolbar_icons/wearable_favorites.png" preload="true" />
  <texture name="ChaosDarkFS_chaos_ao_toggle_btn" file_name="toolbar_icons/animation_override.png" preload="true" />
+<texture name="ChaosDarkFS_poser_btn" file_name="toolbar_icons/poser.png" preload="true" />
 </textures>

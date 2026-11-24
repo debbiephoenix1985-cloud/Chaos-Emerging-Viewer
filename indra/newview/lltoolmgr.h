@@ -108,7 +108,7 @@ class LLToolset
 {
 public:
 	LL_INLINE LLToolset()
-	:	mSelectedTool(NULL)
+	:	mSelectedTool(NULL), mIsShowFloaterTools(true)
 	{
 	}
 
@@ -124,6 +124,10 @@ public:
 
 	void handleScrollWheel(S32 clicks);
 
+	// Firestorm 7.2.5: per-toolset suppression of Build/Edit floater.
+	LL_INLINE void setShowFloaterTools(bool show) { mIsShowFloaterTools = show; }
+	LL_INLINE bool isShowFloaterTools() const { return mIsShowFloaterTools; }
+
 #if 0	// Not used
 	LL_INLINE bool isToolSelected(U32 idx)
 	{
@@ -136,6 +140,7 @@ protected:
 
 	typedef std::vector<LLTool*> tool_list_t;
 	tool_list_t	mToolList;
+	bool	mIsShowFloaterTools;
 };
 
 // Globals
@@ -146,3 +151,4 @@ extern LLToolset*	gBasicToolset;
 extern LLToolset*	gCameraToolset;
 extern LLToolset*	gMouselookToolset;
 extern LLToolset*	gFaceEditToolset;
+extern LLToolset*	gPoserToolset;

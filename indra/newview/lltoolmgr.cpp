@@ -63,6 +63,7 @@ LLToolset* gBasicToolset = NULL;
 LLToolset* gCameraToolset = NULL;
 LLToolset* gMouselookToolset = NULL;
 LLToolset* gFaceEditToolset = NULL;
+LLToolset* gPoserToolset = NULL;
 
 /////////////////////////////////////////////////////
 // LLToolMgr
@@ -82,6 +83,8 @@ LLToolMgr::LLToolMgr()
 	gCameraToolset = new LLToolset();
 	gMouselookToolset = new LLToolset();
 	gFaceEditToolset = new LLToolset();
+	gPoserToolset = new LLToolset();
+	gPoserToolset->setShowFloaterTools(false);
 }
 
 void LLToolMgr::initTools()
@@ -103,6 +106,8 @@ void LLToolMgr::initTools()
 	gMouselookToolset->addTool(&gToolCompGun);
 	gBasicToolset->addTool(&gToolCompInspect);
 	gFaceEditToolset->addTool(&gToolFocus);
+	gPoserToolset->addTool(FSToolCompPose::getInstance());
+	gPoserToolset->addTool(FSToolCompPoseTranslate::getInstance());
 
 	// In case focus was lost before we got here
 	clearSavedTool();
@@ -122,6 +127,8 @@ LLToolMgr::~LLToolMgr()
 
 	delete gFaceEditToolset;
 	gFaceEditToolset = NULL;
+	delete gPoserToolset;
+	gPoserToolset = NULL;
 
 	delete gCameraToolset;
 	gCameraToolset = NULL;

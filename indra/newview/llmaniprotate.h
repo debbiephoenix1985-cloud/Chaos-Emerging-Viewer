@@ -75,7 +75,7 @@ public:
 	virtual void	highlightManipulators(S32 x, S32 y);
 	virtual bool	canAffectSelection();
 
-private:
+protected:
 	void			updateHoverView();
 
 	void			drag(S32 x, S32 y);
@@ -108,7 +108,7 @@ private:
 											   const LLVector3& sphere_center,
 											   F32 sphere_radius);
 
-private:
+protected:
 	LLVector3d			mRotationCenter;
 	LLCoordGL			mCenterScreen;
 	LLQuaternion		mRotation;

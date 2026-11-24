@@ -35,7 +35,7 @@
 #include "llvector4.h"
 #include "llquaternion.h"
 
-class LLManipTranslate final : public LLManip
+class LLManipTranslate : public LLManip
 {
 protected:
 	LOG_CLASS(LLManipTranslate);
@@ -99,7 +99,7 @@ protected:
 							   LLColor4 inner_color);
 	F32 getMinGridScale();
 
-private:
+protected:
 	struct compare_manipulators
 	{
 		LL_INLINE bool operator()(const ManipulatorHandle* const a,
@@ -113,7 +113,7 @@ private:
 		}
 	};
 
-private:
+protected:
 	S32			mLastHoverMouseX;
 	S32			mLastHoverMouseY;
 	S32			mMouseDownX;

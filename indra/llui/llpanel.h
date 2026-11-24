@@ -140,6 +140,7 @@ public:
 	std::string getString(const std::string& name,
 						  const LLStringUtil::format_map_t& args) const;
 	std::string getString(const std::string& name) const;
+	bool hasString(const std::string& name) const;
 
 	// ** Wrappers for setting child properties by name ** -TomY
 

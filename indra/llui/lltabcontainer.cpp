@@ -154,6 +154,26 @@ LLView* LLTabContainer::getChildView(const char* name, bool recurse,
 //virtual
 void LLTabContainer::draw()
 {
+    // Firestorm's nested Poser tab layout exposed a Cool VL construction
+    // sequence where scroll-arrow controls are not fully initialized at draw.
+    // Do not dereference half-constructed LLButton pointers; complete the
+    // original LLTabContainer buttons when its geometry becomes available.
+    if (!mPrevArrowBtn || !mNextArrowBtn ||
+        (!mIsVertical && (!mJumpPrevArrowBtn || !mJumpNextArrowBtn)))
+    {
+        initButtons();
+        if (!mPrevArrowBtn || !mNextArrowBtn ||
+            (!mIsVertical && (!mJumpPrevArrowBtn || !mJumpNextArrowBtn)))
+        {
+            llwarns_once << "Tab container '" << getName()
+                         << "' has uninitialized arrow controls (width "
+                         << getRect().getWidth() << ", height "
+                         << getRect().getHeight() << "); deferring its draw."
+                         << llendl;
+            return;
+        }
+    }
+
 	tuple_list_t::iterator begin = mTabList.begin();
 	tuple_list_t::iterator end = mTabList.end();
 
@@ -1865,7 +1885,9 @@ LLView* LLTabContainer::fromXML(LLXMLNodePtr nodep, LLView* parentp,
 void LLTabContainer::initButtons()
 {
 	// *HACK:
-	if (getRect().getHeight() == 0 || mPrevArrowBtn)
+	if (getRect().getHeight() <= 0 ||
+        (mPrevArrowBtn && mNextArrowBtn &&
+         (mIsVertical || (mJumpPrevArrowBtn && mJumpNextArrowBtn))))
 	{
 		return; // Do not have a rect yet or already got called
 	}
@@ -1891,17 +1913,23 @@ void LLTabContainer::initButtons()
 
 		out_id = "UIImgBtnScrollUpOutUUID";
 		in_id = "UIImgBtnScrollUpInUUID";
-		mPrevArrowBtn = new LLButton("Up Arrow", up_arrow_btn_rect, out_id,
-									 in_id, NULL, &onPrevBtn, this, NULL);
-		mPrevArrowBtn->setFollowsTop();
-		mPrevArrowBtn->setFollowsLeft();
+		if (!mPrevArrowBtn)
+		{
+    		mPrevArrowBtn = new LLButton("Up Arrow", up_arrow_btn_rect, out_id,
+    									 in_id, NULL, &onPrevBtn, this, NULL);
+    		mPrevArrowBtn->setFollowsTop();
+    		mPrevArrowBtn->setFollowsLeft();
+		}
 
 		out_id = "UIImgBtnScrollDownOutUUID";
 		in_id = "UIImgBtnScrollDownInUUID";
-		mNextArrowBtn = new LLButton("Down Arrow", down_arrow_btn_rect, out_id,
-									 in_id, NULL, &onNextBtn, this, NULL);
-		mNextArrowBtn->setFollowsBottom();
-		mNextArrowBtn->setFollowsLeft();
+		if (!mNextArrowBtn)
+		{
+    		mNextArrowBtn = new LLButton("Down Arrow", down_arrow_btn_rect, out_id,
+    									 in_id, NULL, &onNextBtn, this, NULL);
+    		mNextArrowBtn->setFollowsBottom();
+    		mNextArrowBtn->setFollowsLeft();
+		}
 	}
 	else // Horizontal
 	{
@@ -1953,38 +1981,50 @@ void LLTabContainer::initButtons()
 		static const LLFontGL* font = LLFontGL::getFontSansSerif();
 		out_id = "UIImgBtnJumpLeftOutUUID";
 		in_id = "UIImgBtnJumpLeftInUUID";
-		mJumpPrevArrowBtn = new LLButton("Jump Left Arrow",
-										 jump_left_arrow_btn_rect, out_id,
-										 in_id, NULL,
-										 &LLTabContainer::onJumpFirstBtn,
-										 this, font);
-		mJumpPrevArrowBtn->setFollowsLeft();
+		if (!mJumpPrevArrowBtn)
+		{
+    		mJumpPrevArrowBtn = new LLButton("Jump Left Arrow",
+    										 jump_left_arrow_btn_rect, out_id,
+    										 in_id, NULL,
+    										 &LLTabContainer::onJumpFirstBtn,
+    										 this, font);
+    		mJumpPrevArrowBtn->setFollowsLeft();
+		}
 
 		out_id = "UIImgBtnScrollLeftOutUUID";
 		in_id = "UIImgBtnScrollLeftInUUID";
-		mPrevArrowBtn = new LLButton("Left Arrow", left_arrow_btn_rect,
-									 out_id, in_id, NULL,
-									 &LLTabContainer::onPrevBtn,
-									 this, font);
-		mPrevArrowBtn->setHeldDownCallback(onPrevBtnHeld);
-		mPrevArrowBtn->setFollowsLeft();
+		if (!mPrevArrowBtn)
+		{
+    		mPrevArrowBtn = new LLButton("Left Arrow", left_arrow_btn_rect,
+    									 out_id, in_id, NULL,
+    									 &LLTabContainer::onPrevBtn,
+    									 this, font);
+    		mPrevArrowBtn->setHeldDownCallback(onPrevBtnHeld);
+    		mPrevArrowBtn->setFollowsLeft();
+		}
 
 		out_id = "UIImgBtnJumpRightOutUUID";
 		in_id = "UIImgBtnJumpRightInUUID";
-		mJumpNextArrowBtn = new LLButton("Jump Right Arrow",
-										 jump_right_arrow_btn_rect,
-										 out_id, in_id, NULL,
-										 &LLTabContainer::onJumpLastBtn,
-										 this, font);
-		mJumpNextArrowBtn->setFollowsRight();
+		if (!mJumpNextArrowBtn)
+		{
+    		mJumpNextArrowBtn = new LLButton("Jump Right Arrow",
+    										 jump_right_arrow_btn_rect,
+    										 out_id, in_id, NULL,
+    										 &LLTabContainer::onJumpLastBtn,
+    										 this, font);
+    		mJumpNextArrowBtn->setFollowsRight();
+		}
 
 		out_id = "UIImgBtnScrollRightOutUUID";
 		in_id = "UIImgBtnScrollRightInUUID";
-		mNextArrowBtn = new LLButton("Right Arrow", right_arrow_btn_rect,
-									 out_id, in_id, NULL,
-									 &LLTabContainer::onNextBtn,
-									 this, font);
-		mNextArrowBtn->setFollowsRight();
+		if (!mNextArrowBtn)
+		{
+    		mNextArrowBtn = new LLButton("Right Arrow", right_arrow_btn_rect,
+    									 out_id, in_id, NULL,
+    									 &LLTabContainer::onNextBtn,
+    									 this, font);
+    		mNextArrowBtn->setFollowsRight();
+		}
 
 		if (getTabPosition() == TOP)
 		{
@@ -2005,17 +2045,20 @@ void LLTabContainer::initButtons()
 	mPrevArrowBtn->setHeldDownCallback(onPrevBtnHeld);
 	mPrevArrowBtn->setSaveToXML(false);
 	mPrevArrowBtn->setTabStop(false);
-	addChild(mPrevArrowBtn);
+	if (mPrevArrowBtn->getParent() != this)
+		addChild(mPrevArrowBtn);
 
 	mNextArrowBtn->setHeldDownCallback(onNextBtnHeld);
 	mNextArrowBtn->setSaveToXML(false);
 	mNextArrowBtn->setTabStop(false);
-	addChild(mNextArrowBtn);
+	if (mNextArrowBtn->getParent() != this)
+		addChild(mNextArrowBtn);
 
 	if (mJumpPrevArrowBtn)
 	{
 		mJumpPrevArrowBtn->setSaveToXML(false);
 		mJumpPrevArrowBtn->setTabStop(false);
+		if (mJumpPrevArrowBtn->getParent() != this)
 		addChild(mJumpPrevArrowBtn);
 	}
 
@@ -2023,6 +2066,7 @@ void LLTabContainer::initButtons()
 	{
 		mJumpNextArrowBtn->setSaveToXML(false);
 		mJumpNextArrowBtn->setTabStop(false);
+		if (mJumpNextArrowBtn->getParent() != this)
 		addChild(mJumpNextArrowBtn);
 	}
 

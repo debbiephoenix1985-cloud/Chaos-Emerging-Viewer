@@ -1,5 +1,4 @@
 <textures version="101">
-  <!-- Original Firestorm Favorites bar button artwork and 9-slice scaling. -->
   <texture name="ChaosFavoriteButtonOff" file_name="widgets/PushButton_Off.png" preload="true" scale_left="4" scale_top="19" scale_right="28" scale_bottom="4" />
   <texture name="ChaosFavoriteButtonOver" file_name="navbar/Favorite_Link_Over.png" preload="false" />
   <texture name="Radar_VoicePTT_Lvl1" file_name="icons/radar_voice/VoicePTT_Lvl1.png" preload="false" />
@@ -415,7 +414,6 @@
   <texture name="DisclosureArrow_Opened_Off" file_name="widgets/DisclosureArrow_Opened_Off.png" preload="true" />
   <texture name="Edit_Wrench" file_name="icons/Edit_Wrench.png" preload="false" />
   <texture name="Inv_Animation" file_name="icons/Inv_Animation.png" preload="false" />
-  <!-- Official Firestorm 7.1.13 Outfit Gallery default picture asset. -->
   <texture name="Default_Outfit_Photo" file_name="icons/Default_Outfit_Photo.png" preload="true" />
   <texture name="FSAO_Animation_Playing" file_name="icn_play.tga" preload="false" />
   <texture name="FSAO_Animation_Stopped" file_name="icons/Inv_Animation.png" preload="false" />
@@ -429,4 +427,53 @@
   <texture name="ChaosAO_Right_Off" file_name="widgets/ChaosAO_SplitButtonRight_Off.png" preload="true" scale_left="2" scale_top="16" scale_right="20" scale_bottom="7" />
   <texture name="ChaosAO_Right_Selected" file_name="widgets/ChaosAO_SplitButtonRight_Selected.png" preload="true" scale_left="2" scale_top="16" scale_right="20" scale_bottom="7" />
   <texture name="ChaosAO_Right_Disabled" file_name="widgets/ChaosAO_SplitButtonRight_Disabled.png" preload="true" scale_left="2" scale_top="16" scale_right="20" scale_bottom="7" />
+  <texture name="Progress_1" file_name="icons/Progress_1.png" preload="true" />
+  <texture name="Progress_2" file_name="icons/Progress_2.png" preload="true" />
+  <texture name="Progress_3" file_name="icons/Progress_3.png" preload="true" />
+  <texture name="Progress_4" file_name="icons/Progress_4.png" preload="true" />
+  <texture name="Progress_5" file_name="icons/Progress_5.png" preload="true" />
+  <texture name="Progress_6" file_name="icons/Progress_6.png" preload="true" />
+  <texture name="Progress_7" file_name="icons/Progress_7.png" preload="true" />
+  <texture name="Progress_8" file_name="icons/Progress_8.png" preload="true" />
+  <texture name="Progress_9" file_name="icons/Progress_9.png" preload="true" />
+  <texture name="Progress_10" file_name="icons/Progress_10.png" preload="true" />
+  <texture name="Progress_11" file_name="icons/Progress_11.png" preload="true" />
+  <texture name="Progress_12" file_name="icons/Progress_12.png" preload="true" />
+  <texture name="VirtualTrackball_Moon_Back" file_name="widgets/track_control_moon_back.png" />
+  <texture name="VirtualTrackball_Moon_Front" file_name="widgets/track_control_moon_front.png" />
+  <texture name="VirtualTrackball_Rotate_Bottom" file_name="widgets/track_control_rotate_bottom.png" />
+  <texture name="VirtualTrackball_Rotate_Left" file_name="widgets/track_control_rotate_left_side.png" />
+  <texture name="VirtualTrackball_Rotate_Right" file_name="widgets/track_control_rotate_right_side.png" />
+  <texture name="VirtualTrackball_Rotate_Top" file_name="widgets/track_control_rotate_top.png" />
+  <texture name="VirtualTrackball_Rotate_Bottom_Active" file_name="widgets/track_control_rotate_bottom_active.png" />
+  <texture name="VirtualTrackball_Rotate_Left_Active" file_name="widgets/track_control_rotate_left_side_active.png" />
+  <texture name="VirtualTrackball_Rotate_Right_Active" file_name="widgets/track_control_rotate_right_side_active.png" />
+  <texture name="VirtualTrackball_Rotate_Top_Active" file_name="widgets/track_control_rotate_top_active.png" />
+  <texture name="VirtualTrackball_Sphere" file_name="widgets/track_control_sphere.png" />
+  <texture name="VirtualTrackball_Sun_Back" file_name="widgets/track_control_sun_back.png" />
+  <texture name="VirtualTrackball_Sun_Front" file_name="widgets/track_control_sun_front.png" />
+  <texture name="Check_Mark" file_name="icons/check_mark.png" preload="true" />
+  <texture name="Conv_toolbar_close" file_name="icons/Conv_toolbar_close.png" preload="false" />
+  <texture name="Edit_Flip_X" file_name="icons/Edit_Flip_X.png" preload="false" />
+  <texture name="Hierarchy_View_On" file_name="icons/Hierarchy_View_On.png" preload="false" />
+  <texture name="Icon_Dock_Foreground" file_name="windows/Icon_Dock_Foreground.png" preload="true" />
+  <texture name="Icon_Undock_Foreground" file_name="windows/Icon_Undock_Foreground.png" preload="true" />
+  <texture name="Info" file_name="icons/Info.png" preload="false" />
+  <texture name="Inv_BodyShape" file_name="icons/Inv_BodyShape.png" preload="false" />
+  <texture name="Inv_Mesh" file_name="icons/Inv_Mesh.png" preload="false" />
+  <texture name="Inv_Object" file_name="icons/Inv_Object.png" preload="false" />
+  <texture name="Inv_Physics" file_name="icons/Inv_Physics.png" preload="false" />
+  <texture name="Inv_TrashOpen" file_name="icons/Inv_TrashOpen.png" preload="false" />
+  <texture name="Locked_Icon" file_name="icons/Locked_Icon.png" preload="false" />
+  <texture name="Parcel_Exp_Color" file_name="icons/Parcel_Exp_Color.png" preload="false" />
+  <texture name="Poser_Visual_On" file_name="icons/visual_pose_enabled.png" />
+  <texture name="Refresh_Off" file_name="icons/Refresh_Off.png" preload="true" />
+  <texture name="Script_Error" file_name="icons/red_square.png" preload="false" />
+  <texture name="Script_NotRunning" file_name="icons/yellow_square.png" preload="false" />
+  <texture name="Script_Redo" file_name="icons/script_redo.png" preload="false" />
+  <texture name="Script_Running" file_name="icons/green_square.png" preload="false" />
+  <texture name="Script_Undo" file_name="icons/script_undo.png" preload="false" />
+  <texture name="Toolbar_Middle_Off" file_name="containers/Toolbar_Middle_Off.png" preload="false" scale.left="1" scale.bottom="2" scale.top="24" scale.right="30" />
+  <texture name="Toolbar_Middle_Over" file_name="containers/Toolbar_Middle_Over.png" preload="false" scale.left="1" scale.bottom="2" scale.top="24" scale.right="30" />
+  <texture name="Toolbar_Middle_Selected" file_name="containers/Toolbar_Middle_Selected.png" preload="false" scale.left="1" scale.bottom="2" scale.top="24" scale.right="30" />
 </textures>

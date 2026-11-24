@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lltoolbar.cpp
  * @author James Cook, Richard Nelson
  * @brief Large friendly buttons at bottom of screen.
@@ -48,6 +48,7 @@ extern void chaosToggleQuickPreferences();
 #include "llfloaterinventory.h"
 #include "hbfloaterwearablefavorites.h"
 #include "ao.h" // Existing Firestorm-based AO editor; no AO engine changes.
+#include "fsfloaterposer.h"
 #include "llfloaterminimap.h"
 #include "hbfloatersearch.h"
 #include "hbfloaterradar.h"
@@ -193,7 +194,11 @@ bool LLToolBar::postBuild()
 	mFavoritesButton->setClickedCallback(onClickFavorites, this);
 	mFavoritesButton->setControlName("", NULL);
 
-	// Firestorm Vintage split AO control: add only the AO toggle and editor.
+	mPoserButton = getChild<LLButton>("chaos_poser_btn");
+    mPoserButton->setClickedCallback(onClickPoser, this);
+    mPoserButton->setControlName("", NULL);
+
+    // Firestorm Vintage split AO control: add only the AO toggle and editor.
 	mAOButton = getChild<LLButton>("chaos_ao_toggle_btn");
 	mAOButton->setClickedCallback(onClickAOToggle, this);
 	mAOButton->setControlName("", NULL);
@@ -364,7 +369,11 @@ void LLToolBar::layoutButtons()
 	mFavoritesButton->setVisible(show);
 	if (!show) --count;
 
-	// Both halves of the AO split control must always hide/show together.
+	show = gSavedSettings.getBool("ShowPoserButton");
+    mPoserButton->setVisible(show);
+    if (!show) --count;
+
+    // Both halves of the AO split control must always hide/show together.
 	// Exclude BOTH halves from the ordinary toolbar button distribution;
 	// the compact AO control is positioned separately on the far right.
 	const bool show_ao = gSavedSettings.getBool("ShowAOButton");
@@ -495,19 +504,22 @@ void LLToolBar::refresh()
 
 	// Only the new AO control responds to its Show/Hide preference.
 	static S32 last_show_ao = -1;
+    static S32 last_show_poser = -1;
 	const S32 show_ao = gSavedSettings.getBool("ShowAOButton") ? 1 : 0;
+    const S32 show_poser = gSavedSettings.getBool("ShowPoserButton") ? 1 : 0;
 	static S32 last_show_region_info = -1;
 	static S32 last_show_statistics = -1;
 	static S32 last_show_camera = -1;
 	const S32 show_region_info = gSavedSettings.getBool("ShowRegionInfoButton") ? 1 : 0;
 	const S32 show_statistics = gSavedSettings.getBool("ShowStatisticsButton") ? 1 : 0;
 	const S32 show_camera = gSavedSettings.getBool("ShowCameraControlsButton") ? 1 : 0;
-	if (last_show_ao != show_ao ||
+	if (last_show_poser != show_poser || last_show_ao != show_ao ||
 		last_show_region_info != show_region_info ||
 		last_show_statistics != show_statistics ||
 		last_show_camera != show_camera)
 	{
 		last_show_ao = show_ao;
+        last_show_poser = show_poser;
 		last_show_region_info = show_region_info;
 		last_show_statistics = show_statistics;
 		last_show_camera = show_camera;
@@ -663,4 +675,9 @@ void LLToolBar::onClickAOToggle(void*)
 void LLToolBar::onClickAOEditor(void*)
 {
 	FloaterAO::showInstance();
+}
+
+void LLToolBar::onClickPoser(void*)
+{
+    FSFloaterPoser::toggleInstance();
 }
